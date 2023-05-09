@@ -1,4 +1,5 @@
 #include "AsyncIOProcessor.hpp"
+#include "AsyncIOTaskHandler.hpp"
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
@@ -9,11 +10,13 @@ static const timespec zerosec = {0, 0};
 AsyncIOProcessor::AsyncIOProcessor(void)
 {
 	initializeKQueue();
+	AsyncIOTaskHandler::registerTask(this);
 }
 
 AsyncIOProcessor::~AsyncIOProcessor()
 {
 	close(_kq);
+	AsyncIOTaskHandler::unregisterTask(this);
 }
 
 AsyncIOProcessor::AsyncIOProcessor(const AsyncIOProcessor &orig)
