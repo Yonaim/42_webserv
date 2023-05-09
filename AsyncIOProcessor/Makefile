@@ -1,7 +1,7 @@
 CXX			= c++
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
 
-SRCS	= AsyncIOProcessor.cpp AsyncSingleIOProcessor.cpp AsyncTCPIOProcessor.cpp
+SRCS	= AsyncIOProcessor.cpp AsyncSingleIOProcessor.cpp AsyncTCPIOProcessor.cpp AsyncIOTaskHandler.cpp
 OBJS	= $(SRCS:.cpp=.o)
 
 all: test_singleio test_echo
