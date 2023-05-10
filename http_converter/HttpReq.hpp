@@ -25,18 +25,19 @@ class HttpReq
   private:
 	str_t const &_src;
 	size_t       _offset;
-	int          _method; // 메서드 : GET, POST, DELETE
-	str_t        _uri;
-	str_t        _version;
-	str_map_t    _header;
-	str_t        _body;
-	int          _status;
+	size_t       _step;
+
+	int       _method; // 메서드 : GET, POST, DELETE
+	str_t     _uri;
+	str_t     _version;
+	str_map_t _header;
+	str_t     _body;
+	int       _status;
 
 	void parseStartLine();
 	void parseHeader();
 	void parseBody();
 };
-
 } // namespace http_msg
 
 #endif

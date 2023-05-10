@@ -9,18 +9,26 @@ using http_msg::str_t;
 using http_msg::str_vec_t;
 
 HttpReq::HttpReq(str_t const &req)
-	: _src(req), _offset(0), _method(-1), _status(0)
+	: _src(req), _offset(0), _step(0), _method(-1), _status(0)
 {
 }
 
 // parsing
 bool HttpReq::parse()
 {
+	int cur_step = _step;
+
 	try
 	{
-		parseStartLine();
-		parseHeader();
-		parseBody();
+		switch (cur_step)
+		{
+		case (0):
+			parseStartLine();
+		case (1):
+			parseHeader();
+		case (2):
+			parseBody();
+		}
 		return (true);
 	}
 	catch (HttpReqException &e)
@@ -37,12 +45,12 @@ void HttpReq::parseStartLine()
 	/* line 파싱 */
 	str_t line = strBeforeSep(_src, CRLF, _offset);
 	if (line == "" || line[0] == ' ')
-		throw(HttpReqException(ERR_START_LINE_PARSING));
+		throw(HttpReqException(kErrStartLineParsing));
 
 	/* 공백 기준 split*/
 	str_vec_t *components = split(line, ' ');
 	if (!components || components->size() != 3)
-		throw(HttpReqException(ERR_START_LINE_PARSING, components));
+		throw(HttpReqException(kErrStartLineParsing, components));
 
 	/* method index 구하기 */
 	for (int i = 0; i < method::kCount; i++)
@@ -54,12 +62,13 @@ void HttpReq::parseStartLine()
 		}
 	}
 	if (_method == -1)
-		throw(HttpReqException(ERR_START_LINE_PARSING, components));
+		throw(HttpReqException(kErrStartLineParsing, components));
 
 	/* uri, version 파싱 */
 	_uri = components->at(1);
 	_version = components->at(2);
 	delete components; // split으로 인한 동적 할당 해제
+	_step = 0;
 }
 
 // 여러 줄 헤더 처리
@@ -84,8 +93,9 @@ void HttpReq::parseHeader()
 		key_end_idx = 0;
 		key = strBeforeSep(line, ":", key_end_idx);
 		if (key == "" || hasSpace(key))
-			throw(HttpReqException(ERR_HEADER_PARSING));
-		// value 파싱
+			throw(HttpReqException(kErrHeaderParsing));
+
+		/* value 파싱 */
 		while (std::isspace(line[key_end_idx]))
 			++key_end_idx;
 		while (true)
@@ -101,6 +111,7 @@ void HttpReq::parseHeader()
 		_header[key] = vec_value;
 		vec_value.clear();
 	}
+	_step = 1;
 }
 
 void HttpReq::parseBody()
@@ -110,16 +121,17 @@ void HttpReq::parseBody()
 	case (method::kGet):
 	case (method::kDelete): {
 		if (_offset != _src.length())
-			throw(HttpReqException(ERR_BODY_PARSING));
+			throw(HttpReqException(kErrBodyParsing));
 		break;
 	}
 	case (method::kPost): {
-		const size_t end_idx = _src.find_last_of(CRLF, _offset);
+		const size_t end_idx = _src.find_last_of("\r", _src.size()); // 두 번째 인자부터 뒤로 찾는다. 첫 번째 인자의 문자 중 하나라도 맞으면 반환한다.
 		if (end_idx == std::string::npos || end_idx != _src.length() - CRLF_LEN)
-			throw(HttpReqException(ERR_BODY_PARSING));
+			throw(HttpReqException(kErrBodyParsing));
 		_body = _src.substr(_offset, end_idx - _offset);
 	}
 	}
+	_step = 2;
 }
 
 // getter
