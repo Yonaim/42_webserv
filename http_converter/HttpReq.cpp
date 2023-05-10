@@ -1,11 +1,15 @@
 #include "HttpReq.hpp"
+#include "HttpMsgException.hpp"
 #include "utils.hpp"
+#include <iostream>
 
 using http_msg::HttpReq;
+using http_msg::str_map_t;
 using http_msg::str_t;
 using http_msg::str_vec_t;
 
-HttpReq::HttpReq(str_t const &req) : _src(req), _method(-1), _offset(0)
+HttpReq::HttpReq(str_t const &req)
+	: _src(req), _offset(0), _method(-1), _status(0)
 {
 }
 
@@ -14,79 +18,52 @@ bool HttpReq::parse()
 {
 	try
 	{
-		return (parseStartLine() && parseHeader() && parseBody());
+		parseStartLine();
+		parseHeader();
+		parseBody();
+		return (true);
 	}
 	catch (HttpReqException &e)
 	{
 		e.deleteAll();
 		std::cerr << e.what() << std::endl;
-		_status = e.getErrrcode();
+		_status = 400;
 		return (false);
 	}
 }
 
-bool HttpReq::parseStartLine()
+void HttpReq::parseStartLine()
 {
-	const size_t line_end_idx = _src.find(CRLF, _offset);
-	if (line_end_idx == std::string::npos)
-		throw(HttpReqException(400, NULL));
-	std::string line = _src.substr(0, line_end_idx);
-	str_vec_t  *components = split(_src.substr(0, line_end_idx), ' ');
+	/* line 파싱 */
+	str_t line = strBeforeSep(_src, CRLF, _offset);
+	if (line == "" || line[0] == ' ')
+		throw(HttpReqException(ERR_START_LINE_PARSING));
+
+	/* 공백 기준 split*/
+	str_vec_t *components = split(line, ' ');
 	if (!components || components->size() != 3)
-		throw(HttpReqException(400, components));
-	for (int i = 0; i < http_msg::method::kCount; i++)
+		throw(HttpReqException(ERR_START_LINE_PARSING, components));
+
+	/* method index 구하기 */
+	for (int i = 0; i < method::kCount; i++)
 	{
-		if (components->at(0) == http_msg::method::kTypeStr[i])
+		if (components->at(0) == method::kTypeStr[i])
 		{
 			_method = i;
 			break;
 		}
 	}
 	if (_method == -1)
-		throw(HttpReqException(400, components));
+		throw(HttpReqException(ERR_START_LINE_PARSING, components));
+
+	/* uri, version 파싱 */
 	_uri = components->at(1);
 	_version = components->at(2);
-	_offset = line_end_idx + 2;
-	return (true);
-}
-
-str_t parseBeforeSep(const str_t &be_parsed, const str_t &sep, size_t &start)
-{
-	str_t  result;
-	size_t end;
-
-	end = be_parsed.find(sep, start);
-	if (end == str_t::npos)
-		return ("");
-	result = be_parsed.substr(start, end - start);
-	start = end + sep.size();
-	return (result);
-}
-
-std::string strtrim(str_t str, str_t charset)
-{
-	size_t start;
-	size_t offest;
-
-	start = 0;
-	while (str[start] && strchr(charset.c_str(), str[start]))
-		++start;
-	offest = start;
-	while (str[offest] && !strchr(charset.c_str(), str[offest]))
-		++offest;
-	return (str.substr(start, offest - start));
-}
-
-bool has_space(const std::string &key)
-{
-	for (size_t i = 0; key[i]; ++i)
-		if (std::isspace(key[i]))
-			return (true);
-	return (false);
+	delete components; // split으로 인한 동적 할당 해제
 }
 
 // 여러 줄 헤더 처리
-bool HttpReq::parseHeader()
+void HttpReq::parseHeader()
 {
 	str_t line;
 
@@ -99,21 +76,21 @@ bool HttpReq::parseHeader()
 	while (true)
 	{
 		/* line 파싱 */
-		line = parseBeforeSep(_src, CRLF, _offset);
-		if (line == "" || line == CRLF) // CRLF면 빈 줄이니까 break
+		line = strBeforeSep(_src, CRLF, _offset);
+		if (line == "")
 			break;
 
 		/* key와 value 파싱 */
 		key_end_idx = 0;
-		key = parseBeforeSep(line, ":", key_end_idx);
-		if (key == "" || has_space(key))
-			return (false);
+		key = strBeforeSep(line, ":", key_end_idx);
+		if (key == "" || hasSpace(key))
+			throw(HttpReqException(ERR_HEADER_PARSING));
 		// value 파싱
 		while (std::isspace(line[key_end_idx]))
 			++key_end_idx;
 		while (true)
 		{
-			value = parseBeforeSep(line, ",", key_end_idx);
+			value = strBeforeSep(line, ",", key_end_idx);
 			if (value == "")
 				break;
 			vec_value.push_back(strtrim(value, " "));
@@ -124,15 +101,25 @@ bool HttpReq::parseHeader()
 		_header[key] = vec_value;
 		vec_value.clear();
 	}
-	return (true);
 }
 
-bool HttpReq::parseBody()
+void HttpReq::parseBody()
 {
-	const size_t end_idx = _src.find(CRLF, _offset);
-	if (end_idx == std::string::npos || end_idx != _src.length() - 1)
-		return (processError(400));
-	_body = _src.substr(_offset, end_idx - _offset);
+	switch (_method)
+	{
+	case (method::kGet):
+	case (method::kDelete): {
+		if (_offset != _src.length())
+			throw(HttpReqException(ERR_BODY_PARSING));
+		break;
+	}
+	case (method::kPost): {
+		const size_t end_idx = _src.find_last_of(CRLF, _offset);
+		if (end_idx == std::string::npos || end_idx != _src.length() - CRLF_LEN)
+			throw(HttpReqException(ERR_BODY_PARSING));
+		_body = _src.substr(_offset, end_idx - _offset);
+	}
+	}
 }
 
 // getter
@@ -146,18 +133,22 @@ str_t const &HttpReq::getUri() const
 	return (_uri);
 }
 
-str_vec_t const &HttpReq::getHeaderVal(str_t const &key) const
+str_t const &HttpReq::getVersion() const
 {
+	return (_version);
+}
+
+str_map_t const &HttpReq::getHeader() const
+{
+	return (_header);
+}
+
+str_map_t::const_iterator HttpReq::getHeaderVal(str_t const &key) const
+{
+	return (_header.find(key));
 }
 
 str_t const &HttpReq::getBody() const
 {
 	return (_body);
-}
-
-// error
-bool HttpReq::processError(int status)
-{
-	_status = status;
-	return (false);
 }
