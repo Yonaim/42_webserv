@@ -1,0 +1,8 @@
+---
+BasedOnStyle: Microsoft
+AlignConsecutiveDeclarations: 'true'
+BreakBeforeBinaryOperators: All
+ColumnLimit: '80'
+TabWidth: '4'
+UseTab: ForContinuationAndIndentation
+...
