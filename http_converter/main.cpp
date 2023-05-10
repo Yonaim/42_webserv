@@ -41,7 +41,7 @@ int main(void)
 			std::cout << std::endl;
 		}
 		std::cout << std::endl;
-		std::cout << "body: " << std::endl << req.getBody() << std::endl;
+		std::cout << "body: " << req.getBody();
 	}
 	catch (int e)
 	{
