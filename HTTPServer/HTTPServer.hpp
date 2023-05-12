@@ -35,6 +35,7 @@ class HTTPServer
 
 	  public:
 		HTTPLocation();
+		HTTPLocation(const ConfigContext &location_context);
 		~HTTPLocation();
 		HTTPLocation(const HTTPLocation &orig);
 		HTTPLocation &operator=(const HTTPLocation &orig);
@@ -43,7 +44,10 @@ class HTTPServer
 	int port;
 	std::string server_name;
 	std::map<int, std::string> error_pages;
-	std::vector<std::string, HTTPLocation> locations;
+	std::vector<std::pair<std::string, HTTPLocation>> locations;
+
+	void addLocation(const ConfigContext &location_context);
+	void addOtherInfo(const ConfigDirective &directive);
 
   public:
 	HTTPServer(const ConfigContext &server_context);
