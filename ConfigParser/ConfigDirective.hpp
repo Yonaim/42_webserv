@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 
 class ConfigDirective
 {
@@ -42,5 +43,8 @@ class ConfigContext : public ConfigDirective
 	const ConfigDirective &directive(size_t index) const;
 	size_t nDirectives(void) const;
 };
+
+std::ostream &operator<<(std::ostream &os, const ConfigDirective &directive);
+std::ostream &operator<<(std::ostream &os, const ConfigContext &context);
 
 #endif
