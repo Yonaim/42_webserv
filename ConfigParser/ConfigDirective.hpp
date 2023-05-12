@@ -9,7 +9,7 @@ class ConfigDirective
   protected:
 	std::string _name;
 	std::vector<std::string> _parameters;
-	bool is_context;
+	bool _is_context;
 
   public:
 	ConfigDirective(const std::string name = "");
@@ -19,6 +19,7 @@ class ConfigDirective
 	ConfigDirective(const ConfigDirective &orig);
 	ConfigDirective &operator=(const ConfigDirective &orig);
 
+	bool is_context(void) const;
 	const std::string &name(void) const;
 	const std::string &parameter(size_t index) const;
 	size_t nParameters(void) const;
