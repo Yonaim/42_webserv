@@ -33,6 +33,7 @@ class ConfigContext : public ConfigDirective
   public:
 	ConfigContext(const std::string name = "");
 	ConfigContext(const std::string &name,
+				  const std::vector<std::string> &parameters,
 				  const std::vector<ConfigDirective *> &directives);
 	~ConfigContext();
 	ConfigContext(const ConfigContext &orig);
