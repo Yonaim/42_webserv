@@ -11,11 +11,11 @@ bool hasSpace(const std::string &key)
 	return (false);
 }
 
-std::vector<std::string> *split(std::string const &s, char const c)
+std::vector<std::string> split(std::string const &s, char const c)
 {
-	std::vector<std::string> *words = new std::vector<std::string>;
-	size_t                    offset = 0;
-	size_t                    end_idx;
+	std::vector<std::string> words;
+	size_t                   offset = 0;
+	size_t                   end_idx;
 
 	while (offset < s.length())
 	{
@@ -24,7 +24,7 @@ std::vector<std::string> *split(std::string const &s, char const c)
 			if ((end_idx = s.find(c, offset)) == std::string::npos)
 				end_idx = s.length();
 			std::string word = s.substr(offset, end_idx - offset);
-			words->push_back(word);
+			words.push_back(word);
 			offset = end_idx;
 		}
 		offset++;
@@ -44,9 +44,9 @@ static size_t _findFirstSep(std::string const &s, std::string const &sep,
 	return (offset);
 }
 
-std::vector<std::string> *split(std::string const &s, std::string const &sep)
+std::vector<std::string> split(std::string const &s, std::string const &sep)
 {
-	std::vector<std::string> *words = new std::vector<std::string>;
+	std::vector<std::string> words;
 	size_t                    offset = 0;
 	size_t                    end_idx;
 
@@ -56,7 +56,7 @@ std::vector<std::string> *split(std::string const &s, std::string const &sep)
 		{
 			end_idx = _findFirstSep(s, sep, offset);
 			std::string word = s.substr(offset, end_idx - offset);
-			words->push_back(word);
+			words.push_back(word);
 			offset = end_idx;
 		}
 		offset++;

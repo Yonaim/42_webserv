@@ -1,7 +1,7 @@
 #ifndef HTTP_REQ_HPP
 #define HTTP_REQ_HPP
 
-#include "http_msg_const.hpp"
+#include "http_msg.hpp"
 
 // 시작줄 : [메서드] [URI] [HTTP 버전] # 공백으로 띄워진다.
 // 헤더, 빈 줄, 엔티티 본문이 온다.
@@ -25,7 +25,6 @@ class HttpReq
   private:
 	str_t const &_src;
 	size_t       _offset;
-	size_t       _step;
 
 	int       _method; // 메서드 : GET, POST, DELETE
 	str_t     _uri;
