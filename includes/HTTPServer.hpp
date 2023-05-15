@@ -3,8 +3,8 @@
 
 #include "AsyncTCPIOProcessor.hpp"
 #include "ConfigDirective.hpp"
+#include <set>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 enum e_http_method
@@ -32,7 +32,7 @@ class HTTPServer
 		std::string root;
 		std::string index;
 		std::pair<int, std::string> redirection;
-		std::unordered_set<int> allowed_methods;
+		std::set<int> allowed_methods;
 		static const std::map<std::string, bool> directives_info;
 
 	  public:
