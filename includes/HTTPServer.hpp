@@ -30,7 +30,7 @@ class HTTPServer
 		bool autoindex;
 		std::string path;
 		std::string root;
-		std::string index;
+		std::vector<std::string> index;
 		std::pair<int, std::string> redirection;
 		std::set<int> allowed_methods;
 		static const std::map<std::string, bool> directives_info;
