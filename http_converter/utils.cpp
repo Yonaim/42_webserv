@@ -47,8 +47,8 @@ static size_t _findFirstSep(std::string const &s, std::string const &sep,
 std::vector<std::string> split(std::string const &s, std::string const &sep)
 {
 	std::vector<std::string> words;
-	size_t                    offset = 0;
-	size_t                    end_idx;
+	size_t                   offset = 0;
+	size_t                   end_idx;
 
 	while (offset < s.length())
 	{
@@ -91,6 +91,29 @@ std::string strtrim(std::string str, std::string charset)
 		++offest;
 	return (str.substr(start, offest - start));
 }
+
+std::string uintToStr(size_t num)
+{
+	size_t      tem = num;
+	size_t      length = 0;
+	std::string num_str;
+
+	if (num == 0)
+		return ("0");
+	while (tem > 0)
+	{
+		length++;
+		tem /= 10;
+	}
+	num_str.resize(length, '\0');
+	tem = num;
+	while (tem > 0)
+	{
+		num_str[--length] = tem % 10 + '0';
+		tem /= 10;
+	}
+	return (num_str);
+};
 
 // int main(void)
 // {
