@@ -49,6 +49,7 @@ class HTTPServer
 	std::map<int, std::string> error_pages;
 	std::map<std::string, HTTPLocation> locations;
 	static const std::map<std::string, bool> directives_info;
+	static const std::map<int, std::string> http_methods;
 
 	void addLocationInfo(const ConfigContext &location_context);
 	void addOtherInfo(const ConfigDirective &directive);
