@@ -1,7 +1,10 @@
 #ifndef HTTP_RES_HPP
 #define HTTP_RES_HPP
-#include "http_msg_const.hpp"
+
 #include <map>
+
+#include "StatusModule.hpp"
+#include "http_msg.hpp"
 
 // 시작줄 : [HTTP 버전] [상태 코드] [사유 구절] # 공백으로 띄워진다.
 // 헤더, 빈 줄, 엔티티 본문이 온다.
@@ -23,27 +26,38 @@ namespace http_msg
 class HttpRes
 {
   public:
-	HttpRes(int status);
+	HttpRes();
+	~HttpRes();
+
 	str_t toString(void);
 
-	void setHeaderField(std::string const &key, std::string const &val);
-	// Server
-	// Date
-	// Content-Type
-	// Content-Length
-	// Last-Modified
-	// Connection
-	// ETag
-	// Accept-Ranges
+	// setter
+	void setStatus(int status_code);
+	void setValue(std::string const &key, std::string const &val);
 
   private:
-	str_t _dest;
+	typedef std::map<std::string, std::string>::iterator _header_iterator;
 
-	const str_t                _version;
-	int                        _status;
-	str_t                      _comment;
-	str_t                      _body; // 실제 엔티티 본문
-	std::map<str_t, str_vec_t> _header;
+	HttpRes(HttpRes const &other);
+	HttpRes &operator=(HttpRes const &other);
+
+	void initGeneralHeaderFields();
+	void initResponseHeaderFields();
+	void initEntityHeaderFields();
+	void makeStatusLine();
+	void makeHeader();
+	void makeBody();
+	bool isComplete() const;
+
+	// final
+	str_t _response;
+
+	// status-line
+	static const str_t     _http_version;
+	str_t                  _status_code;
+	str_t                  _reason_phrase;
+	std::map<str_t, str_t> _header;
+	str_t                  _body;
 };
 } // namespace http_msg
 

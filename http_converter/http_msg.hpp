@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <exception>
 
 namespace http_msg
 {
