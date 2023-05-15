@@ -19,7 +19,7 @@ class AsyncSingleIOProcessor : public AsyncIOProcessor
 	AsyncSingleIOProcessor &operator=(const AsyncSingleIOProcessor &orig);
 	virtual void task(void);
 	void setWriteBuf(const std::string &str);
-	std::string getReadBuf(void);
+	void getReadBuf(std::string &str);
 };
 
 AsyncSingleIOProcessor &operator<<(AsyncSingleIOProcessor &io,
