@@ -5,8 +5,7 @@
 #include <vector>
 
 using http_msg::HttpReq;
-using http_msg::str_map_t;
-using http_msg::str_vec_t;
+using http_msg::str_vec_map_t;
 
 int main(void)
 {
@@ -29,12 +28,12 @@ int main(void)
 			std::cout << "url: " << req.getUri() << std::endl;
 			std::cout << "version: " << req.getVersion() << std::endl;
 			std::cout << "header: " << std::endl;
-			str_map_t &header = const_cast<str_map_t &>(req.getHeader());
-			for (str_map_t::iterator it = header.begin(); it != header.end();
+			str_vec_map_t &header = const_cast<str_vec_map_t &>(req.getHeader());
+			for (str_vec_map_t::iterator it = header.begin(); it != header.end();
 				 ++it)
 			{
 				std::cout << "\t" << it->first << ":" << std::endl;
-				for (str_vec_t::iterator it2 = it->second.begin();
+				for (std::vector<std::string>::iterator it2 = it->second.begin();
 					 it2 != it->second.end(); ++it2)
 					std::cout << "\t\t" << *it2 << std::endl;
 			}
