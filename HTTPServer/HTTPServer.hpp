@@ -28,10 +28,12 @@ class HTTPServer
 		bool has_index;
 		bool do_redirection;
 		bool autoindex;
+		std::string path;
 		std::string root;
 		std::string index;
 		std::pair<int, std::string> redirection;
 		std::unordered_set<int> allowed_methods;
+		static const std::map<std::string, bool> directives_info;
 
 	  public:
 		HTTPLocation();
@@ -39,17 +41,15 @@ class HTTPServer
 		~HTTPLocation();
 		HTTPLocation(const HTTPLocation &orig);
 		HTTPLocation &operator=(const HTTPLocation &orig);
+		const std::string &getPath(void);
 	};
 
 	int port;
 	std::string server_name;
 	std::map<int, std::string> error_pages;
 	std::map<std::string, HTTPLocation> locations;
+	static const std::map<std::string, bool> directives_info;
 
-	static bool isNumericString(const std::string &str);
-	static std::map<std::string, std::vector<ConfigDirective>> &getDirectiveMap(
-		const ConfigContext &context,
-		std::vector<std::pair<std::string, bool>> infos);
 	void addLocationInfo(const ConfigContext &location_context);
 	void addOtherInfo(const ConfigDirective &directive);
 
