@@ -1,8 +1,8 @@
 #include "HttpRes.hpp"
 
 using http_msg::HttpRes;
-using http_msg::str_t;
-using http_msg::str_vec_t;
+
+const std::string HttpRes::_http_version = "HTTP/1.1";
 
 HttpRes::HttpRes()
 {
@@ -47,7 +47,7 @@ void HttpRes::setStatus(int status_code)
 	_reason_phrase = status_manager.getReasonPhrase(status_code);
 }
 
-str_t HttpRes::toString(void)
+std::string HttpRes::toString(void)
 {
 	try
 	{

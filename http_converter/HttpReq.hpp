@@ -11,37 +11,36 @@ namespace http_msg
 class HttpReq
 {
   public:
-	HttpReq(str_t const &req);
+	HttpReq(std::string const &req);
 
 	bool parse();
 
 	int                       getMethod() const;
-	str_t const              &getUri() const;
-	str_t const              &getVersion() const;
-	str_map_t const          &getHeader() const;
-	str_map_t::const_iterator getHeaderVal(str_t const &key) const;
-	str_t const              &getBody() const;
+	std::string const        &getUri() const;
+	std::string const        &getVersion() const;
+	str_vec_map_t const          &getHeader() const;
+	str_vec_map_t::const_iterator getHeaderVal(std::string const &key) const;
+	std::string const        &getBody() const;
 	bool                      isChunked() const;
-	void                      appendChunk(str_t const &chunk);
+	void                      appendChunk(std::string const &chunk);
 
   private:
-	str_t const &_src;
-	size_t       _offset;
-
-	int       _method; // 메서드 : GET, POST, DELETE
-	str_t     _uri;
-	str_t     _version;
-	str_map_t _header;
-	str_t     _body;
-	int       _status;
-	bool      _isChunked;
+	std::string const &_src;
+	size_t             _offset;
+	int                _method; // 메서드 : GET, POST, DELETE
+	std::string        _uri;
+	std::string        _version;
+	str_vec_map_t          _header;
+	std::string        _body;
+	int                _status;
+	bool               _isChunked;
 
 	void                parseStartLine();
 	void                parseHeader();
 	void                parseBody();
 	void                checkHost();
 	void                checkChunk();
-	str_map_t::iterator findKey(str_t key);
+	str_vec_map_t::iterator findKey(std::string key);
 };
 } // namespace http_msg
 

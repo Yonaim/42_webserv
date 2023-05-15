@@ -29,9 +29,6 @@ class HttpRes
 	HttpRes();
 	~HttpRes();
 
-	HttpRes();
-	~HttpRes();
-
 	str_t toString(void);
 
 	// setter
@@ -46,7 +43,7 @@ class HttpRes
 	void makeHeader();
 	void makeBody();
 
-	str_t _response;
+	std::string _response;
 
 	// status-line
 	static const str_t _http_version;
@@ -54,6 +51,11 @@ class HttpRes
 	str_t _reason_phrase;
 	std::map<str_t, str_t> _header;
 	str_t _body;
+	static const std::string _http_version;
+	std::string _status_code;
+	std::string _reason_phrase;
+	std::map<std::string, std::string> _header;
+	std::string _body;
 };
 } // namespace http_msg
 

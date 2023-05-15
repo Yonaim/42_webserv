@@ -4,16 +4,14 @@
 #include <iostream>
 
 using http_msg::HttpReq;
-using http_msg::str_map_t;
-using http_msg::str_t;
-using http_msg::str_vec_t;
+using http_msg::str_vec_map_t;
 
-HttpReq::HttpReq(str_t const &req)
+HttpReq::HttpReq(std::string const &req)
 	: _src(req), _offset(0), _method(-1), _status(0), _isChunked(false)
 {
 }
 
-void HttpReq::appendChunk(str_t const &chunk)
+void HttpReq::appendChunk(std::string const &chunk)
 {
 	size_t start;
 	size_t content_length = strtol(chunk.c_str(), NULL, 16);
@@ -25,7 +23,7 @@ void HttpReq::appendChunk(str_t const &chunk)
 	}
 	start = chunk.find("\r\n", 0);
 	// 못 찾았을 때 처리
-	if (start == str_t::npos)
+	if (start == std::string::npos)
 	{
 		// _status = 400;
 		_isChunked = false;
@@ -60,12 +58,12 @@ bool HttpReq::parse()
 void HttpReq::parseStartLine()
 {
 	/* line 파싱 */
-	str_t line = strBeforeSep(_src, CRLF, _offset);
+	std::string line = strBeforeSep(_src, CRLF, _offset);
 	if (line == "" || line[0] == ' ')
 		throw(std::runtime_error("failed to parse request line."));
 
 	/* 공백 기준 split*/
-	str_vec_t tokens = split(line, ' ');
+	std::vector<std::string> tokens = split(line, ' ');
 	if (tokens.size() != 3)
 		throw(std::runtime_error("token num of request line is not correct."));
 
@@ -89,7 +87,7 @@ void HttpReq::parseStartLine()
 
 void HttpReq::checkHost()
 {
-	str_map_t::iterator itr = findKey("Host");
+	str_vec_map_t::iterator itr = findKey("Host");
 
 	if (itr == _header.end() || itr->second.size() == 0)
 		throw(HttpReqException(kErrHeaderParsing));
@@ -97,17 +95,17 @@ void HttpReq::checkHost()
 
 void HttpReq::checkChunk()
 {
-	str_map_t::iterator itr = findKey("Transfer-Encoding");
+	str_vec_map_t::iterator itr = findKey("Transfer-Encoding");
 
 	if (itr == _header.end())
 		return;
 	_isChunked = true;
 }
 
-str_map_t::iterator HttpReq::findKey(str_t key)
+str_vec_map_t::iterator HttpReq::findKey(std::string key)
 {
-	str_map_t::iterator itr = _header.begin();
-	str_map_t::iterator end = _header.end();
+	str_vec_map_t::iterator itr = _header.begin();
+	str_vec_map_t::iterator end = _header.end();
 
 	for (; itr != end; ++itr)
 		if (itr->first == key)
@@ -126,6 +124,12 @@ void HttpReq::parseHeader()
 	str_t value;
 	str_vec_t vec_value;
 	str_map_t::iterator itr;
+	std::string line;
+	std::string key;
+	size_t key_end_idx;
+	std::string value;
+	std::vector<std::string> vec_value;
+	str_vec_map_t::iterator itr;
 
 	while (true)
 	{
@@ -150,7 +154,7 @@ void HttpReq::parseHeader()
 				break;
 			vec_value.push_back(strtrim(value, " "));
 		}
-		value = strtrim(str_t(&line[key_end_idx]), " ");
+		value = strtrim(std::string(&line[key_end_idx]), " ");
 		if (value != "")
 			vec_value.push_back(value);
 
@@ -197,27 +201,28 @@ int HttpReq::getMethod() const
 	return (_method);
 }
 
-str_t const &HttpReq::getUri() const
+std::string const &HttpReq::getUri() const
 {
 	return (_uri);
 }
 
-str_t const &HttpReq::getVersion() const
+std::string const &HttpReq::getVersion() const
 {
 	return (_version);
 }
 
-str_map_t const &HttpReq::getHeader() const
+str_vec_map_t const &HttpReq::getHeader() const
 {
 	return (_header);
 }
 
-str_map_t::const_iterator HttpReq::getHeaderVal(str_t const &key) const
+str_vec_map_t::const_iterator HttpReq::getHeaderVal(
+	std::string const &key) const
 {
 	return (_header.find(key));
 }
 
-str_t const &HttpReq::getBody() const
+std::string const &HttpReq::getBody() const
 {
 	return (_body);
 }
