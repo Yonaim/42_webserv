@@ -11,9 +11,9 @@ StatusModule &StatusModule::GetInstance()
 std::string StatusModule::toStr(int status_code) const
 {
 	std::string res;
-	char buff[4];
-	int  i = 3;
-	int  temp = status_code;
+	char        buff[4];
+	int         i = 3;
+	int         temp = status_code;
 
 	if (status_code < 0)
 		throw(std::runtime_error("wrong status code"));

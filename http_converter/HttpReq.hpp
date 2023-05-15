@@ -15,14 +15,14 @@ class HttpReq
 
 	bool parse();
 
-	int                       getMethod() const;
-	std::string const        &getUri() const;
-	std::string const        &getVersion() const;
+	int                           getMethod() const;
+	std::string const            &getUri() const;
+	std::string const            &getVersion() const;
 	str_vec_map_t const          &getHeader() const;
 	str_vec_map_t::const_iterator getHeaderVal(std::string const &key) const;
-	std::string const        &getBody() const;
-	bool                      isChunked() const;
-	void                      appendChunk(std::string const &chunk);
+	std::string const            &getBody() const;
+	bool                          isChunked() const;
+	void                          appendChunk(std::string const &chunk);
 
   private:
 	std::string const &_src;
@@ -30,16 +30,16 @@ class HttpReq
 	int                _method; // 메서드 : GET, POST, DELETE
 	std::string        _uri;
 	std::string        _version;
-	str_vec_map_t          _header;
+	str_vec_map_t      _header;
 	std::string        _body;
 	int                _status;
 	bool               _isChunked;
 
-	void                parseStartLine();
-	void                parseHeader();
-	void                parseBody();
-	void                checkHost();
-	void                checkChunk();
+	void                    parseStartLine();
+	void                    parseHeader();
+	void                    parseBody();
+	void                    checkHost();
+	void                    checkChunk();
 	str_vec_map_t::iterator findKey(std::string key);
 };
 } // namespace http_msg

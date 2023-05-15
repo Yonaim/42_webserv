@@ -9,8 +9,8 @@ class StatusModule
 {
   public:
 	static StatusModule &GetInstance();
-	std::string toStr(int status_code) const;
-	std::string const &getReasonPhrase(int status_code) const;
+	std::string          toStr(int status_code) const;
+	std::string const   &getReasonPhrase(int status_code) const;
 
   private:
 	typedef std::map<int, std::string>::const_iterator _iterator;
