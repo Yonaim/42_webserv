@@ -29,7 +29,7 @@ static bool isUnsignedIntStr(const std::string &str)
 
 HTTPServer::HTTPServer(const ConfigContext &server_context)
 {
-	std::map<std::string, std::vector<ConfigDirective>> directive_map;
+	std::map<std::string, std::vector<ConfigDirective> > directive_map;
 
 	if (!server_context.isConfigValid(directives_info))
 		throw(std::runtime_error("Invalid directive(s): context 'server'"));
