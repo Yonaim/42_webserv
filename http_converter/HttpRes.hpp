@@ -6,6 +6,7 @@
 #include "HttpReq.hpp"
 #include "StatusModule.hpp"
 #include "http_msg.hpp"
+#include "utils.hpp"
 
 // 시작줄 : [HTTP 버전] [상태 코드] [사유 구절] # 공백으로 띄워진다.
 // 헤더, 빈 줄, 엔티티 본문이 온다.
@@ -43,6 +44,7 @@ class HttpRes
 	void setDefault();
 	void setStatus(int status_code);
 	void setConnection();
+	void setContentLength();
 	void setValue(std::string const &key, std::string const &val);
 
   private:

@@ -2,8 +2,6 @@
 
 using http_msg::HttpRes;
 
-const std::string HttpRes::_http_version = "HTTP/1.1";
-
 HttpRes::HttpRes() : _request(NULL)
 {
 }
@@ -44,50 +42,21 @@ HttpRes::~HttpRes()
 {
 }
 
-void HttpRes::setDefault()
-{
-	setConnection();
-}
-
-void HttpRes::setStatus(int status_code)
-{
-	StatusModule &status_manager = StatusModule::GetInstance();
-
-	_status_code = status_manager.toStr(status_code);
-	_reason_phrase = status_manager.getReasonPhrase(status_code);
-}
-
-void HttpRes::setConnection()
-{
-	if (_request->hasHeaderVal("Connection", "close") == true)
-		setValue("Connection", "close");
-	else
-		setValue("Connection", "keep-alive");
-}
-
-void HttpRes::setValue(std::string const &key, std::string const &val)
-{
-	_header_iterator iter = _header.find(key);
-
-	if (iter == _header.end())
-		throw(std::logic_error("wrong header for response."));
-	else if (iter->second.length() > 0)
-		iter->second.append(", ");
-	iter->second.append(val);
-}
-
 // convert to string
 std::string HttpRes::toString(void)
 {
-	try
-	{
-		makeStatusLine();
-		makeHeader();
-		makeBody();
-	}
-	catch (std::exception &e)
-	{
-	}
+	if (isComplete() == false)
+		throw(std::logic_error("needs more data to make response message"));
+	setDefault();
+	_response.clear();
+	makeStatusLine();
+	makeHeader();
+	makeBody();
+	return (_response);
+}
+
+bool HttpRes::isComplete() const
+{
 }
 
 void HttpRes::makeStatusLine()
@@ -102,7 +71,6 @@ void HttpRes::makeBody()
 {
 	_response.append(_body);
 }
-
 
 void HttpRes::initGeneralHeaderFields()
 {
