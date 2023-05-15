@@ -133,6 +133,11 @@ bool ConfigContext::isConfigValid(const std::map<std::string, bool> &info) const
 	return (true);
 }
 
+bool ConfigContext::isDirectiveExist(const std::string &name) const
+{
+	return (countDirectivesByName(name) > 0);
+}
+
 std::ostream &operator<<(std::ostream &os, const ConfigDirective &directive)
 {
 	os << "ConfigDirective " << directive.name() << " (";
