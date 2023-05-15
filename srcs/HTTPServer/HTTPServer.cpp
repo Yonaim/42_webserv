@@ -1,5 +1,5 @@
 #include "HTTPServer.hpp"
-#include "../ConfigParser/ConfigDirective.hpp"
+#include "ConfigDirective.hpp"
 #include <cctype>
 #include <iostream>
 #include <sstream>

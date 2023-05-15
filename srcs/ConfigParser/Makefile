@@ -1,6 +1,8 @@
 CXX			= c++
 CXXFLAGS	= \
-			-Wall -Wextra -Werror -std=c++98 -fsanitize=address -g \
+			-I../../includes \
+			-Wall -Wextra -Werror \
+			-std=c++98 -fsanitize=address -g \
 
 SRCS	= ConfigDirective.cpp parseConfig.cpp recursiveParser.cpp splitIntoTokens.cpp
 OBJS	= $(SRCS:.cpp=.o)

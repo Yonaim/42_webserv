@@ -1,8 +1,8 @@
 #ifndef HTTPSERVER_HPP
 #define HTTPSERVER_HPP
 
-#include "../AsyncIOProcessor/AsyncTCPIOProcessor.hpp"
-#include "../ConfigParser/ConfigDirective.hpp"
+#include "AsyncTCPIOProcessor.hpp"
+#include "ConfigDirective.hpp"
 #include <string>
 #include <unordered_set>
 #include <vector>
