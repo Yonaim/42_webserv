@@ -26,16 +26,16 @@ const std::map<std::string, bool> HTTPServer::HTTPLocation::directives_info(
 		+ sizeof(_http_location_directives_info)
 			  / sizeof(_http_location_directives_info[0]));
 
-static const std::pair<int, std::string> _http_methods[]
-	= {std::pair<int, std::string>(GET, "GET"),
-	   std::pair<int, std::string>(HEAD, "HEAD"),
-	   std::pair<int, std::string>(POST, "POST"),
-	   std::pair<int, std::string>(PUT, "PUT"),
-	   std::pair<int, std::string>(DELETE, "DELETE"),
-	   std::pair<int, std::string>(CONNECT, "CONNECT"),
-	   std::pair<int, std::string>(OPTIONS, "OPTIONS"),
-	   std::pair<int, std::string>(TRACE, "TRACE")};
+static const std::pair<std::string, int> _http_methods[]
+	= {std::pair<std::string, int>("GET", GET),
+	   std::pair<std::string, int>("HEAD", HEAD),
+	   std::pair<std::string, int>("POST", POST),
+	   std::pair<std::string, int>("PUT", PUT),
+	   std::pair<std::string, int>("DELETE", DELETE),
+	   std::pair<std::string, int>("CONNECT", CONNECT),
+	   std::pair<std::string, int>("OPTIONS", OPTIONS),
+	   std::pair<std::string, int>("TRACE", TRACE)};
 
-const std::map<int, std::string> HTTPServer::http_methods(
+const std::map<std::string, int> HTTPServer::http_methods(
 	_http_methods,
 	_http_methods + sizeof(_http_methods) / sizeof(_http_methods[0]));
