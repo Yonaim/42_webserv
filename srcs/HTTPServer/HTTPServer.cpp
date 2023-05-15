@@ -116,24 +116,79 @@ HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
 
 	// directive 처리
 	// root
-	if (location_context.getNthDirectiveByName("root", 0).nParameters() != 1)
+	const ConfigDirective &d_root
+		= location_context.getNthDirectiveByName("root", 0);
+	if (d_root.nParameters() != 1)
 		throw("Invalid number of argument(s): context 'root'");
-	root = location_context.getNthDirectiveByName("root", 0).parameter(0);
+	this->root = d_root.parameter(0);
 
 	// limit_except
-	if (location_context.countDirectivesByName("limit_except") == 0)
+	if (location_context.isDirectiveExist("limit_except") == true)
 	{
-		allowed_methods.insert(GET);
-		allowed_methods.insert(HEAD);
+		const ConfigDirective d_limit_except
+			= location_context.getNthDirectiveByName("limit_except", 0);
+		for (size_t i = 0; i < d_limit_except.nParameters(); i++)
+		{
+			if (http_methods.find(d_limit_except.parameter(i))
+				== http_methods.end())
+				throw(std::runtime_error(
+					"Undefined argument found: directive 'limit_except'"));
+			this->allowed_methods.insert(
+				http_methods.find(d_limit_except.parameter(i))->second);
+		}
 	}
 	else
 	{
-		// http method 문자열과 일치 확인하여 allowed methods에 넣기
+		this->allowed_methods.insert(GET);
+		this->allowed_methods.insert(HEAD);
 	}
 
 	// return
+	if (location_context.isDirectiveExist("return") == true)
+	{
+		do_redirection = true;
+		const ConfigDirective d_return
+			= location_context.getNthDirectiveByName("return", 0);
+		if (d_return.nParameters() != 2)
+			throw("Invalid number of argument(s): directive 'return'");
+		if (isUnsignedIntStr(d_return.parameter(0)) == false)
+			throw(std::runtime_error(
+				"Undefined argument found: directive 'return'"));
+
+		// ss.fail() 리턴값 확인으로 대체할 수 있는지 체크해볼 것
+		std::stringstream ss(d_return.parameter(0));
+		ss >> this->redirection.first;
+		this->redirection.second = d_return.parameter(1);
+	}
 
 	// autoindex
+	if (location_context.isDirectiveExist("autoindex") == true)
+	{
+		const ConfigDirective &d_autoindex
+			= location_context.getNthDirectiveByName("autoindex", 0);
+		if (d_autoindex.nParameters() != 1)
+			throw("Invalid number of argument(s): directive 'autoindex'");
+		if (d_autoindex.parameter(0) == "on")
+			this->autoindex = true;
+		else if (d_autoindex.parameter(0) == "off")
+			;
+		else
+			throw(std::runtime_error(
+				"Undefined argument found: directive 'autoindex'"));
+	}
 
 	// index
+	if (location_context.isDirectiveExist("index") == true)
+	{
+		for (size_t i = 0; i < location_context.countDirectivesByName("index");
+			 i++)
+		{
+			const ConfigDirective &d_index
+				= location_context.getNthDirectiveByName("index", i);
+			for (size_t j = 0; j < d_index.nParameters(); j++)
+			{
+				this->index.push_back(d_index.parameter(j));
+			}
+		}
+	}
 }
