@@ -1,8 +1,6 @@
 #include "AsyncIOTaskHandler.hpp"
 #include <algorithm>
 
-std::vector<AsyncIOProcessor *> AsyncIOTaskHandler::_tasks;
-
 AsyncIOTaskHandler::AsyncIOTaskHandler(void)
 {
 }
@@ -23,24 +21,36 @@ AsyncIOTaskHandler &AsyncIOTaskHandler::operator=(
 	return (*this);
 }
 
+AsyncIOTaskHandler &AsyncIOTaskHandler::getInstance(void)
+{
+	static AsyncIOTaskHandler instance;
+	return (instance);
+}
+
 void AsyncIOTaskHandler::registerTask(AsyncIOProcessor *task)
 {
-	_iterator it = std::lower_bound(_tasks.begin(), _tasks.end(), task);
-	if (it != _tasks.end() && *it == task)
+	AsyncIOTaskHandler &instance = getInstance();
+	_iterator it = std::lower_bound(instance._tasks.begin(),
+									instance._tasks.end(), task);
+	if (it != instance._tasks.end() && *it == task)
 		return;
-	_tasks.insert(it, task);
+	instance._tasks.insert(it, task);
 }
 
 void AsyncIOTaskHandler::unregisterTask(AsyncIOProcessor *task)
 {
-	_iterator it = std::lower_bound(_tasks.begin(), _tasks.end(), task);
-	if (it == _tasks.end())
+	AsyncIOTaskHandler &instance = getInstance();
+	_iterator it = std::lower_bound(instance._tasks.begin(),
+									instance._tasks.end(), task);
+	if (it == instance._tasks.end())
 		return;
-	_tasks.erase(it);
+	instance._tasks.erase(it);
 }
 
 void AsyncIOTaskHandler::task(void)
 {
-	for (_iterator it = _tasks.begin(); it != _tasks.end(); it++)
+	AsyncIOTaskHandler &instance = getInstance();
+	for (_iterator it = instance._tasks.begin(); it != instance._tasks.end();
+		 it++)
 		(*it)->task();
 }
