@@ -19,20 +19,7 @@
 	- 이때 형식이 알맞지 않은 directive가 있다면 에러를 던진다
 */
 
-const std::map<std::string, bool> HTTPServer::directives_info
-	= {{"listen", false},
-	   {"server_name", false},
-	   {"error_page", false},
-	   {"location", true}};
-
-const std::map<std::string, bool> HTTPServer::HTTPLocation::directives_info
-	= {{"root", false},
-	   {"limit_except", false},
-	   {"return", false},
-	   {"autoindex", false},
-	   {"index", false}};
-
-static bool isUnsignedInt(const std::string &str)
+static bool isUnsignedIntStr(const std::string &str)
 {
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
 		if (std::isdigit(*it) == false)
