@@ -92,6 +92,47 @@ size_t ConfigContext::nDirectives(void) const
 	return (_directives.size());
 }
 
+size_t ConfigContext::countDirectivesByName(const std::string &name) const
+{
+	size_t counter = 0;
+	for (size_t i = 0; i < _directives.size(); i++)
+	{
+		if (_directives[i]->name() == name)
+			counter++;
+	}
+	return (counter);
+}
+
+const ConfigDirective &ConfigContext::getNthDirectiveByName(
+	const std::string &name, size_t n) const
+{
+	size_t counter = 0;
+	for (size_t i = 0; i < _directives.size(); i++)
+	{
+		if (_directives[i]->name() == name)
+		{
+			if (counter == n)
+				return (*(_directives[i]));
+			counter++;
+		}
+	}
+	throw(std::runtime_error("No ConfigDirective found."));
+}
+
+bool ConfigContext::isConfigValid(const std::map<std::string, bool> &info) const
+{
+	for (size_t i = 0; i < _directives.size(); i++)
+	{
+		const std::map<std::string, bool>::const_iterator it
+			= info.find(_directives[i]->name());
+		if (it == info.end())
+			return (false);
+		if (it->second != _directives[i]->is_context())
+			return (false);
+	}
+	return (true);
+}
+
 std::ostream &operator<<(std::ostream &os, const ConfigDirective &directive)
 {
 	os << "ConfigDirective " << directive.name() << " (";

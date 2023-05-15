@@ -1,9 +1,10 @@
 #ifndef CONFIGDIRECTIVE_HPP
 #define CONFIGDIRECTIVE_HPP
 
+#include <map>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
 
 class ConfigDirective
 {
@@ -42,6 +43,10 @@ class ConfigContext : public ConfigDirective
 
 	const ConfigDirective &directive(size_t index) const;
 	size_t nDirectives(void) const;
+	size_t countDirectivesByName(const std::string &name) const;
+	const ConfigDirective &getNthDirectiveByName(const std::string &name,
+												 size_t n) const;
+	bool isConfigValid(const std::map<std::string, bool> &info) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const ConfigDirective &directive);
