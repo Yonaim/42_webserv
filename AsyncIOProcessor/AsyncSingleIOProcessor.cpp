@@ -88,6 +88,7 @@ AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io, std::string &str)
 
 namespace async
 {
-AsyncSingleIOProcessor cout(STDOUT_FILENO);
 AsyncSingleIOProcessor cin(STDIN_FILENO);
+AsyncSingleIOProcessor cout(STDOUT_FILENO);
+AsyncSingleIOProcessor cerr(STDERR_FILENO);
 } // namespace async

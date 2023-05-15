@@ -29,8 +29,9 @@ AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io,
 
 namespace async
 {
-extern AsyncSingleIOProcessor cout;
 extern AsyncSingleIOProcessor cin;
+extern AsyncSingleIOProcessor cout;
+extern AsyncSingleIOProcessor cerr;
 } // namespace async
 
 #endif
