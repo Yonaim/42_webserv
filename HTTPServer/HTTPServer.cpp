@@ -58,10 +58,15 @@ HTTPServer::~HTTPServer()
 
 HTTPServer::HTTPServer(const HTTPServer &orig)
 {
+	(void)orig;
+	// TODO: 복사 생성자 구현
 }
 
 HTTPServer &HTTPServer::operator=(const HTTPServer &orig)
 {
+	(void)orig;
+	// TODO: 할당 연산자 구현
+	return (*this);
 }
 
 // locations vector에 새로운 location의 string 및 객체 추가
