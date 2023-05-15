@@ -32,10 +32,14 @@ class HttpReq
 	str_map_t _header;
 	str_t     _body;
 	int       _status;
+	bool      _isChunked;
 
-	void parseStartLine();
-	void parseHeader();
-	void parseBody();
+	void                parseStartLine();
+	void                parseHeader();
+	void                parseBody();
+	void                checkHost();
+	void                checkChunk();
+	str_map_t::iterator findKey(std::string key);
 };
 } // namespace http_msg
 

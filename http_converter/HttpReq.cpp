@@ -9,7 +9,7 @@ using http_msg::str_t;
 using http_msg::str_vec_t;
 
 HttpReq::HttpReq(str_t const &req)
-	: _src(req), _offset(0), _method(-1), _status(0)
+	: _src(req), _offset(0), _method(-1), _status(0), _isChunked(false)
 {
 }
 
@@ -56,8 +56,37 @@ void HttpReq::parseStartLine()
 		throw(std::runtime_error("method is not implemented: " + tokens.at(0)));
 
 	/* uri, version 파싱 */
-	_uri = tokens.at(1);
-	_version = tokens.at(2);
+	_uri = components->at(1);
+	_version = components->at(2);
+	delete components; // split으로 인한 동적 할당 해제
+}
+
+void HttpReq::checkHost()
+{
+	str_map_t::iterator itr = findKey("Host");
+
+	if (itr == _header.end() || itr->second.size() == 0)
+		throw(HttpReqException(kErrHeaderParsing));
+}
+
+void HttpReq::checkChunk()
+{
+	str_map_t::iterator itr = findKey("Transfer-Encoding");
+
+	if (itr == _header.end())
+		return;
+	_isChunked = true;
+}
+
+str_map_t::iterator HttpReq::findKey(std::string key)
+{
+	str_map_t::iterator itr = _header.begin();
+	str_map_t::iterator end = _header.end();
+
+	for (; itr != end; ++itr)
+		if (itr->first == key)
+			break;
+	return (itr);
 }
 
 // 여러 줄 헤더 처리
@@ -65,11 +94,12 @@ void HttpReq::parseHeader()
 {
 	str_t line;
 
-	str_t  key;
+	str_t key;
 	size_t key_end_idx;
 
-	str_t     value;
+	str_t value;
 	str_vec_t vec_value;
+	str_map_t::iterator itr;
 
 	while (true)
 	{
@@ -78,7 +108,7 @@ void HttpReq::parseHeader()
 		if (line == "")
 			break;
 
-		/* key와 value 파싱 */
+		/* key 파싱 */
 		key_end_idx = 0;
 		key = strBeforeSep(line, ":", key_end_idx);
 		if (key == "" || hasSpace(key))
@@ -97,9 +127,20 @@ void HttpReq::parseHeader()
 		value = strtrim(str_t(&line[key_end_idx]), " ");
 		if (value != "")
 			vec_value.push_back(value);
-		_header[key] = vec_value;
+
+		/* key가 있다면, 붙여넣기 */
+		itr = findKey(key);
+		if (itr == _header.end())
+			_header[key] = vec_value;
+		else
+			itr->second.insert(itr->second.end(), vec_value.begin(),
+							   vec_value.end());
 		vec_value.clear();
 	}
+	/* Host 헤더 있는지 확인 */
+	checkHost();
+	/* Transfer-Encoding: chunked인지 확인 */
+	checkChunk();
 }
 
 void HttpReq::parseBody()
@@ -112,7 +153,7 @@ void HttpReq::parseBody()
 			throw(std::runtime_error("given method must not have the body."));
 		break;
 	}
-	case (kPost): {
+	case (method::kPost): {
 		const size_t end_idx = _src.find_last_of(
 			"\r", _src.size()); // 두 번째 인자부터 뒤로 찾는다. 첫 번째 인자의
 								// 문자 중 하나라도 맞으면 반환한다.
