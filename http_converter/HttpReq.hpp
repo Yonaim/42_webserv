@@ -21,6 +21,8 @@ class HttpReq
 	str_map_t const          &getHeader() const;
 	str_map_t::const_iterator getHeaderVal(str_t const &key) const;
 	str_t const              &getBody() const;
+	bool                      isChunked() const;
+	void                      appendChunk(str_t const &chunk);
 
   private:
 	str_t const &_src;
@@ -39,7 +41,7 @@ class HttpReq
 	void                parseBody();
 	void                checkHost();
 	void                checkChunk();
-	str_map_t::iterator findKey(std::string key);
+	str_map_t::iterator findKey(str_t key);
 };
 } // namespace http_msg
 

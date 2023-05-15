@@ -13,6 +13,32 @@ HttpReq::HttpReq(str_t const &req)
 {
 }
 
+void HttpReq::appendChunk(str_t const &chunk)
+{
+	size_t start;
+	size_t content_length = strtol(chunk.c_str(), NULL, 16);
+
+	if (content_length == 0)
+	{
+		_isChunked = false;
+		return;
+	}
+	start = chunk.find("\r\n", 0);
+	// 못 찾았을 때 처리
+	if (start == str_t::npos)
+	{
+		// _status = 400;
+		_isChunked = false;
+		return;
+	}
+	_body.append(chunk.substr(start + 2, content_length));
+}
+
+bool HttpReq::isChunked() const
+{
+	return (_isChunked);
+}
+
 // parsing
 bool HttpReq::parse()
 {
@@ -78,7 +104,7 @@ void HttpReq::checkChunk()
 	_isChunked = true;
 }
 
-str_map_t::iterator HttpReq::findKey(std::string key)
+str_map_t::iterator HttpReq::findKey(str_t key)
 {
 	str_map_t::iterator itr = _header.begin();
 	str_map_t::iterator end = _header.end();
@@ -143,6 +169,7 @@ void HttpReq::parseHeader()
 	checkChunk();
 }
 
+// body는 Content-Length만큼 읽어야 한다.
 void HttpReq::parseBody()
 {
 	switch (_method)
