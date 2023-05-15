@@ -1,5 +1,8 @@
 CXX			= c++
-CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+CXXFLAGS	= \
+			-I../../includes \
+			-Wall -Wextra -Werror \
+			-std=c++98 -fsanitize=address -g \
 
 SRCS	= AsyncIOProcessor.cpp AsyncSingleIOProcessor.cpp AsyncTCPIOProcessor.cpp AsyncIOTaskHandler.cpp
 OBJS	= $(SRCS:.cpp=.o)
