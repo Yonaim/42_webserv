@@ -29,6 +29,9 @@ class HttpRes
 	HttpRes();
 	~HttpRes();
 
+	HttpRes();
+	~HttpRes();
+
 	str_t toString(void);
 
 	// setter
@@ -36,28 +39,46 @@ class HttpRes
 	void setValue(std::string const &key, std::string const &val);
 
   private:
-	typedef std::map<std::string, std::string>::iterator _header_iterator;
-
 	HttpRes(HttpRes const &other);
 	HttpRes &operator=(HttpRes const &other);
 
-	void initGeneralHeaderFields();
-	void initResponseHeaderFields();
-	void initEntityHeaderFields();
 	void makeStatusLine();
 	void makeHeader();
 	void makeBody();
-	bool isComplete() const;
 
 	// final
-	str_t _response;
+	str_t _message;
 
-	// status-line
-	static const str_t     _http_version;
-	str_t                  _status_code;
-	str_t                  _reason_phrase;
-	std::map<str_t, str_t> _header;
-	str_t                  _body;
+	// status-line = http_version SP status-code SP reason-phrase CRLF
+	static const str_t _http_version;
+	str_t _status_code;
+	str_t _reason_phrase;
+
+	// entity header
+	str_t _content_type;
+	str_t _content_length;
+	str_t _last_modified;
+	str_t _connection;
+	str_t _accept_ranges;
+	str_t _body;
+
+	// Server
+	// Date
+	// Content-Type
+	// Content-Length
+	// Last-Modified
+	// Connection
+	// ETag
+	// Accept-Ranges
+
+  private:
+	str_t _dest;
+
+	const str_t _version;
+	int _status;
+	str_t _comment;
+	str_t _body; // 실제 엔티티 본문
+	std::map<str_t, str_vec_t> _header;
 };
 } // namespace http_msg
 
