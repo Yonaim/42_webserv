@@ -46,6 +46,7 @@ void HttpRes::setDate()
 	date.append(toStr(tm_gmt->tm_hour / 10, tm_gmt->tm_hour % 10) + ":");
 	date.append(toStr(tm_gmt->tm_min / 10, tm_gmt->tm_min % 10) + ":");
 	date.append(toStr(tm_gmt->tm_sec / 10, tm_gmt->tm_sec % 10) + " GMT");
+	setValue("Date", date);
 }
 
 void HttpRes::setStatus(int status_code)
