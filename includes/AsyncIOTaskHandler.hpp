@@ -8,12 +8,13 @@ class AsyncIOTaskHandler
 {
   private:
 	typedef std::vector<AsyncIOProcessor *>::iterator _iterator;
-	static std::vector<AsyncIOProcessor *> _tasks;
+	std::vector<AsyncIOProcessor *> _tasks;
 
 	AsyncIOTaskHandler(void);
 	~AsyncIOTaskHandler();
 	AsyncIOTaskHandler(const AsyncIOTaskHandler &orig);
 	AsyncIOTaskHandler &operator=(const AsyncIOTaskHandler &orig);
+	static AsyncIOTaskHandler &getInstance(void);
 
   public:
 	static void registerTask(AsyncIOProcessor *task);

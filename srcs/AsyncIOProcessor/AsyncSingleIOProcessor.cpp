@@ -67,11 +67,10 @@ void AsyncSingleIOProcessor::setWriteBuf(const std::string &str)
 	_wrbuf[_fd] += str;
 }
 
-std::string AsyncSingleIOProcessor::getReadBuf(void)
+void AsyncSingleIOProcessor::getReadBuf(std::string &str)
 {
-	std::string buf = _rdbuf[_fd];
+	str += _rdbuf[_fd];
 	_rdbuf[_fd] = "";
-	return (buf);
 }
 
 AsyncSingleIOProcessor &operator<<(AsyncSingleIOProcessor &io,
@@ -83,12 +82,13 @@ AsyncSingleIOProcessor &operator<<(AsyncSingleIOProcessor &io,
 
 AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io, std::string &str)
 {
-	str = io.getReadBuf();
+	io.getReadBuf(str);
 	return (io);
 }
 
 namespace async
 {
-AsyncSingleIOProcessor cout(STDOUT_FILENO);
 AsyncSingleIOProcessor cin(STDIN_FILENO);
+AsyncSingleIOProcessor cout(STDOUT_FILENO);
+AsyncSingleIOProcessor cerr(STDERR_FILENO);
 } // namespace async
