@@ -97,9 +97,9 @@ void HTTPServer::addOtherInfo(const ConfigDirective &directive)
 HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
 {
 	// 기본값
-	has_index = false;
-	do_redirection = false;
-	autoindex = false;
+	this->has_index = false;
+	this->do_redirection = false;
+	this->autoindex = false;
 
 	if (location_context.nParameters() != 1)
 		throw(std::runtime_error(
