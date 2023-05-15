@@ -44,9 +44,13 @@ class HTTPServer
 	int port;
 	std::string server_name;
 	std::map<int, std::string> error_pages;
-	std::vector<std::pair<std::string, HTTPLocation>> locations;
+	std::map<std::string, HTTPLocation> locations;
 
-	void addLocation(const ConfigContext &location_context);
+	static bool isNumericString(const std::string &str);
+	static std::map<std::string, std::vector<ConfigDirective>> &getDirectiveMap(
+		const ConfigContext &context,
+		std::vector<std::pair<std::string, bool>> infos);
+	void addLocationInfo(const ConfigContext &location_context);
 	void addOtherInfo(const ConfigDirective &directive);
 
   public:
