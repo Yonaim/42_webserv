@@ -4,8 +4,9 @@
 #include <iostream>
 #include <sstream>
 
-// TODO: 직접 NGINX를 구동해서 어떤 config파일 형식에 대해 에러로 간주하고, 어떤
-// 형식에 대해 통과시켜주는지 확인해볼 것
+// TODO: 에러 메세지 문자열 생성해주는 함수 만들기
+// TODO: HTTPLocation private 데이터 멤버 앞에 _ 붙이기
+// TODO: unordered_set(C++11)을 다른 자료구조로 변경
 
 /*
 1. 처음부터 끝까지 순회하며 같은 종류의 directive들을 모아둔다 (name과 개수
@@ -31,17 +32,17 @@ HTTPServer::HTTPServer(const ConfigContext &server_context)
 {
 	std::map<std::string, std::vector<ConfigDirective> > directive_map;
 
+	// 1. server_context에 속한 모든 directive들이 유효한지 확인
 	if (!server_context.isConfigValid(directives_info))
 		throw(std::runtime_error("Invalid directive(s): context 'server'"));
 
-	// 1. 처음부터 끝까지 순회하며 같은 종류의 directive들을 모아둔다
-	// (name과 개수 체크)
+	// 2. 특정한 directive의 라인의 개수 확인
 	if (server_context.countDirectivesByName("listen") != 1
 		|| server_context.countDirectivesByName("server_name") == 0)
 		throw(std::runtime_error(
 			"Invalid number of directive(s): context 'server'"));
 
-	// 2. 종류 별로 directive를 처리
+	// 3. directive의 데이터를 객체에 넣는다
 	for (size_t i = 0; i < server_context.nDirectives(); i++)
 	{
 		if (server_context.directive(i).name() == "location")
@@ -78,6 +79,7 @@ void HTTPServer::addLocationInfo(const ConfigContext &location_context)
 	locations[new_location.getPath()] = new_location;
 }
 
+// TODO: location 외 다른 directive 처리부 작성
 void HTTPServer::addOtherInfo(const ConfigDirective &directive)
 {
 	if (directive.name() == "listen")
