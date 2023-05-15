@@ -113,6 +113,17 @@ str_vec_map_t::iterator HttpReq::findKey(std::string key)
 	return (itr);
 }
 
+str_vec_map_t::const_iterator HttpReq::findKey(std::string key) const
+{
+	str_vec_map_t::const_iterator itr = _header.begin();
+	str_vec_map_t::const_iterator end = _header.end();
+
+	for (; itr != end; ++itr)
+		if (itr->first == key)
+			break;
+	return (itr);
+}
+
 // 여러 줄 헤더 처리
 void HttpReq::parseHeader()
 {
@@ -129,6 +140,7 @@ void HttpReq::parseHeader()
 	size_t key_end_idx;
 	std::string value;
 	std::vector<std::string> vec_value;
+	str_vec_map_t::iterator itr;
 	str_vec_map_t::iterator itr;
 
 	while (true)
@@ -216,8 +228,9 @@ str_vec_map_t const &HttpReq::getHeader() const
 	return (_header);
 }
 
-str_vec_map_t::const_iterator HttpReq::getHeaderVal(
-	std::string const &key) const
+str_vec_map_t::const_iterator HttpReq::getHeaderVal(std::string const &key)
+	const str_vec_map_t::const_iterator HttpReq::getHeaderVal(
+		std::string const &key) const
 {
 	return (_header.find(key));
 }
@@ -225,4 +238,19 @@ str_vec_map_t::const_iterator HttpReq::getHeaderVal(
 std::string const &HttpReq::getBody() const
 {
 	return (_body);
+}
+
+bool HttpReq::hasHeaderVal(std::string const &key, std::string const &val) const
+{
+	str_vec_map_t::const_iterator key_itr = findKey(key);
+	if (key_itr == _header.end())
+		return (false);
+
+	std::vector<std::string>::const_iterator val_itr = key_itr->second.begin();
+	for (; val_itr != key_itr->second.end(); ++val_itr)
+	{
+		if (*val_itr == val)
+			return (true);
+	}
+	return (false);
 }

@@ -23,6 +23,7 @@ class HttpReq
 	std::string const            &getBody() const;
 	bool                          isChunked() const;
 	void                          appendChunk(std::string const &chunk);
+	bool hasHeaderVal(std::string const &key, std::string const &val) const;
 
   private:
 	std::string const &_src;
@@ -35,12 +36,13 @@ class HttpReq
 	int                _status;
 	bool               _isChunked;
 
-	void                    parseStartLine();
-	void                    parseHeader();
-	void                    parseBody();
-	void                    checkHost();
-	void                    checkChunk();
-	str_vec_map_t::iterator findKey(std::string key);
+	void                          parseStartLine();
+	void                          parseHeader();
+	void                          parseBody();
+	void                          checkHost();
+	void                          checkChunk();
+	str_vec_map_t::iterator       findKey(std::string key);
+	str_vec_map_t::const_iterator findKey(std::string key) const;
 };
 } // namespace http_msg
 
