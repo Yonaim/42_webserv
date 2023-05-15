@@ -20,6 +20,34 @@ void HttpRes::setValue(std::string const &key, std::string const &val)
 	iter->second.append(val);
 }
 
+std::string	toStr(int num, int num2)
+{
+	std::ostringstream	ss;
+
+	ss << num << num2;
+	return (ss.str());
+}
+
+void HttpRes::setDate()
+{
+	time_t cur_time = time(NULL);
+	tm    *tm_gmt = gmtime(&cur_time);
+
+	static const std::string month[]
+		= {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	static const std::string day_name[]
+		= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+	std::string date(day_name[tm_gmt->tm_wday] + ", ");
+
+	date.append(toStr(tm_gmt->tm_mday / 10, tm_gmt->tm_mday % 10) + " ");
+	date.append(month[tm_gmt->tm_mon] + " " + toStr(tm_gmt->tm_year, 1900) + " ");
+	date.append(toStr(tm_gmt->tm_hour / 10, tm_gmt->tm_hour % 10) + ":");
+	date.append(toStr(tm_gmt->tm_min / 10, tm_gmt->tm_min % 10) + ":");
+	date.append(toStr(tm_gmt->tm_sec / 10, tm_gmt->tm_sec % 10) + " GMT");
+}
+
 void HttpRes::setStatus(int status_code)
 {
 	StatusModule &status_manager = StatusModule::GetInstance();
@@ -41,4 +69,3 @@ void HttpRes::setContentLength()
 	if (_body.length() > 0)
 		setValue("Content-Length", uintToStr(_body.length()));
 }
-

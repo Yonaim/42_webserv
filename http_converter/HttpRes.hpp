@@ -2,7 +2,8 @@
 #define HTTP_RES_HPP
 
 #include <map>
-
+#include <ctime>
+#include <sstream>
 #include "HttpReq.hpp"
 #include "StatusModule.hpp"
 #include "http_msg.hpp"
@@ -41,6 +42,7 @@ class HttpRes
 	str_t toString(void);
 
 	// setter
+	void setDate();
 	void setDefault();
 	void setStatus(int status_code);
 	void setConnection();
