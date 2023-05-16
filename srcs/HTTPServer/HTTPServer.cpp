@@ -109,15 +109,17 @@ HTTPServer::~HTTPServer()
 }
 
 HTTPServer::HTTPServer(const HTTPServer &orig)
+	: _port(orig._port), _server_name(orig._server_name),
+	  _error_pages(orig._error_pages), _locations(orig._locations)
 {
-	(void)orig;
-	// TODO: 복사 생성자 구현
 }
 
 HTTPServer &HTTPServer::operator=(const HTTPServer &orig)
 {
-	(void)orig;
-	// TODO: 할당 연산자 구현
+	_port = orig._port;
+	_server_name = orig._server_name;
+	_error_pages = orig._error_pages;
+	_locations = orig._locations;
 	return (*this);
 }
 
