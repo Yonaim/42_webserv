@@ -27,6 +27,8 @@ void HTTPServer::parseDirectiveListen(const ConfigContext &server_context)
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 	std::stringstream ss(port_str);
 	ss >> _port;
+	if (!(0 <= _port && _port <= 65536))
+		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 }
 
 void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
