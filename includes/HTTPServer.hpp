@@ -54,6 +54,7 @@ class HTTPServer
 	std::map<int, std::string> _error_pages;
 	std::map<std::string, HTTPLocation> _locations;
 	static const std::map<std::string, int> _http_methods;
+	static const std::map<int, std::string> _http_status_code;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
