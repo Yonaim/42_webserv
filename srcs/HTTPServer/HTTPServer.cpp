@@ -5,7 +5,6 @@
 #include <sstream>
 
 // TODO: 에러 메세지 문자열 생성해주는 함수 만들기
-// TODO: unordered_set(C++11)을 다른 자료구조로 변경
 
 /*
 1. 처음부터 끝까지 순회하며 같은 종류의 directive들을 모아둔다 (name과 개수
