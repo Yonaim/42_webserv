@@ -33,7 +33,6 @@ class HTTPServer
 		std::vector<std::string> index;
 		std::pair<int, std::string> redirection;
 		std::set<int> allowed_methods;
-		static const std::map<std::string, bool> directives_info;
 
 	  public:
 		HTTPLocation();
@@ -48,7 +47,6 @@ class HTTPServer
 	std::string server_name;
 	std::map<int, std::string> error_pages;
 	std::map<std::string, HTTPLocation> locations;
-	static const std::map<std::string, bool> directives_info;
 	static const std::map<std::string, int> http_methods;
 
 	void addLocationInfo(const ConfigContext &location_context);
