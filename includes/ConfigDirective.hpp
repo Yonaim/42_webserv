@@ -47,7 +47,7 @@ class ConfigContext : public ConfigDirective
 	const ConfigDirective &getNthDirectiveByName(const std::string &name,
 												 size_t n) const;
 	bool isConfigValid(const std::map<std::string, bool> &info) const;
-	bool isDirectiveExist(const std::string &name) const;
+	bool hasDirective(const std::string &name) const;
 };
 
 std::ostream &operator<<(std::ostream &os, const ConfigDirective &directive);
