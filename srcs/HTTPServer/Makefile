@@ -6,6 +6,7 @@ CXXFLAGS	= \
 
 SRCS		= \
 			HTTPServer.cpp \
+			HTTPLocation.cpp \
 			HTTPServerConstValues.cpp \
 			../ConfigParser/ConfigDirective.cpp \
 			../ConfigParser/parseConfig.cpp \
