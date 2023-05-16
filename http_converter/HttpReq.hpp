@@ -18,6 +18,7 @@ class HTTPReq
 	HTTPReq(std::queue<HTTPReq> const &chunks);
 
 	// getter
+	int                           getType() const;
 	int                           getMethod() const;
 	std::string const            &getUri() const;
 	std::string const            &getVersion() const;
@@ -31,10 +32,10 @@ class HTTPReq
 	enum eType
 	{
 		NONE = -1,
-		ALL = 1 << 0,
-		HEAD = 1 << 2,
-		CHUNK = 1 << 3,
-		TRAILER = 1 << 4
+		ALL,
+		HEAD,
+		CHUNK,
+		TRAILER
 	};
 
 	enum eMethodType

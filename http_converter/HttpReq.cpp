@@ -1,4 +1,4 @@
-#include "HTTPReq.hpp"
+#include "HttpReq.hpp"
 #include "utils.hpp"
 #include <exception>
 #include <iostream>
@@ -42,13 +42,37 @@ HTTPReq::HTTPReq(std::string const &req)
 
 bool HTTPReq::isChunkType()
 {
+	size_t i;
+
+	for (i = 0; _src[i]; ++i)
+	{
+		if (!isdigit(_src[i]) && !('A' <= _src[i] && _src[i] <= 'F'))
+			break;
+	}
+	return (i != 0);
+}
+
+void HTTPReq::parseChunk()
+{
+	size_t crlf_pos;
+	size_t content_length = strtol(_src.c_str(), NULL, 16);
+
+	if (content_length <= 0)
+		return;
+	std::cout << "content_length : " << content_length << std::endl;
+	crlf_pos = _src.find(CRLF, 0);
+	if (crlf_pos == std::string::npos)
+		throw(std::runtime_error("no crlf"));
+	_body = _src.substr(crlf_pos + 2, content_length);
 }
 
 // 결정 가능한 type: ALL | HEAD
 void HTTPReq::parseStartLine()
 {
+	size_t temp = _offset;
+
 	/* line 파싱 */
-	std::string line = strBeforeSep(_src, CRLF, _offset);
+	std::string line = strBeforeSep(_src, CRLF, temp);
 	if (line == "" || line[0] == ' ')
 		throw(std::runtime_error("failed to parse request line."));
 
@@ -76,32 +100,10 @@ void HTTPReq::parseStartLine()
 	}
 
 	/* uri, version 파싱 */
-	_uri = components->at(1);
-	_version = components->at(2);
-	delete components; // split으로 인한 동적 할당 해제
-}
+	_uri = tokens.at(1);
+	_version = tokens.at(2);
 
-void HTTPReq::checkHost()
-{
-	str_vec_map_t::iterator key_itr = _header.find("Host");
-
-	if (key_itr == _header.end() || key_itr->second.size() == 0)
-		throw(std::runtime_error("host error"));
-}
-
-bool HTTPReq::hasChunkedVal()
-{
-	str_vec_map_t::iterator key_itr = _header.find("Transfer-Encoding");
-
-	if (key_itr == _header.end())
-		return (false);
-	std::vector<std::string>::iterator val_itr = key_itr->second.begin();
-	for (; val_itr != key_itr->second.end(); ++val_itr)
-	{
-		if (*val_itr == "chunked")
-			return (true);
-	}
-	return (false);
+	_offset = temp;
 }
 
 // 결정 가능한 type: HEAD, ALL, TRAILER
@@ -164,8 +166,6 @@ void HTTPReq::parseHeader()
 
 void HTTPReq::checkHeader()
 {
-	/* Host 헤더 있는지 확인 */
-	checkHost();
 	/* Transfer-Encoding: chunked가 있는지 확인*/
 	if (_type == TRAILER)
 	{
@@ -186,6 +186,8 @@ void HTTPReq::checkHeader()
 				&& _header.find("Content-Length") == _header.end())
 				throw(std::runtime_error("need Content-Length Header Field"));
 		}
+		/* Host 헤더 있는지 확인 */
+		checkHost();
 	}
 }
 
@@ -215,11 +217,35 @@ void HTTPReq::parseBody()
 	}
 }
 
-void HTTPReq::parseChunk()
+void HTTPReq::checkHost()
 {
+	str_vec_map_t::iterator key_itr = _header.find("Host");
+
+	if (key_itr == _header.end() || key_itr->second.size() == 0)
+		throw(std::runtime_error("host error"));
+}
+
+bool HTTPReq::hasChunkedVal()
+{
+	str_vec_map_t::iterator key_itr = _header.find("Transfer-Encoding");
+
+	if (key_itr == _header.end())
+		return (false);
+	std::vector<std::string>::iterator val_itr = key_itr->second.begin();
+	for (; val_itr != key_itr->second.end(); ++val_itr)
+	{
+		if (*val_itr == "chunked")
+			return (true);
+	}
+	return (false);
 }
 
 // getter
+int HTTPReq::getType() const
+{
+	return (_type);
+}
+
 int HTTPReq::getMethod() const
 {
 	return (_method);
