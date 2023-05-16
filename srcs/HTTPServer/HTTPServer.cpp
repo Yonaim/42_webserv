@@ -4,20 +4,6 @@
 #include <iostream>
 #include <sstream>
 
-// TODO: 에러 메세지 문자열 생성해주는 함수 만들기
-
-/*
-1. 처음부터 끝까지 순회하며 같은 종류의 directive들을 모아둔다 (name과 개수
-체크)
-	- 틀린 name을 갖는 directive가 있다면 에러
-	- 중복 허용되지 않는 directive가 여러 개 있으면 에러
-	- 필수적인 directive가 없으면 에러
-
-2. 종류 별로 directive를 처리
-	- listen, server_name, error_page, location순
-	- 이때 형식이 알맞지 않은 directive가 있다면 에러를 던진다
-*/
-
 static bool isUnsignedIntStr(const std::string &str)
 {
 	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
