@@ -5,7 +5,6 @@
 #include <sstream>
 
 // TODO: 에러 메세지 문자열 생성해주는 함수 만들기
-// TODO: HTTPLocation private 데이터 멤버 앞에 _ 붙이기
 // TODO: unordered_set(C++11)을 다른 자료구조로 변경
 
 /*
@@ -87,9 +86,9 @@ void HTTPServer::parseDirectiveLocation(const ConfigContext &server_context)
 			location_context.throwException(PARSINGEXC_UNDEF_DIR);
 
 		HTTPLocation new_location(location_context);
-		if (locations.find(new_location.getPath()) != locations.end())
+		if (_locations.find(new_location.getPath()) != _locations.end())
 			location_context.throwException(PARSINGEXC_DUP_DIR);
-		locations[new_location.getPath()] = new_location;
+		_locations[new_location.getPath()] = new_location;
 	}
 }
 
@@ -195,9 +194,9 @@ void HTTPServer::HTTPLocation::parseDirectiveIndex(
 HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
 {
 	// 기본값
-	this->has_index = false;
-	this->do_redirection = false;
-	this->autoindex = false;
+	this->_has_index = false;
+	this->_do_redirection = false;
+	this->_autoindex = false;
 
 	if (location_context.nParameters() != 1)
 		location_context.throwException(PARSINGEXC_INVALID_N_ARG);

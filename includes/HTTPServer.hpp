@@ -25,14 +25,14 @@ class HTTPServer
 	class HTTPLocation
 	{
 	  private:
-		bool has_index;
-		bool do_redirection;
-		bool autoindex;
-		std::string path;
-		std::string root;
-		std::vector<std::string> index;
-		std::pair<int, std::string> redirection;
-		std::set<int> allowed_methods;
+		bool _has_index;
+		bool _do_redirection;
+		bool _autoindex;
+		std::string _path;
+		std::string _root;
+		std::vector<std::string> _index;
+		std::pair<int, std::string> _redirection;
+		std::set<int> _allowed_methods;
 
 	  public:
 		HTTPLocation();
@@ -49,11 +49,11 @@ class HTTPServer
 		const std::string &getPath(void);
 	};
 
-	int port;
-	std::string server_name;
-	std::map<int, std::string> error_pages;
-	std::map<std::string, HTTPLocation> locations;
-	static const std::map<std::string, int> http_methods;
+	int _port;
+	std::string _server_name;
+	std::map<int, std::string> _error_pages;
+	std::map<std::string, HTTPLocation> _locations;
+	static const std::map<std::string, int> _http_methods;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);

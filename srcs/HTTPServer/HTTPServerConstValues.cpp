@@ -1,7 +1,7 @@
 #include "HTTPServer.hpp"
 #include <map>
 
-static const std::pair<std::string, int> _http_methods[]
+static const std::pair<std::string, int> __http_methods[]
 	= {std::pair<std::string, int>("GET", GET),
 	   std::pair<std::string, int>("HEAD", HEAD),
 	   std::pair<std::string, int>("POST", POST),
@@ -11,6 +11,6 @@ static const std::pair<std::string, int> _http_methods[]
 	   std::pair<std::string, int>("OPTIONS", OPTIONS),
 	   std::pair<std::string, int>("TRACE", TRACE)};
 
-const std::map<std::string, int> HTTPServer::http_methods(
-	_http_methods,
-	_http_methods + sizeof(_http_methods) / sizeof(_http_methods[0]));
+const std::map<std::string, int> HTTPServer::_http_methods(
+	__http_methods,
+	__http_methods + sizeof(__http_methods) / sizeof(__http_methods[0]));
