@@ -1,61 +1,51 @@
-#include "HttpReq.hpp"
+#include "HTTPReq.hpp"
 #include "utils.hpp"
 #include <exception>
 #include <iostream>
 
-using http_msg::HttpReq;
+using http_msg::HTTPReq;
 using http_msg::str_vec_map_t;
 
-HttpReq::HttpReq(std::string const &req)
-	: _src(req), _offset(0), _method(-1), _status(0), _isChunked(false)
-{
-}
+/**
+ *                	ALL		HEAD	TRAILER		CHUNK
+ * start-line		OK		OK		KO			KO
+ * header			OK		OK		OK			KO
+ * body				OK		OK(X)	OK(X)		OK
+ *
+ * OK(X) : 해당 부분이 그냥 없어야 OK
+ **/
 
-void HttpReq::appendChunk(std::string const &chunk)
+HTTPReq::HTTPReq(std::string const &req)
+	: _src(req), _offset(0), _type(NONE), _method(-1)
 {
-	size_t start;
-	size_t content_length = strtol(chunk.c_str(), NULL, 16);
-
-	if (content_length == 0)
+	if (isChunkType())
 	{
-		_isChunked = false;
-		return;
+		parseChunk();
+		_type = CHUNK;
 	}
-	start = chunk.find("\r\n", 0);
-	// 못 찾았을 때 처리
-	if (start == std::string::npos)
-	{
-		// _status = 400;
-		_isChunked = false;
-		return;
-	}
-	_body.append(chunk.substr(start + 2, content_length));
-}
-
-bool HttpReq::isChunked() const
-{
-	return (_isChunked);
-}
-
-// parsing
-bool HttpReq::parse()
-{
-	try
+	else
 	{
 		parseStartLine();
+		// 성공 -> ALL | HEAD
+		// 실패 -> TRAILER
 		parseHeader();
+		// 다 header 파싱하고
+		checkHeader();
+		// 어떤 header가 있는지에 따라 type 정하기
+		// 지금 all이랑 head && Trasfer-Encoding 헤더가 있다 -> HEAD
+		//                                          없다 -> ALL
+		// 지금 TRAILER && Transfer-Encoding 헤더가 있다. -> 오류
+		// content-length
 		parseBody();
-		return (true);
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-		_status = 400;
-		return (false);
 	}
 }
 
-void HttpReq::parseStartLine()
+bool HTTPReq::isChunkType()
+{
+}
+
+// 결정 가능한 type: ALL | HEAD
+void HTTPReq::parseStartLine()
 {
 	/* line 파싱 */
 	std::string line = strBeforeSep(_src, CRLF, _offset);
@@ -65,7 +55,10 @@ void HttpReq::parseStartLine()
 	/* 공백 기준 split*/
 	std::vector<std::string> tokens = split(line, ' ');
 	if (tokens.size() != 3)
-		throw(std::runtime_error("token num of request line is not correct."));
+	{
+		_type = TRAILER;
+		return;
+	}
 
 	/* method index 구하기 */
 	for (int i = 0; i < kMethodCount; i++)
@@ -77,7 +70,10 @@ void HttpReq::parseStartLine()
 		}
 	}
 	if (_method == -1)
-		throw(std::runtime_error("method is not implemented: " + tokens.at(0)));
+	{
+		_type = TRAILER;
+		return;
+	}
 
 	/* uri, version 파싱 */
 	_uri = components->at(1);
@@ -85,47 +81,31 @@ void HttpReq::parseStartLine()
 	delete components; // split으로 인한 동적 할당 해제
 }
 
-void HttpReq::checkHost()
+void HTTPReq::checkHost()
 {
-	str_vec_map_t::iterator itr = findKey("Host");
+	str_vec_map_t::iterator key_itr = _header.find("Host");
 
-	if (itr == _header.end() || itr->second.size() == 0)
-		throw(HttpReqException(kErrHeaderParsing));
+	if (key_itr == _header.end() || key_itr->second.size() == 0)
+		throw(std::runtime_error("host error"));
 }
 
-void HttpReq::checkChunk()
+bool HTTPReq::hasChunkedVal()
 {
-	str_vec_map_t::iterator itr = findKey("Transfer-Encoding");
+	str_vec_map_t::iterator key_itr = _header.find("Transfer-Encoding");
 
-	if (itr == _header.end())
-		return;
-	_isChunked = true;
+	if (key_itr == _header.end())
+		return (false);
+	std::vector<std::string>::iterator val_itr = key_itr->second.begin();
+	for (; val_itr != key_itr->second.end(); ++val_itr)
+	{
+		if (*val_itr == "chunked")
+			return (true);
+	}
+	return (false);
 }
 
-str_vec_map_t::iterator HttpReq::findKey(std::string key)
-{
-	str_vec_map_t::iterator itr = _header.begin();
-	str_vec_map_t::iterator end = _header.end();
-
-	for (; itr != end; ++itr)
-		if (itr->first == key)
-			break;
-	return (itr);
-}
-
-str_vec_map_t::const_iterator HttpReq::findKey(std::string key) const
-{
-	str_vec_map_t::const_iterator itr = _header.begin();
-	str_vec_map_t::const_iterator end = _header.end();
-
-	for (; itr != end; ++itr)
-		if (itr->first == key)
-			break;
-	return (itr);
-}
-
-// 여러 줄 헤더 처리
-void HttpReq::parseHeader()
+// 결정 가능한 type: HEAD, ALL, TRAILER
+void HTTPReq::parseHeader()
 {
 	str_t line;
 
@@ -140,7 +120,6 @@ void HttpReq::parseHeader()
 	size_t key_end_idx;
 	std::string value;
 	std::vector<std::string> vec_value;
-	str_vec_map_t::iterator itr;
 	str_vec_map_t::iterator itr;
 
 	while (true)
@@ -171,78 +150,110 @@ void HttpReq::parseHeader()
 			vec_value.push_back(value);
 
 		/* key가 있다면, 붙여넣기 */
-		itr = findKey(key);
-		if (itr == _header.end())
+		key_itr = _header.find(key);
+		if (key_itr == _header.end())
 			_header[key] = vec_value;
 		else
-			itr->second.insert(itr->second.end(), vec_value.begin(),
-							   vec_value.end());
+			key_itr->second.insert(key_itr->second.end(), vec_value.begin(),
+								   vec_value.end());
 		vec_value.clear();
 	}
+}
+// TODO: trailer에 있으면 안되는 헤더 필드 있는지 확인할 것
+// TODO: Content-Length 있는지 확인할 것
+
+void HTTPReq::checkHeader()
+{
 	/* Host 헤더 있는지 확인 */
 	checkHost();
-	/* Transfer-Encoding: chunked인지 확인 */
-	checkChunk();
+	/* Transfer-Encoding: chunked가 있는지 확인*/
+	if (_type == TRAILER)
+	{
+		if (_header.find("Transfer-Encoding") != _header.end()
+			|| _header.find("Content-Length") != _header.end()
+			|| _header.find("Trailer") != _header.end())
+			throw(
+				std::runtime_error("Trailer must not have Transfer-Encoding"));
+	}
+	else
+	{
+		if (hasHeaderVal("Transfer-Encoding", "chunked"))
+			_type = HEAD;
+		else
+		{
+			_type = ALL;
+			if (_method == POST
+				&& _header.find("Content-Length") == _header.end())
+				throw(std::runtime_error("need Content-Length Header Field"));
+		}
+	}
 }
 
 // body는 Content-Length만큼 읽어야 한다.
-void HttpReq::parseBody()
+void HTTPReq::parseBody()
 {
+	if (_type != ALL)
+	{
+		if (_offset != _src.length())
+			throw(std::runtime_error("must not have entity body"));
+		else
+			return;
+	}
+
 	switch (_method)
 	{
-	case (kGet):
-	case (kDelete): {
+	case (GET):
+	case (DELETE): {
 		if (_offset != _src.length())
 			throw(std::runtime_error("given method must not have the body."));
 		break;
 	}
-	case (method::kPost): {
-		const size_t end_idx = _src.find_last_of(
-			"\r", _src.size()); // 두 번째 인자부터 뒤로 찾는다. 첫 번째 인자의
-								// 문자 중 하나라도 맞으면 반환한다.
-		if (end_idx == std::string::npos || end_idx != _src.length() - CRLF_LEN)
-			throw(std::runtime_error("failed to parse entity body."));
-		_body = _src.substr(_offset, end_idx - _offset);
+	case (POST): {
+		if (_offset +)
+			_body = _src.substr(_offset, _src.length() - _offset);
 	}
 	}
 }
 
+void HTTPReq::parseChunk()
+{
+}
+
 // getter
-int HttpReq::getMethod() const
+int HTTPReq::getMethod() const
 {
 	return (_method);
 }
 
-std::string const &HttpReq::getUri() const
+std::string const &HTTPReq::getUri() const
 {
 	return (_uri);
 }
 
-std::string const &HttpReq::getVersion() const
+std::string const &HTTPReq::getVersion() const
 {
 	return (_version);
 }
 
-str_vec_map_t const &HttpReq::getHeader() const
+str_vec_map_t const &HTTPReq::getHeader() const
 {
 	return (_header);
 }
 
-str_vec_map_t::const_iterator HttpReq::getHeaderVal(std::string const &key)
-	const str_vec_map_t::const_iterator HttpReq::getHeaderVal(
-		std::string const &key) const
+str_vec_map_t::const_iterator HTTPReq::getHeaderVal(
+	std::string const &key) const
 {
 	return (_header.find(key));
 }
 
-std::string const &HttpReq::getBody() const
+std::string const &HTTPReq::getBody() const
 {
 	return (_body);
 }
 
-bool HttpReq::hasHeaderVal(std::string const &key, std::string const &val) const
+bool HTTPReq::hasHeaderVal(std::string const &key, std::string const &val) const
 {
-	str_vec_map_t::const_iterator key_itr = findKey(key);
+	str_vec_map_t::const_iterator key_itr = _header.find(key);
 	if (key_itr == _header.end())
 		return (false);
 
