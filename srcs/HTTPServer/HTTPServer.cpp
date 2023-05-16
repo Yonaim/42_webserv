@@ -28,29 +28,77 @@ static bool isUnsignedIntStr(const std::string &str)
 	return (true);
 }
 
+void HTTPServer::parseDirectiveListen(const ConfigContext &server_context)
+{
+	if (server_context.countDirectivesByName("listen") != 1)
+		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	const ConfigDirective &listen_directive
+		= server_context.getNthDirectiveByName("listen", 0);
+	if (listen_directive.is_context())
+		listen_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	if (listen_directive.nParameters() != 1)
+		listen_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	// TODO: listen port 정보 파싱
+}
+
+void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
+{
+	const size_t n_error_pages
+		= server_context.countDirectivesByName("error_page");
+	if (n_error_pages == 0)
+		return;
+	for (size_t i = 0; i < n_error_pages; i++)
+	{
+		const ConfigDirective &error_page_directive
+			= server_context.getNthDirectiveByName("error_page", i);
+		if (error_page_directive.is_context())
+			error_page_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		// TODO: error page 정보 파싱
+	}
+}
+
+void HTTPServer::parseDirectiveServerName(const ConfigContext &server_context)
+{
+	const size_t n_server_names
+		= server_context.countDirectivesByName("server_name");
+	if (n_server_names == 0)
+		return;
+	for (size_t i = 0; i < n_server_names; i++)
+	{
+		const ConfigDirective &server_name_directive
+			= server_context.getNthDirectiveByName("server_name", i);
+		if (server_name_directive.is_context())
+			server_name_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		// TODO: server_name 정보 파싱
+	}
+}
+
+void HTTPServer::parseDirectiveLocation(const ConfigContext &server_context)
+{
+	const size_t n_locations = server_context.countDirectivesByName("location");
+	if (n_locations == 0)
+		return;
+	for (size_t i = 0; i < n_locations; i++)
+	{
+		const ConfigContext &location_context
+			= (const ConfigContext &)(server_context.getNthDirectiveByName(
+				"location", i));
+		if (!location_context.is_context())
+			location_context.throwException(PARSINGEXC_UNDEF_DIR);
+
+		HTTPLocation new_location(location_context);
+		if (locations.find(new_location.getPath()) != locations.end())
+			location_context.throwException(PARSINGEXC_DUP_DIR);
+		locations[new_location.getPath()] = new_location;
+	}
+}
+
 HTTPServer::HTTPServer(const ConfigContext &server_context)
 {
-	std::map<std::string, std::vector<ConfigDirective> > directive_map;
-
-	// 1. server_context에 속한 모든 directive들이 유효한지 확인
-	if (!server_context.isConfigValid(directives_info))
-		throw(std::runtime_error("Invalid directive(s): context 'server'"));
-
-	// 2. 특정한 directive의 라인의 개수 확인
-	if (server_context.countDirectivesByName("listen") != 1
-		|| server_context.countDirectivesByName("server_name") == 0)
-		throw(std::runtime_error(
-			"Invalid number of directive(s): context 'server'"));
-
-	// 3. directive의 데이터를 객체에 넣는다
-	for (size_t i = 0; i < server_context.nDirectives(); i++)
-	{
-		if (server_context.directive(i).name() == "location")
-			addLocationInfo(
-				(const ConfigContext &)(server_context.directive(i)));
-		else
-			addOtherInfo(server_context.directive(i));
-	}
+	parseDirectiveListen(server_context);
+	parseDirectiveErrorPage(server_context);
+	parseDirectiveServerName(server_context);
+	parseDirectiveLocation(server_context);
 }
 
 HTTPServer::~HTTPServer()
@@ -70,30 +118,78 @@ HTTPServer &HTTPServer::operator=(const HTTPServer &orig)
 	return (*this);
 }
 
-// locations vector에 새로운 location의 string 및 객체 추가
-void HTTPServer::addLocationInfo(const ConfigContext &location_context)
+void HTTPServer::HTTPLocation::parseDirectiveRoot(
+	const ConfigContext &location_context)
 {
-	HTTPLocation new_location(location_context);
-	if (locations.find(new_location.getPath()) != locations.end())
-		throw(std::runtime_error("Duplicated location path: context 'server'"));
-	locations[new_location.getPath()] = new_location;
+	if (location_context.countDirectivesByName("root") != 1)
+		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	const ConfigDirective &root_directive
+		= location_context.getNthDirectiveByName("root", 0);
+	if (root_directive.is_context())
+		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	if (root_directive.nParameters() != 1)
+		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	// TODO: root 정보 파싱
 }
 
-// TODO: location 외 다른 directive 처리부 작성
-void HTTPServer::addOtherInfo(const ConfigDirective &directive)
+void HTTPServer::HTTPLocation::parseDirectiveLimitExcept(
+	const ConfigContext &location_context)
 {
-	if (directive.name() == "listen")
+	const size_t n_limit_excepts
+		= location_context.countDirectivesByName("limit_except");
+	if (n_limit_excepts == 0)
+		return;
+	for (size_t i = 0; i < n_limit_excepts; i++)
 	{
+		const ConfigDirective &limit_except_directive
+			= location_context.getNthDirectiveByName("limit_except", i);
+		if (limit_except_directive.is_context())
+			limit_except_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		// TODO: limit_except 정보 파싱
 	}
-	else if (directive.name() == "server_name")
+}
+
+void HTTPServer::HTTPLocation::parseDirectiveReturn(
+	const ConfigContext &location_context)
+{
+	const size_t n_returns = location_context.countDirectivesByName("return");
+	if (n_returns == 0)
+		return;
+	const ConfigDirective &return_directive
+		= location_context.getNthDirectiveByName("return", 0);
+	if (n_returns > 1)
+		return_directive.throwException(PARSINGEXC_DUP_DIR);
+	// TODO: return 정보 파싱
+}
+
+void HTTPServer::HTTPLocation::parseDirectiveAutoIndex(
+	const ConfigContext &location_context)
+{
+	const size_t n_auto_indexs
+		= location_context.countDirectivesByName("auto_index");
+	if (n_auto_indexs == 0)
+		return;
+	const ConfigDirective &auto_index_directive
+		= location_context.getNthDirectiveByName("auto_index", 0);
+	if (n_auto_indexs > 1)
+		auto_index_directive.throwException(PARSINGEXC_DUP_DIR);
+	// TODO: auto_index 정보 파싱
+}
+
+void HTTPServer::HTTPLocation::parseDirectiveIndex(
+	const ConfigContext &location_context)
+{
+	const size_t n_indexs = location_context.countDirectivesByName("index");
+	if (n_indexs == 0)
+		return;
+	for (size_t i = 0; i < n_indexs; i++)
 	{
+		const ConfigDirective &index_directive
+			= location_context.getNthDirectiveByName("index", i);
+		if (index_directive.is_context())
+			index_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		// TODO: index 정보 파싱
 	}
-	else if (directive.name() == "error_page")
-	{
-	}
-	else
-		throw(
-			std::runtime_error("Undefined directive found: context 'server'"));
 }
 
 HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
@@ -104,93 +200,11 @@ HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
 	this->autoindex = false;
 
 	if (location_context.nParameters() != 1)
-		throw(std::runtime_error(
-			"Invalid number of argument(s): context 'location'"));
-	if (!location_context.isConfigValid(directives_info))
-		throw(std::runtime_error("Invalid directive(s): context 'location'"));
-	// directive의 기본적인 name과 개수 확인
-	if (location_context.countDirectivesByName("root") != 1
-		|| location_context.countDirectivesByName("limit_except") > 1
-		|| location_context.countDirectivesByName("return") > 1
-		|| location_context.countDirectivesByName("autoindex") > 1)
-		throw(std::runtime_error(
-			"Invalid number of directive(s): context 'location'"));
+		location_context.throwException(PARSINGEXC_INVALID_N_ARG);
 
-	// directive 처리
-	// root
-	const ConfigDirective &d_root
-		= location_context.getNthDirectiveByName("root", 0);
-	if (d_root.nParameters() != 1)
-		throw("Invalid number of argument(s): context 'root'");
-	this->root = d_root.parameter(0);
-
-	// limit_except
-	if (location_context.isDirectiveExist("limit_except") == true)
-	{
-		const ConfigDirective d_limit_except
-			= location_context.getNthDirectiveByName("limit_except", 0);
-		for (size_t i = 0; i < d_limit_except.nParameters(); i++)
-		{
-			if (http_methods.find(d_limit_except.parameter(i))
-				== http_methods.end())
-				throw(std::runtime_error(
-					"Undefined argument found: directive 'limit_except'"));
-			this->allowed_methods.insert(
-				http_methods.find(d_limit_except.parameter(i))->second);
-		}
-	}
-	else
-	{
-		this->allowed_methods.insert(GET);
-		this->allowed_methods.insert(HEAD);
-	}
-
-	// return
-	if (location_context.isDirectiveExist("return") == true)
-	{
-		do_redirection = true;
-		const ConfigDirective d_return
-			= location_context.getNthDirectiveByName("return", 0);
-		if (d_return.nParameters() != 2)
-			throw("Invalid number of argument(s): directive 'return'");
-		if (isUnsignedIntStr(d_return.parameter(0)) == false)
-			throw(std::runtime_error(
-				"Undefined argument found: directive 'return'"));
-
-		// ss.fail() 리턴값 확인으로 대체할 수 있는지 체크해볼 것
-		std::stringstream ss(d_return.parameter(0));
-		ss >> this->redirection.first;
-		this->redirection.second = d_return.parameter(1);
-	}
-
-	// autoindex
-	if (location_context.isDirectiveExist("autoindex") == true)
-	{
-		const ConfigDirective &d_autoindex
-			= location_context.getNthDirectiveByName("autoindex", 0);
-		if (d_autoindex.nParameters() != 1)
-			throw("Invalid number of argument(s): directive 'autoindex'");
-		if (d_autoindex.parameter(0) == "on")
-			this->autoindex = true;
-		else if (d_autoindex.parameter(0) == "off")
-			;
-		else
-			throw(std::runtime_error(
-				"Undefined argument found: directive 'autoindex'"));
-	}
-
-	// index
-	if (location_context.isDirectiveExist("index") == true)
-	{
-		for (size_t i = 0; i < location_context.countDirectivesByName("index");
-			 i++)
-		{
-			const ConfigDirective &d_index
-				= location_context.getNthDirectiveByName("index", i);
-			for (size_t j = 0; j < d_index.nParameters(); j++)
-			{
-				this->index.push_back(d_index.parameter(j));
-			}
-		}
-	}
+	parseDirectiveRoot(location_context);
+	parseDirectiveLimitExcept(location_context);
+	parseDirectiveReturn(location_context);
+	parseDirectiveAutoIndex(location_context);
+	parseDirectiveIndex(location_context);
 }

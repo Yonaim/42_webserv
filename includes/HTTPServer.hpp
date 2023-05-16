@@ -40,6 +40,12 @@ class HTTPServer
 		~HTTPLocation();
 		HTTPLocation(const HTTPLocation &orig);
 		HTTPLocation &operator=(const HTTPLocation &orig);
+
+		void parseDirectiveRoot(const ConfigContext &location_context);
+		void parseDirectiveLimitExcept(const ConfigContext &location_context);
+		void parseDirectiveReturn(const ConfigContext &location_context);
+		void parseDirectiveAutoIndex(const ConfigContext &location_context);
+		void parseDirectiveIndex(const ConfigContext &location_context);
 		const std::string &getPath(void);
 	};
 
@@ -49,8 +55,10 @@ class HTTPServer
 	std::map<std::string, HTTPLocation> locations;
 	static const std::map<std::string, int> http_methods;
 
-	void addLocationInfo(const ConfigContext &location_context);
-	void addOtherInfo(const ConfigDirective &directive);
+	void parseDirectiveListen(const ConfigContext &server_context);
+	void parseDirectiveErrorPage(const ConfigContext &server_context);
+	void parseDirectiveServerName(const ConfigContext &server_context);
+	void parseDirectiveLocation(const ConfigContext &server_context);
 
   public:
 	HTTPServer(const ConfigContext &server_context);
