@@ -290,3 +290,7 @@ HTTPServer::HTTPLocation &HTTPServer::HTTPLocation::operator=(
 	return (*this);
 }
 
+const std::string &HTTPServer::HTTPLocation::getPath(void)
+{
+	return (_path);
+}
