@@ -4,19 +4,26 @@ CXXFLAGS	= \
 			-Wall -Wextra -Werror \
 			-std=c++98 -fsanitize=address -g \
 
-SRCS	= HTTPServer.cpp HTTPServerConstValues.cpp
-OBJS	= $(SRCS:.cpp=.o)
+SRCS		= \
+			HTTPServer.cpp \
+			HTTPServerConstValues.cpp \
+			../ConfigParser/ConfigDirective.cpp \
+			../ConfigParser/parseConfig.cpp \
+			../ConfigParser/recursiveParser.cpp \
+			../ConfigParser/splitIntoTokens.cpp \
 
-all: test_server
+OBJS		= $(SRCS:.cpp=.o)
 
-test_server: $(OBJS) test_server.o
-	$(CXX) $(CXXFLAGS) $(OBJS) test_server.o -o $@ $(LDFLAGS)
+all: test_constructor
+
+test_constructor: $(OBJS) test_constructor.o
+	$(CXX) $(CXXFLAGS) $(OBJS) test_constructor.o -o $@ $(LDFLAGS)
 
 clean:
-	$(RM) $(OBJS) test_server.o
+	$(RM) $(OBJS) test_constructor.o
 
 fclean: clean
-	$(RM) test_server
+	$(RM) test_constructor
 
 re:
 	make fclean
