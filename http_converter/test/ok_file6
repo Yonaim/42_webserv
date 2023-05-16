@@ -1,14 +1,9 @@
 POST / HTTP/1.1
 Host: localhost
-Content-Length: 3
 Transfer-Encoding: chunked
 
-hi
-
-_
-6
-hello
-
-_
-0
+_6
+hihihi_A
+byebyebye
+_0
 _

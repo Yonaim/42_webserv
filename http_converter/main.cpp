@@ -4,27 +4,28 @@
 #include <string>
 #include <vector>
 
-using http_msg::HttpReq;
+using http_msg::HTTPReq;
 using http_msg::str_vec_map_t;
 
 int main(void)
 {
+	std::string	typeStr[] = {"complete", "chunk header", "chunk", "trailer"};
+	std::string	methodStr[] = {"GET", "POST", "DELETE"};
+
 	while (true)
 	{
 		std::string str;
 		std::getline(std::cin, str, '_');
-		if (str == "\n" || str == "")
-			break;
-
-		static HttpReq req(str);
+		if (str == "\r\n" || str == "\n" || str == "")
+			break ;
 
 		try
 		{
-			if (req.isChunked())
-				req.appendChunk(str);
-			else if (req.parse() == false)
-				throw(1);
-			std::cout << "method: " << req.getMethod() << std::endl;
+			HTTPReq req(str);
+
+			std::cout << "----------------------------------------" << std::endl;
+			std::cout << "type: " << typeStr[req.getType()] << std::endl;
+			std::cout << "method: " << methodStr[req.getMethod()] << std::endl;
 			std::cout << "url: " << req.getUri() << std::endl;
 			std::cout << "version: " << req.getVersion() << std::endl;
 			std::cout << "header: " << std::endl;
@@ -38,10 +39,11 @@ int main(void)
 					std::cout << "\t\t" << *it2 << std::endl;
 			}
 			std::cout << "body: " << req.getBody() << std::endl;
+			std::cout << "----------------------------------------" << std::endl << std::endl;
 		}
-		catch (int e)
+		catch (std::exception &e)
 		{
-			std::cout << "error당" << std::endl;
+			std::cout << e.what() << std::endl;
 		}
 	}
 	return (0);

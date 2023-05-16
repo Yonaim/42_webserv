@@ -1,15 +1,9 @@
 POST /upload HTTP/1.1
-User-Agent: Arduino
-Accept: */*
-Transfer-Encoding: chunked
 Host: localhost
+Transfer-Encoding: chunked
+Trailer: test
 
-_
-25
-this is the text, of this file, wooo!
-_
-1d
-more test, of this file,luck
-_
-0
+_C
+trailer-test_0
+_test: ok
 _
