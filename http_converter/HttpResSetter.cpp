@@ -20,14 +20,6 @@ void HttpRes::setValue(std::string const &key, std::string const &val)
 	iter->second.append(val);
 }
 
-std::string	toStr(int num, int num2)
-{
-	std::ostringstream	ss;
-
-	ss << num << num2;
-	return (ss.str());
-}
-
 void HttpRes::setDate()
 {
 	time_t cur_time = time(NULL);
@@ -42,7 +34,8 @@ void HttpRes::setDate()
 	std::string date(day_name[tm_gmt->tm_wday] + ", ");
 
 	date.append(toStr(tm_gmt->tm_mday / 10, tm_gmt->tm_mday % 10) + " ");
-	date.append(month[tm_gmt->tm_mon] + " " + toStr(tm_gmt->tm_year, 1900) + " ");
+	date.append(month[tm_gmt->tm_mon] + " ");
+	date.append(toStr(tm_gmt->tm_year, 1900) + " ");
 	date.append(toStr(tm_gmt->tm_hour / 10, tm_gmt->tm_hour % 10) + ":");
 	date.append(toStr(tm_gmt->tm_min / 10, tm_gmt->tm_min % 10) + ":");
 	date.append(toStr(tm_gmt->tm_sec / 10, tm_gmt->tm_sec % 10) + " GMT");
