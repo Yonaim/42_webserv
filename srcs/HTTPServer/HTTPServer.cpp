@@ -36,7 +36,11 @@ void HTTPServer::parseDirectiveListen(const ConfigContext &server_context)
 		listen_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	if (listen_directive.nParameters() != 1)
 		listen_directive.throwException(PARSINGEXC_INVALID_N_ARG);
-	// TODO: listen port 정보 파싱
+	const std::string &port_str = listen_directive.parameter(0);
+	if (!isUnsignedIntStr(port_str))
+		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
+	std::stringstream ss(port_str);
+	ss >> _port;
 }
 
 void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
@@ -45,13 +49,26 @@ void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
 		= server_context.countDirectivesByName("error_page");
 	if (n_error_pages == 0)
 		return;
+	std::stringstream ss;
+	int code;
 	for (size_t i = 0; i < n_error_pages; i++)
 	{
 		const ConfigDirective &error_page_directive
 			= server_context.getNthDirectiveByName("error_page", i);
 		if (error_page_directive.is_context())
 			error_page_directive.throwException(PARSINGEXC_UNDEF_DIR);
-		// TODO: error page 정보 파싱
+		const size_t n_arguments = error_page_directive.nParameters();
+		const std::string file_path
+			= error_page_directive.parameter(n_arguments - 1);
+		for (size_t i = 0; i < n_arguments - 1; i++)
+		{
+			const std::string &code_str = error_page_directive.parameter(i);
+			if (!isUnsignedIntStr(code_str))
+				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
+			ss.str(code_str);
+			ss >> code;
+			_error_pages[code] = file_path;
+		}
 	}
 }
 
@@ -67,7 +84,9 @@ void HTTPServer::parseDirectiveServerName(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName("server_name", i);
 		if (server_name_directive.is_context())
 			server_name_directive.throwException(PARSINGEXC_UNDEF_DIR);
-		// TODO: server_name 정보 파싱
+		const size_t n_arguments = server_name_directive.nParameters();
+		for (size_t i = 0; i < n_arguments; i++)
+			_server_name.insert(server_name_directive.parameter(i));
 	}
 }
 
@@ -127,29 +146,57 @@ void HTTPServer::HTTPLocation::parseDirectiveRoot(
 		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	if (root_directive.nParameters() != 1)
 		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
-	// TODO: root 정보 파싱
+	_root = root_directive.parameter(0);
 }
 
 void HTTPServer::HTTPLocation::parseDirectiveLimitExcept(
 	const ConfigContext &location_context)
 {
+	_allowed_methods.insert(GET);
+	_allowed_methods.insert(HEAD);
+
 	const size_t n_limit_excepts
 		= location_context.countDirectivesByName("limit_except");
 	if (n_limit_excepts == 0)
 		return;
+	_allowed_methods.clear();
+
 	for (size_t i = 0; i < n_limit_excepts; i++)
 	{
 		const ConfigDirective &limit_except_directive
 			= location_context.getNthDirectiveByName("limit_except", i);
 		if (limit_except_directive.is_context())
 			limit_except_directive.throwException(PARSINGEXC_UNDEF_DIR);
-		// TODO: limit_except 정보 파싱
+
+		const size_t n_methods = limit_except_directive.nParameters();
+		if (n_methods == 0)
+			limit_except_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+
+		for (size_t j = 0; j < n_methods; j++)
+		{
+			const std::map<std::string, int>::const_iterator it
+				= _http_methods.find(limit_except_directive.parameter(j));
+			if (it == _http_methods.end())
+				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
+
+			const int method = it->second;
+			if (method == GET)
+			{
+				_allowed_methods.insert(GET);
+				_allowed_methods.insert(HEAD);
+			}
+			else
+			{
+				_allowed_methods.insert(method);
+			}
+		}
 	}
 }
 
 void HTTPServer::HTTPLocation::parseDirectiveReturn(
 	const ConfigContext &location_context)
 {
+	_do_redirection = false;
 	const size_t n_returns = location_context.countDirectivesByName("return");
 	if (n_returns == 0)
 		return;
@@ -157,12 +204,20 @@ void HTTPServer::HTTPLocation::parseDirectiveReturn(
 		= location_context.getNthDirectiveByName("return", 0);
 	if (n_returns > 1)
 		return_directive.throwException(PARSINGEXC_DUP_DIR);
-	// TODO: return 정보 파싱
+	if (return_directive.nParameters() != 2)
+		return_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	if (!isUnsignedIntStr(return_directive.parameter(0)))
+		return_directive.throwException(PARSINGEXC_UNDEF_ARG);
+	_do_redirection = true;
+	std::stringstream buf(return_directive.parameter(0));
+	buf >> _redirection.first;
+	_redirection.second = return_directive.parameter(1);
 }
 
 void HTTPServer::HTTPLocation::parseDirectiveAutoIndex(
 	const ConfigContext &location_context)
 {
+	_autoindex = false;
 	const size_t n_auto_indexs
 		= location_context.countDirectivesByName("auto_index");
 	if (n_auto_indexs == 0)
@@ -171,7 +226,14 @@ void HTTPServer::HTTPLocation::parseDirectiveAutoIndex(
 		= location_context.getNthDirectiveByName("auto_index", 0);
 	if (n_auto_indexs > 1)
 		auto_index_directive.throwException(PARSINGEXC_DUP_DIR);
-	// TODO: auto_index 정보 파싱
+	if (auto_index_directive.nParameters() != 1)
+		auto_index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	if (auto_index_directive.parameter(0) == "off")
+		return;
+	else if (auto_index_directive.parameter(0) == "on")
+		_autoindex = true;
+	else
+		auto_index_directive.throwException(PARSINGEXC_UNDEF_ARG);
 }
 
 void HTTPServer::HTTPLocation::parseDirectiveIndex(
@@ -186,7 +248,10 @@ void HTTPServer::HTTPLocation::parseDirectiveIndex(
 			= location_context.getNthDirectiveByName("index", i);
 		if (index_directive.is_context())
 			index_directive.throwException(PARSINGEXC_UNDEF_DIR);
-		// TODO: index 정보 파싱
+		if (index_directive.nParameters() == 0)
+			index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		for (size_t j = 0; j < index_directive.nParameters(); j++)
+			_index.push_back(index_directive.parameter(j));
 	}
 }
 
