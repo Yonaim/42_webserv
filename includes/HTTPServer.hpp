@@ -50,7 +50,7 @@ class HTTPServer
 	};
 
 	int _port;
-	std::string _server_name;
+	std::set<std::string> _server_name;
 	std::map<int, std::string> _error_pages;
 	std::map<std::string, HTTPLocation> _locations;
 	static const std::map<std::string, int> _http_methods;
