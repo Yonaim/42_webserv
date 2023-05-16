@@ -243,6 +243,10 @@ void HTTPServer::HTTPLocation::parseDirectiveIndex(
 	}
 }
 
+HTTPServer::HTTPLocation::HTTPLocation()
+{
+}
+
 HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
 {
 	// 기본값
@@ -259,3 +263,30 @@ HTTPServer::HTTPLocation::HTTPLocation(const ConfigContext &location_context)
 	parseDirectiveAutoIndex(location_context);
 	parseDirectiveIndex(location_context);
 }
+
+HTTPServer::HTTPLocation::~HTTPLocation()
+{
+}
+
+HTTPServer::HTTPLocation::HTTPLocation(const HTTPLocation &orig)
+	: _has_index(orig._has_index), _do_redirection(orig._do_redirection),
+	  _autoindex(orig._autoindex), _path(orig._path), _root(orig._root),
+	  _index(orig._index), _redirection(orig._redirection),
+	  _allowed_methods(orig._allowed_methods)
+{
+}
+
+HTTPServer::HTTPLocation &HTTPServer::HTTPLocation::operator=(
+	const HTTPLocation &orig)
+{
+	_has_index = orig._has_index;
+	_do_redirection = orig._do_redirection;
+	_autoindex = orig._autoindex;
+	_path = orig._path;
+	_root = orig._root;
+	_index = orig._index;
+	_redirection = orig._redirection;
+	_allowed_methods = orig._allowed_methods;
+	return (*this);
+}
+
