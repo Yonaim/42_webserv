@@ -55,6 +55,8 @@ void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			ss.str(code_str);
 			ss >> code;
+			if (!isValidStatusCode(code))
+				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			_error_pages[code] = file_path;
 		}
 	}
@@ -96,6 +98,11 @@ void HTTPServer::parseDirectiveLocation(const ConfigContext &server_context)
 			location_context.throwException(PARSINGEXC_DUP_DIR);
 		_locations[new_location.getPath()] = new_location;
 	}
+}
+
+bool HTTPServer::isValidStatusCode(const int &status_code)
+{
+	return (_http_status_code.find(status_code) != _http_status_code.end());
 }
 
 HTTPServer::HTTPServer(const ConfigContext &server_context)
@@ -201,6 +208,8 @@ void HTTPServer::HTTPLocation::parseDirectiveReturn(
 	_do_redirection = true;
 	std::stringstream buf(return_directive.parameter(0));
 	buf >> _redirection.first;
+	if (!(isValidStatusCode(_redirection.first)))
+		return_directive.throwException(PARSINGEXC_DUP_ARG);
 	_redirection.second = return_directive.parameter(1);
 }
 

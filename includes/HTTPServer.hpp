@@ -60,6 +60,7 @@ class HTTPServer
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);
 	void parseDirectiveLocation(const ConfigContext &server_context);
+	static bool isValidStatusCode(const int &status_code);
 
   public:
 	HTTPServer(const ConfigContext &server_context);
