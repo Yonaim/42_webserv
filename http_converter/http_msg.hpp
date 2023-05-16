@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <queue>
 
 namespace http_msg
 {
@@ -18,15 +19,8 @@ const std::string SP = " ";
 const int         CRLF_LEN = 2;
 const int         SP_LEN = 1;
 
-// method
-enum eMethodType
-{
-	kGet,
-	kPost,
-	kDelete
-};
 const int         kMethodCount = 3;
-const std::string kMethodStr[kCount] = {"GET", "POST", "DELETE"};
+const std::string kMethodStr[kMethodCount] = {"GET", "POST", "DELETE"};
 } // namespace http_msg
 
 #endif
