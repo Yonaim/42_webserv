@@ -6,6 +6,16 @@
 #include <string>
 #include <vector>
 
+enum parsingexc_e
+{
+	PARSINGEXC_UNDEF_DIR,
+	PARSINGEXC_UNDEF_ARG,
+	PARSINGEXC_INVALID_N_DIR,
+	PARSINGEXC_INVALID_N_ARG,
+	PARSINGEXC_DUP_DIR,
+	PARSINGEXC_DUP_ARG
+};
+
 class ConfigDirective
 {
   protected:
@@ -21,6 +31,7 @@ class ConfigDirective
 	ConfigDirective(const ConfigDirective &orig);
 	ConfigDirective &operator=(const ConfigDirective &orig);
 
+	void throwException(int code) const;
 	bool is_context(void) const;
 	const std::string &name(void) const;
 	const std::string &parameter(size_t index) const;
