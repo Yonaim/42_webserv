@@ -59,7 +59,6 @@ void HTTPReq::parseChunk()
 
 	if (content_length <= 0)
 		return;
-	std::cout << "content_length : " << content_length << std::endl;
 	crlf_pos = _src.find(CRLF, 0);
 	if (crlf_pos == std::string::npos)
 		throw(std::runtime_error("no crlf"));
