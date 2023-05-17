@@ -457,6 +457,8 @@ int HTTP::Request::consumeCRLF(std::string &buffer)
 		_error_offset = 0;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
+	/* unreachable */
+	return (RETURN_TYPE_INVALID);
 }
 
 bool HTTP::Request::hasHeaderValue(std::string const &name,
