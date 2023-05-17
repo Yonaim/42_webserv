@@ -12,7 +12,7 @@ static bool isUnsignedIntStr(const std::string &str)
 	return (true);
 }
 
-void HTTPServer::parseDirectiveListen(const ConfigContext &server_context)
+void HTTP::Server::parseDirectiveListen(const ConfigContext &server_context)
 {
 	if (server_context.countDirectivesByName("listen") != 1)
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
@@ -31,7 +31,7 @@ void HTTPServer::parseDirectiveListen(const ConfigContext &server_context)
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 }
 
-void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
+void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 {
 	const size_t n_error_pages
 		= server_context.countDirectivesByName("error_page");
@@ -62,7 +62,7 @@ void HTTPServer::parseDirectiveErrorPage(const ConfigContext &server_context)
 	}
 }
 
-void HTTPServer::parseDirectiveServerName(const ConfigContext &server_context)
+void HTTP::Server::parseDirectiveServerName(const ConfigContext &server_context)
 {
 	const size_t n_server_names
 		= server_context.countDirectivesByName("server_name");
@@ -80,7 +80,7 @@ void HTTPServer::parseDirectiveServerName(const ConfigContext &server_context)
 	}
 }
 
-void HTTPServer::parseDirectiveLocation(const ConfigContext &server_context)
+void HTTP::Server::parseDirectiveLocation(const ConfigContext &server_context)
 {
 	const size_t n_locations = server_context.countDirectivesByName("location");
 	if (n_locations == 0)
@@ -93,19 +93,19 @@ void HTTPServer::parseDirectiveLocation(const ConfigContext &server_context)
 		if (!location_context.is_context())
 			location_context.throwException(PARSINGEXC_UNDEF_DIR);
 
-		HTTPLocation new_location(location_context);
+		Location new_location(location_context);
 		if (_locations.find(new_location.getPath()) != _locations.end())
 			location_context.throwException(PARSINGEXC_DUP_DIR);
 		_locations[new_location.getPath()] = new_location;
 	}
 }
 
-bool HTTPServer::isValidStatusCode(const int &status_code)
+bool HTTP::Server::isValidStatusCode(const int &status_code)
 {
 	return (_http_status_code.find(status_code) != _http_status_code.end());
 }
 
-HTTPServer::HTTPServer(const ConfigContext &server_context)
+HTTP::Server::Server(const ConfigContext &server_context)
 {
 	parseDirectiveListen(server_context);
 	parseDirectiveErrorPage(server_context);
@@ -113,17 +113,17 @@ HTTPServer::HTTPServer(const ConfigContext &server_context)
 	parseDirectiveLocation(server_context);
 }
 
-HTTPServer::~HTTPServer()
+HTTP::Server::~Server()
 {
 }
 
-HTTPServer::HTTPServer(const HTTPServer &orig)
+HTTP::Server::Server(const Server &orig)
 	: _port(orig._port), _server_name(orig._server_name),
 	  _error_pages(orig._error_pages), _locations(orig._locations)
 {
 }
 
-HTTPServer &HTTPServer::operator=(const HTTPServer &orig)
+HTTP::Server &HTTP::Server::operator=(const Server &orig)
 {
 	_port = orig._port;
 	_server_name = orig._server_name;

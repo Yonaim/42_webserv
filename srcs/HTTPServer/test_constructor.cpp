@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 				"server", 0));
 		if (server_context.nParameters() != 0)
 			server_context.throwException(PARSINGEXC_INVALID_N_ARG);
-		const HTTPServer server(server_context);
+		const HTTP::Server server(server_context);
 		std::cout << "Server parsing success" << std::endl;
 	}
 	catch (const std::exception &e)

@@ -19,27 +19,29 @@ enum e_http_method
 	TRACE
 };
 
-class HTTPServer
+namespace HTTP
+{
+class Server
 {
   private:
-	class HTTPLocation
+	class Location
 	{
 	  private:
-		bool _has_index;
-		bool _do_redirection;
-		bool _autoindex;
-		std::string _path;
-		std::string _root;
-		std::vector<std::string> _index;
+		bool                        _has_index;
+		bool                        _do_redirection;
+		bool                        _autoindex;
+		std::string                 _path;
+		std::string                 _root;
+		std::vector<std::string>    _index;
 		std::pair<int, std::string> _redirection;
-		std::set<int> _allowed_methods;
+		std::set<int>               _allowed_methods;
 
 	  public:
-		HTTPLocation();
-		HTTPLocation(const ConfigContext &location_context);
-		~HTTPLocation();
-		HTTPLocation(const HTTPLocation &orig);
-		HTTPLocation &operator=(const HTTPLocation &orig);
+		Location();
+		Location(const ConfigContext &location_context);
+		~Location();
+		Location(const Location &orig);
+		Location &operator=(const Location &orig);
 
 		void parseDirectiveRoot(const ConfigContext &location_context);
 		void parseDirectiveLimitExcept(const ConfigContext &location_context);
@@ -49,24 +51,25 @@ class HTTPServer
 		const std::string &getPath(void);
 	};
 
-	int _port;
-	std::set<std::string> _server_name;
-	std::map<int, std::string> _error_pages;
-	std::map<std::string, HTTPLocation> _locations;
+	int                                     _port;
+	std::set<std::string>                   _server_name;
+	std::map<int, std::string>              _error_pages;
+	std::map<std::string, Location>         _locations;
 	static const std::map<std::string, int> _http_methods;
 	static const std::map<int, std::string> _http_status_code;
 
-	void parseDirectiveListen(const ConfigContext &server_context);
-	void parseDirectiveErrorPage(const ConfigContext &server_context);
-	void parseDirectiveServerName(const ConfigContext &server_context);
-	void parseDirectiveLocation(const ConfigContext &server_context);
+	void        parseDirectiveListen(const ConfigContext &server_context);
+	void        parseDirectiveErrorPage(const ConfigContext &server_context);
+	void        parseDirectiveServerName(const ConfigContext &server_context);
+	void        parseDirectiveLocation(const ConfigContext &server_context);
 	static bool isValidStatusCode(const int &status_code);
 
   public:
-	HTTPServer(const ConfigContext &server_context);
-	~HTTPServer();
-	HTTPServer(const HTTPServer &orig);
-	HTTPServer &operator=(const HTTPServer &orig);
+	Server(const ConfigContext &server_context);
+	~Server();
+	Server(const Server &orig);
+	Server &operator=(const Server &orig);
 };
+} // namespace HTTP
 
 #endif

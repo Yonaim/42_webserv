@@ -11,7 +11,7 @@ static const std::pair<std::string, int> __http_methods[]
 	   std::pair<std::string, int>("OPTIONS", OPTIONS),
 	   std::pair<std::string, int>("TRACE", TRACE)};
 
-const std::map<std::string, int> HTTPServer::_http_methods(
+const std::map<std::string, int> HTTP::Server::_http_methods(
 	__http_methods,
 	__http_methods + sizeof(__http_methods) / sizeof(__http_methods[0]));
 
@@ -58,7 +58,7 @@ static const std::pair<int, std::string> __http_status_code[] = {
 	std::pair<int, std::string>(505, "HTTP Version not supported"),
 };
 
-const std::map<int, std::string> HTTPServer::_http_status_code(
+const std::map<int, std::string> HTTP::Server::_http_status_code(
 	__http_status_code,
 	__http_status_code
 		+ sizeof(__http_status_code) / sizeof(__http_status_code[0]));
