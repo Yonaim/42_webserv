@@ -11,10 +11,10 @@ namespace HTTP
 // special token
 const std::string CRLF = "\r\n";
 const std::string SP = " ";
-const int         CRLF_LEN = 2;
-const int         SP_LEN = 1;
+const int CRLF_LEN = 2;
+const int SP_LEN = 1;
 
-const int         kMethodCount = 4;
+const int kMethodCount = 4;
 const std::string kMethodStr[kMethodCount] = {"NONE", "GET", "POST", "DELETE"};
 
 enum consume_exc_e
@@ -46,22 +46,22 @@ class Request
 		PARSE_STATE_CRLF_AFTER_CHUNK
 	};
 
-	int         _method;
+	int _method;
 	std::string _uri;
 	std::string _version_string; // 1.1 2.0 1.0
-	int         _version;        // 1001 2000 1000
-	Header      _header;
+	int _version; // 1001 2000 1000
+	Header _header;
 	std::string _body;
-	int         _current_state; // enum parse_state_e
-	size_t      _error_offset;  // 에러가 발생한 위치
+	int _current_state; // enum parse_state_e
+	size_t _error_offset; // 에러가 발생한 위치
 	std::vector<std::string> _trailer_values;
 
-	int  consumeStartLine(std::string &buffer);
-	int  consumeHeader(std::string &buffer);
-	int  consumeBody(std::string &buffer);
-	int  consumeChunk(std::string &buffer);
-	int  consumeCRLF(std::string &buffer);
-	int  consumeTrailer(std::string &buffer);
+	int consumeStartLine(std::string &buffer);
+	int consumeHeader(std::string &buffer);
+	int consumeBody(std::string &buffer);
+	int consumeChunk(std::string &buffer);
+	int consumeCRLF(std::string &buffer);
+	int consumeTrailer(std::string &buffer);
 	void throwException(int code) const;
 
   public:
@@ -78,11 +78,11 @@ class Request
 
 	int parse(std::string &buffer);
 
-	bool               hasHeaderValue(const Header::const_iterator &name_iter,
-									  const std::string            &value) const;
-	bool               hasHeaderValue(const std::string &name,
-									  const std::string &value) const;
-	bool               hasHeaderValue(const std::string &name) const;
+	bool hasHeaderValue(const Header::const_iterator &name_iter,
+						const std::string &value) const;
+	bool hasHeaderValue(const std::string &name,
+						const std::string &value) const;
+	bool hasHeaderValue(const std::string &name) const;
 	const std::string &getHeaderValue(const std::string &name, int idx) const;
 };
 } // namespace HTTP

@@ -12,7 +12,7 @@ bool hasSpace(const std::string &str)
 }
 
 // [CRLF] 1*( SP | HT )
-bool passLWS(std::string &str)
+void passLWS(std::string &str)
 {
 	size_t after_lws = 0;
 
@@ -28,8 +28,8 @@ bool passLWS(std::string &str)
 std::vector<std::string> split(std::string const &s, char const c)
 {
 	std::vector<std::string> words;
-	size_t                   offset = 0;
-	size_t                   end_idx;
+	size_t offset = 0;
+	size_t end_idx;
 
 	while (offset < s.length())
 	{
@@ -61,8 +61,8 @@ static size_t _findFirstSep(std::string const &s, std::string const &sep,
 std::vector<std::string> split(std::string const &s, std::string const &sep)
 {
 	std::vector<std::string> words;
-	size_t                   offset = 0;
-	size_t                   end_idx;
+	size_t offset = 0;
+	size_t end_idx;
 
 	while (offset < s.length())
 	{
@@ -82,7 +82,7 @@ std::string strBeforeSep(const std::string &be_parsed, const std::string &sep,
 						 size_t &start)
 {
 	std::string result;
-	size_t      end;
+	size_t end;
 
 	end = be_parsed.find(sep, start);
 	if (end == std::string::npos)
@@ -108,8 +108,8 @@ std::string strtrim(std::string str, std::string charset)
 
 std::string uintToStr(size_t num)
 {
-	size_t      tem = num;
-	size_t      length = 0;
+	size_t tem = num;
+	size_t length = 0;
 	std::string num_str;
 
 	if (num == 0)

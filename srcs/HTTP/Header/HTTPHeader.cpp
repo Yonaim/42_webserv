@@ -43,7 +43,7 @@ bool HTTP::Header::hasValue(const std::string &name,
 }
 
 bool HTTP::Header::hasValue(const HTTP::Header::const_iterator &iter,
-							const std::string                  &value) const
+							const std::string &value) const
 {
 	for (_list::const_iterator value_iter = iter->second.begin();
 		 value_iter != iter->second.end(); ++value_iter)
@@ -55,7 +55,7 @@ bool HTTP::Header::hasValue(const HTTP::Header::const_iterator &iter,
 }
 
 const std::string &HTTP::Header::getValue(const std::string &name,
-										  int                idx) const
+										  int idx) const
 {
 	HTTP::Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
@@ -64,7 +64,8 @@ const std::string &HTTP::Header::getValue(const std::string &name,
 	return (name_iter->second.at(idx));
 }
 
-const std::vector<std::string> HTTP::Header::getValues(const std::string &name) const
+const std::vector<std::string> HTTP::Header::getValues(
+	const std::string &name) const
 {
 	HTTP::Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
@@ -72,13 +73,13 @@ const std::vector<std::string> HTTP::Header::getValues(const std::string &name) 
 	return (name_iter->second);
 }
 
-void HTTP::Header::assign(const std::string             &name,
+void HTTP::Header::assign(const std::string &name,
 						  const std::vector<std::string> values)
 {
 	_values[name] = values;
 }
 
-void HTTP::Header::insert(const std::string             &name,
+void HTTP::Header::insert(const std::string &name,
 						  const std::vector<std::string> values)
 {
 	_values[name].insert(_values[name].end(), values.begin(), values.end());

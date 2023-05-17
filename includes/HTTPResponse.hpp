@@ -64,14 +64,14 @@ class Response
 
 	// final
 	Request const *_request;
-	std::string    _response;
+	std::string _response;
 
 	// status-line
-	static const std::string           _http_version;
-	std::string                        _status_code;
-	std::string                        _reason_phrase;
+	static const std::string _http_version;
+	std::string _status_code;
+	std::string _reason_phrase;
 	std::map<std::string, std::string> _header;
-	std::string                        _body;
+	std::string _body;
 };
 } // namespace HTTP
 

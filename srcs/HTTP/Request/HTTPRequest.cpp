@@ -279,7 +279,7 @@ int HTTP::Request::consumeHeader(std::string &buffer)
 	std::cout << __func__ << ": header line: " << header_line << std::endl;
 
 	/* name 파싱 */
-	size_t      key_end_idx = 0;
+	size_t key_end_idx = 0;
 	std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
@@ -394,7 +394,7 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 	// }
 
 	/** name 파싱 **/
-	size_t            key_end_idx = 0;
+	size_t key_end_idx = 0;
 	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
@@ -402,7 +402,7 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 	std::vector<std::string>::const_iterator iter = _trailer_values.begin();
-	bool                                     found_name = false;
+	bool found_name = false;
 	for (; iter != _trailer_values.end(); ++iter)
 	{
 		if (*iter == name)
@@ -466,7 +466,7 @@ bool HTTP::Request::hasHeaderValue(std::string const &name,
 }
 
 bool HTTP::Request::hasHeaderValue(const Header::const_iterator &name_iter,
-								   const std::string            &value) const
+								   const std::string &value) const
 {
 	return (_header.hasValue(name_iter, value));
 }
@@ -477,7 +477,7 @@ bool HTTP::Request::hasHeaderValue(std::string const &name) const
 }
 
 const std::string &HTTP::Request::getHeaderValue(std::string const &name,
-												 int                idx) const
+												 int idx) const
 {
 	return (_header.getValue(name, idx));
 }

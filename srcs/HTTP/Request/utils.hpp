@@ -6,17 +6,17 @@
 #include <vector>
 
 // parsing
-bool                     hasSpace(const std::string &key);
-bool                     passLWS(std::string &str);
-std::string              strtrim(std::string str, std::string charset);
+bool hasSpace(const std::string &key);
+void passLWS(std::string &str);
+std::string strtrim(std::string str, std::string charset);
 std::vector<std::string> split(std::string const &s, char const c);
 std::vector<std::string> split(std::string const &s, std::string const &sep);
 std::string strBeforeSep(const std::string &be_parsed, const std::string &sep,
 						 size_t &start);
 std::string getfrontstr(const std::string &str, size_t until);
-void        trimbackstr(std::string &str, size_t until);
+void trimbackstr(std::string &str, size_t until);
 std::string getbackstr(const std::string &str, size_t from);
-void        trimfrontstr(std::string &str, size_t from);
+void trimfrontstr(std::string &str, size_t from);
 
 // conversion
 std::string uintToStr(size_t num);
@@ -39,7 +39,7 @@ template <typename T> std::string toStr(T num)
 
 template <typename T> T toNum(std::string str)
 {
-	T                  num;
+	T num;
 	std::istringstream ss(str);
 
 	ss >> num;

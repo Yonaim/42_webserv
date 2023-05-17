@@ -10,12 +10,12 @@ namespace HTTP
 class Header
 {
   private:
-	typedef std::vector<std::string>     _list;
+	typedef std::vector<std::string> _list;
 	typedef std::map<std::string, _list> _container;
-	_container                           _values;
+	_container _values;
 
   public:
-	typedef _container::iterator       iterator;
+	typedef _container::iterator iterator;
 	typedef _container::const_iterator const_iterator;
 
 	Header();
@@ -32,8 +32,8 @@ class Header
 	void assign(const std::string &name, const std::vector<std::string> values);
 	void insert(const std::string &name, const std::vector<std::string> values);
 
-	iterator       begin(void);
-	iterator       end(void);
+	iterator begin(void);
+	iterator end(void);
 	const_iterator begin(void) const;
 	const_iterator end(void) const;
 };
