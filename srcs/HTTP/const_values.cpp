@@ -1,7 +1,17 @@
 #include "const_values.hpp"
 #include <map>
 
-static const std::pair<int, std::string> _http_status_code[] = {
+const std::string HTTP::CRLF = "\r\n";
+const std::string HTTP::SP = " ";
+const int HTTP::CRLF_LEN = 2;
+const int HTTP::SP_LEN = 1;
+
+// Method
+const int HTTP::METHOD_COUNT = 4;
+const std::string HTTP::METHOD_STR[METHOD_COUNT]
+	= {"NONE", "GET", "POST", "DELETE"};
+
+static const std::pair<int, std::string> _STATUS_CODE[] = {
 	std::pair<int, std::string>(100, "Continue"),
 	std::pair<int, std::string>(101, "Switching Protocols"),
 	std::pair<int, std::string>(200, "Ok"),
@@ -44,7 +54,6 @@ static const std::pair<int, std::string> _http_status_code[] = {
 	std::pair<int, std::string>(505, "HTTP Version not supported"),
 };
 
-const std::map<int, std::string> _http_status_code(
-	_http_status_code,
-	_http_status_code
-		+ sizeof(_http_status_code) / sizeof(_http_status_code[0]));
+const std::map<int, std::string> HTTP::STATUS_CODE(
+	_STATUS_CODE,
+	_STATUS_CODE + sizeof(_STATUS_CODE) / sizeof(_STATUS_CODE[0]));

@@ -9,6 +9,8 @@ SRCS	= \
 		Response/HTTPResponse.cpp \
 		Request/utils.cpp \
 		Header/HTTPHeader.cpp \
+		const_values.cpp \
+		utils.cpp \
 
 OBJS	= $(SRCS:.cpp=.o)
 
