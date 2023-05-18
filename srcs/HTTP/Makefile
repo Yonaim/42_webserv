@@ -6,21 +6,25 @@ CXXFLAGS	= \
 
 SRCS	= \
 		Request/HTTPRequest.cpp \
+		Response/HTTPResponse.cpp \
 		Request/utils.cpp \
 		Header/HTTPHeader.cpp \
 
 OBJS	= $(SRCS:.cpp=.o)
 
-all: test_http_request
+all: test_http_request test_http_response
 
 test_http_request: $(OBJS) test_http_request.o
 	$(CXX) $(CXXFLAGS) $(OBJS) test_http_request.o -o $@ $(LDFLAGS)
 
+test_http_response: $(OBJS) test_http_response.o
+	$(CXX) $(CXXFLAGS) $(OBJS) test_http_response.o -o $@ $(LDFLAGS)
+
 clean:
-	$(RM) $(OBJS) test_http_request.o
+	$(RM) $(OBJS) test_http_request.o test_http_response.o
 
 fclean: clean
-	$(RM) test_http_request
+	$(RM) test_http_request test_http_response
 
 re:
 	make fclean
