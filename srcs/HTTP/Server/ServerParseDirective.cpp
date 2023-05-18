@@ -1,5 +1,6 @@
 #include "ConfigDirective.hpp"
 #include "HTTPServer.hpp"
+#include "../const_values.hpp"
 #include <iostream>
 #include <sstream>
 
@@ -101,5 +102,5 @@ void HTTP::Server::parseDirectiveLocation(const ConfigContext &server_context)
 
 bool HTTP::Server::isValidStatusCode(const int &status_code)
 {
-	return (_http_status_code.find(status_code) != _http_status_code.end());
+	return (HTTP::STATUS_CODE.find(status_code) != HTTP::STATUS_CODE.end());
 }
