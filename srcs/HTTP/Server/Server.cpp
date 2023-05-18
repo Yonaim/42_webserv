@@ -43,20 +43,29 @@ bool isForMe(const HTTP::Request &request)
 	return (false);
 }
 
-void HTTP::Server::registerRequest(const Request &request)
+void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
+	(void)client_fd;
 	(void)request;
 	std::cout << "Unimplemented stub of " << __func__ << std::endl;
 }
 
-HTTP::Response HTTP::Server::retrieveResponse(void)
+HTTP::Response HTTP::Server::retrieveResponse(int client_fd)
 {
+	(void)client_fd;
 	std::cout << "Unimplemented stub of " << __func__ << std::endl;
 	return (HTTP::Response());
 }
 
 bool HTTP::Server::hasResponses(void)
 {
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+	return (false);
+}
+
+bool HTTP::Server::hasResponses(int client_fd)
+{
+	(void)client_fd;
 	std::cout << "Unimplemented stub of " << __func__ << std::endl;
 	return (false);
 }

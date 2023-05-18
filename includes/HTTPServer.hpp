@@ -46,8 +46,8 @@ class Server
 	std::set<std::string> _server_name;
 	std::map<int, std::string> _error_pages;
 	std::map<std::string, Location> _locations;
-	std::queue<Request> _input_queue;
-	std::queue<Response> _output_queue;
+	std::map<int, std::queue<Request> > _input_queue;
+	std::map<int, std::queue<Response> > _output_queue;
 	static const std::map<std::string, int> _http_methods;
 	static const std::map<int, std::string> _http_status_code;
 
@@ -65,9 +65,10 @@ class Server
 
 	void task(void);
 	bool isForMe(const Request &request);
-	void registerRequest(const Request &request);
-	Response retrieveResponse(void);
+	void registerRequest(int client_fd, const Request &request);
+	Response retrieveResponse(int client_fd);
 	bool hasResponses(void);
+	bool hasResponses(int client_fd);
 };
 } // namespace HTTP
 
