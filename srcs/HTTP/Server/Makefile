@@ -1,6 +1,6 @@
 CXX			= c++
 CXXFLAGS	= \
-			-I../../includes \
+			-I../../../includes \
 			-Wall -Wextra -Werror \
 			-std=c++98 -fsanitize=address -g \
 
@@ -8,10 +8,10 @@ SRCS		= \
 			HTTPServer.cpp \
 			HTTPLocation.cpp \
 			HTTPServerConstValues.cpp \
-			../ConfigParser/ConfigDirective.cpp \
-			../ConfigParser/parseConfig.cpp \
-			../ConfigParser/recursiveParser.cpp \
-			../ConfigParser/splitIntoTokens.cpp \
+			../../ConfigParser/ConfigDirective.cpp \
+			../../ConfigParser/parseConfig.cpp \
+			../../ConfigParser/recursiveParser.cpp \
+			../../ConfigParser/splitIntoTokens.cpp \
 
 OBJS		= $(SRCS:.cpp=.o)
 
