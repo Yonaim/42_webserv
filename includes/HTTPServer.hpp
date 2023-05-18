@@ -48,8 +48,6 @@ class Server
 	std::map<std::string, Location> _locations;
 	std::queue<Request> _input_queue;
 	std::queue<Response> _output_queue;
-	static const std::map<std::string, int> _http_methods;
-	static const std::map<int, std::string> _http_status_code;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
