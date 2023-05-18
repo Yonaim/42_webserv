@@ -77,16 +77,16 @@ HTTP::Response HTTP::Server::retrieveResponse(int client_fd)
 	return (res);
 }
 
-bool HTTP::Server::hasResponses(void)
+int HTTP::Server::hasResponses(void)
 {
 	for (std::map<int, std::queue<Response> >::iterator it
 		 = _output_queue.begin();
 		 it != _output_queue.end(); it++)
 	{
 		if (!it->second.empty())
-			return (true);
+			return (it->first);
 	}
-	return (false);
+	return (-1);
 }
 
 bool HTTP::Server::hasResponses(int client_fd)

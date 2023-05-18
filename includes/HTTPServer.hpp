@@ -68,7 +68,7 @@ class Server
 	bool isForMe(const Request &request);
 	void registerRequest(int client_fd, const Request &request);
 	Response retrieveResponse(int client_fd);
-	bool hasResponses(void);
+	int hasResponses(void);
 	bool hasResponses(int client_fd);
 	void disconnect(int client_fd);
 };
