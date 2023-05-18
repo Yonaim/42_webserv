@@ -45,10 +45,10 @@ class Request
 	int _method;
 	std::string _uri;
 	std::string _version_string; // 1.1 2.0 1.0
-	int _version; // 1001 2000 1000
+	int _version;                // 1001 2000 1000
 	Header _header;
 	std::string _body;
-	int _current_state; // enum parse_state_e
+	int _current_state;   // enum parse_state_e
 	size_t _error_offset; // 에러가 발생한 위치
 	std::vector<std::string> _trailer_values;
 

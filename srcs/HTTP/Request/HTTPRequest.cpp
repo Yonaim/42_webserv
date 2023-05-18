@@ -1,6 +1,5 @@
 #include "HTTPRequest.hpp"
 #include "utils.hpp"
-
 #include <iostream>
 
 static const char *consume_exc_description[]
@@ -9,6 +8,11 @@ static const char *consume_exc_description[]
 
 static const char *parse_state_str[]
 	= {"start line", "header", "body", "chunk", "trailer"};
+
+bool isSpace(const char c)
+{
+	return (c == ' ' || c == '\t');
+}
 
 HTTP::Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE)
@@ -40,11 +44,6 @@ HTTP::Request &HTTP::Request::operator=(const HTTP::Request &orig)
 		_current_state = orig._current_state;
 	}
 	return (*this);
-}
-
-bool isSpace(const char c)
-{
-	return (c == ' ' || c == '\t');
 }
 
 int HTTP::Request::parse(std::string &buffer)
