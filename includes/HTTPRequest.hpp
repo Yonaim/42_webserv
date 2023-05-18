@@ -9,6 +9,7 @@
 namespace HTTP
 {
 
+// TODO: const_values에 이미 저장되어있는 상수와 겹치는 상수는 삭제할 예정
 const int kMethodCount = 4;
 const std::string kMethodStr[kMethodCount] = {"NONE", "GET", "POST", "DELETE"};
 

@@ -249,7 +249,7 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 	std::cout << std::endl;
 
 	/* method index 구하기 */
-	for (int i = 0; i < kMethodCount; i++)
+	// TODO: const_values에 이미 저장되어있는 상수와 겹치는 상수는 삭제할 예정
 	{
 		if (tokens[0] == kMethodStr[i])
 		{
