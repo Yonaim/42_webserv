@@ -8,9 +8,9 @@ const int HTTP::CRLF_LEN = 2;
 const int HTTP::SP_LEN = 1;
 
 // method
-const int HTTP::METHOD_COUNT = 4;
+const int HTTP::METHOD_COUNT = 5;
 const std::string HTTP::METHOD_STR[METHOD_COUNT]
-	= {"NONE", "GET", "POST", "DELETE"};
+	= {"NONE", "GET", "HEAD", "POST", "DELETE"};
 
 // status code
 static const std::pair<int, std::string> _STATUS_CODE[] = {

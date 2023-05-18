@@ -6,7 +6,9 @@
 
 enum e_http_method
 {
-	GET = 0,
+	NONE = 0,
+	GET,
+	HEAD,
 	POST,
 	DELETE,
 };
