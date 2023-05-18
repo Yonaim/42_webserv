@@ -65,6 +65,7 @@ class Request
 		RETURN_TYPE_OK = 0,
 		RETURN_TYPE_INVALID,
 		RETURN_TYPE_AGAIN,
+		RETURN_TYPE_IN_PROCESS
 	};
 	Request(void);
 	~Request();

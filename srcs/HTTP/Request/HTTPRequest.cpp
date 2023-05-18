@@ -52,7 +52,7 @@ int HTTP::Request::parse(std::string &buffer)
 	// TODO: 디버그 완료 후 하단 변수 삭제
 	const char *state_names[]
 		= {"STARTLINE", "HEADER", "BODY", "CHUNK", "TRAILER"};
-	const char *code_names[] = {"OK", "INVALID", "AGAIN"};
+	const char *code_names[] = {"OK", "INVALID", "AGAIN", "IN PROCESS"};
 
 	while (true)
 	{
@@ -103,8 +103,12 @@ int HTTP::Request::parse(std::string &buffer)
 				else
 					return (RETURN_TYPE_OK);
 			}
-			if (rc == RETURN_TYPE_AGAIN)
+			else if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
+			else
+			{
+				std::cout << "parsing ing..." << std::endl;
+			}
 			break;
 
 		case PARSE_STATE_BODY:
@@ -326,7 +330,7 @@ int HTTP::Request::consumeHeader(std::string &buffer)
 	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
 			  << std::endl;
 
-	return (RETURN_TYPE_OK);
+	return (RETURN_TYPE_IN_PROCESS);
 }
 
 int HTTP::Request::consumeBody(std::string &buffer)
