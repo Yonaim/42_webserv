@@ -1,16 +1,18 @@
 #include "const_values.hpp"
 #include <map>
 
+// special token
 const std::string HTTP::CRLF = "\r\n";
 const std::string HTTP::SP = " ";
 const int HTTP::CRLF_LEN = 2;
 const int HTTP::SP_LEN = 1;
 
-// Method
+// method
 const int HTTP::METHOD_COUNT = 4;
 const std::string HTTP::METHOD_STR[METHOD_COUNT]
 	= {"NONE", "GET", "POST", "DELETE"};
 
+// status code
 static const std::pair<int, std::string> _STATUS_CODE[] = {
 	std::pair<int, std::string>(100, "Continue"),
 	std::pair<int, std::string>(101, "Switching Protocols"),

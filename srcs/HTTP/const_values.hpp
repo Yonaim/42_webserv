@@ -19,11 +19,11 @@ extern const std::string SP;
 extern const int CRLF_LEN;
 extern const int SP_LEN;
 
-// Method
+// method
 extern const int METHOD_COUNT;
 extern const std::string METHOD_STR[];
 
-// Status Code
+// status Code
 extern const std::map<int, std::string> STATUS_CODE;
 
 } // namespace HTTP
