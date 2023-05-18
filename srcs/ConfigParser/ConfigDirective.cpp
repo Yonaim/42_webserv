@@ -1,4 +1,13 @@
 #include "ConfigDirective.hpp"
+#include <sstream>
+
+static const char *parsingexc_description[]
+	= {"Undefined directive(s) found",
+	   "Undefined argument(s) found",
+	   "Invalid number of directives(s)",
+	   "Invalid number of argument(s)",
+	   "Duplicate directives",
+	   "Duplicate arguments"};
 
 ConfigDirective::ConfigDirective(const std::string name)
 	: _name(name), _is_context(false)
@@ -27,6 +36,23 @@ ConfigDirective &ConfigDirective::operator=(const ConfigDirective &orig)
 	_parameters = orig._parameters;
 	_is_context = orig._is_context;
 	return (*this);
+}
+
+void ConfigDirective::throwException(int code) const
+{
+	std::stringstream what;
+
+	if (code < 0 || code > PARSINGEXC_DUP_ARG)
+		what << "Unknown error";
+	else
+		what << parsingexc_description[code];
+	what << ": ";
+	if (_is_context)
+		what << "context ";
+	else
+		what << "directive ";
+	what << "'" << _name << "'";
+	throw(std::runtime_error(what.str()));
 }
 
 bool ConfigDirective::is_context(void) const
@@ -131,6 +157,11 @@ bool ConfigContext::isConfigValid(const std::map<std::string, bool> &info) const
 			return (false);
 	}
 	return (true);
+}
+
+bool ConfigContext::hasDirective(const std::string &name) const
+{
+	return (countDirectivesByName(name) > 0);
 }
 
 std::ostream &operator<<(std::ostream &os, const ConfigDirective &directive)
