@@ -5,13 +5,20 @@ CXXFLAGS	= \
 			-std=c++98 -fsanitize=address -g \
 
 SRCS		= \
-			HTTPServer.cpp \
-			HTTPLocation.cpp \
-			HTTPServerConstValues.cpp \
+			Server.cpp \
+			ServerConstValues.cpp \
+			Location.cpp \
+			../Request/Request.cpp \
+			../Response/Response.cpp \
+			../Response/ResponseInit.cpp \
+			../Response/ResponseSetter.cpp \
+			../Header/Header.cpp \
 			../../ConfigParser/ConfigDirective.cpp \
 			../../ConfigParser/parseConfig.cpp \
 			../../ConfigParser/recursiveParser.cpp \
 			../../ConfigParser/splitIntoTokens.cpp \
+			../const_values.cpp \
+			../utils.cpp \
 
 OBJS		= $(SRCS:.cpp=.o)
 

@@ -3,6 +3,9 @@
 
 #include "AsyncTCPIOProcessor.hpp"
 #include "ConfigDirective.hpp"
+#include "HTTPRequest.hpp"
+#include "HTTPResponse.hpp"
+#include <queue>
 #include <set>
 #include <string>
 #include <vector>
@@ -55,6 +58,8 @@ class Server
 	std::set<std::string> _server_name;
 	std::map<int, std::string> _error_pages;
 	std::map<std::string, Location> _locations;
+	std::queue<Request> _input_queue;
+	std::queue<Response> _output_queue;
 	static const std::map<std::string, int> _http_methods;
 	static const std::map<int, std::string> _http_status_code;
 
@@ -69,6 +74,12 @@ class Server
 	~Server();
 	Server(const Server &orig);
 	Server &operator=(const Server &orig);
+
+	void task(void);
+	bool isForMe(const Request &request);
+	void registerRequest(const Request &request);
+	Response retrieveResponse(void);
+	bool hasResponses(void);
 };
 } // namespace HTTP
 
