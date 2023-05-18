@@ -50,6 +50,7 @@ class Request
 	int _current_state;   // enum parse_state_e
 	size_t _error_offset; // 에러가 발생한 위치
 	std::vector<std::string> _trailer_values;
+	int _content_length;
 
 	int consumeStartLine(std::string &buffer);
 	int consumeHeader(std::string &buffer);
@@ -65,6 +66,7 @@ class Request
 		RETURN_TYPE_OK = 0,
 		RETURN_TYPE_INVALID,
 		RETURN_TYPE_AGAIN,
+		RETURN_TYPE_IN_PROCESS
 	};
 	Request(void);
 	~Request();

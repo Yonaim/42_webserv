@@ -1,6 +1,6 @@
-GET / HTTP/1.1
+POST / HTTP/1.1
 Host: localhost
+abc: a,b,    c
 Content-Length: 3
-abc: a, b, c
 
-_
+bye

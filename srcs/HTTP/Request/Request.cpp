@@ -8,7 +8,7 @@ static const char *consume_exc_description[]
 	   "Invalid header value"};
 
 static const char *parse_state_str[]
-	= {"start line", "header", "body", "chunk", "trailer"};
+	= {"start line", "header", "body", "chunk", "trailer", "CRLF after chunk"};
 
 bool isSpace(const char c)
 {
@@ -50,9 +50,9 @@ HTTP::Request &HTTP::Request::operator=(const HTTP::Request &orig)
 int HTTP::Request::parse(std::string &buffer)
 {
 	// TODO: 디버그 완료 후 하단 변수 삭제
-	const char *state_names[]
-		= {"STARTLINE", "HEADER", "BODY", "CHUNK", "TRAILER"};
-	const char *code_names[] = {"OK", "INVALID", "AGAIN"};
+	const char *state_names[] = {"STARTLINE", "HEADER",  "BODY",
+								 "CHUNK",     "TRAILER", "CRLF AFTER CHUNK"};
+	const char *code_names[] = {"OK", "INVALID", "AGAIN", "IN PROCESS"};
 
 	while (true)
 	{
@@ -78,13 +78,48 @@ int HTTP::Request::parse(std::string &buffer)
 
 			if (rc == RETURN_TYPE_OK)
 			{
+				if (!_header.hasValue("Host") || !_header.hasValue("Trailer","Host"))
+				{
+					_error_offset = 0;
+					std::cout << __func__ << "Header must include Host header field" << std::endl;
+					throwException(CONSUME_EXC_INVALID_VALUE);
+				}
 				if (_header.hasValue("Transfer-Encoding", "chunked"))
 				{
 					// Transfer coding == chunked라면
 					std::cout << "header has Transfer-Encoding == chunked"
 							  << std::endl;
-
+					if (_header.hasValue("Trailer"))
+					{
+						/** 유효한 Trailer 헤더 필드 값을 가지고 있는지 확인**/
+						_trailer_values = _header.getValues("Trailer");
+						if (_trailer_values.empty())
+						{
+							_error_offset = 0;
+							throwException(CONSUME_EXC_EMPTY_LINE);
+						}
+						std::vector<std::string>::const_iterator iter
+							= _trailer_values.begin();
+						for (; iter != _trailer_values.end(); ++iter)
+						{
+							if (*iter == "Trailer" || *iter == "Content-Length"
+								|| *iter == "Transfer-Encoding")
+							{
+								_error_offset = 0;
+								throwException(CONSUME_EXC_INVALID_FIELD);
+							}
+						}
+						std::cout << "header has Trailer" << std::endl;
+					}
 					_current_state = PARSE_STATE_CHUNK;
+				}
+				else if (_header.hasValue("Trailer"))
+				{
+					_error_offset = 0;
+					std::cout << __func__
+							  << ": Trailer with no Transfer-Encoding"
+							  << std::endl;
+					throwException(CONSUME_EXC_INVALID_VALUE);
 				}
 				else if (_header.hasValue("Content-Length"))
 				{
@@ -93,7 +128,10 @@ int HTTP::Request::parse(std::string &buffer)
 						= getHeaderValue("Content-Length", 0);
 					std::cout << "header has Content-Length" << std::endl;
 
-					if (toNum<int>(content_length) >= 0)
+					std::cout << "content-length : " << content_length
+							  << std::endl;
+					_content_length = toNum<int>(content_length);
+					if (_content_length >= 0)
 					{
 						std::cout << "header has Content-Length >= 0"
 								  << std::endl;
@@ -103,8 +141,12 @@ int HTTP::Request::parse(std::string &buffer)
 				else
 					return (RETURN_TYPE_OK);
 			}
-			if (rc == RETURN_TYPE_AGAIN)
+			else if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
+			else
+			{
+				std::cout << "parsing ing..." << std::endl;
+			}
 			break;
 
 		case PARSE_STATE_BODY:
@@ -119,43 +161,23 @@ int HTTP::Request::parse(std::string &buffer)
 
 			if (rc == RETURN_TYPE_OK)
 			{
-				// _trailer_values = _header.find("Trailer");
-				// if (_trailer_values != _header.end())
 				if (_header.hasValue("Trailer"))
 				{
-					/** 유효한 Trailer 헤더 필드 값을 가지고 있는지 확인**/
-					_trailer_values = _header.getValues("Trailer");
-					if (_trailer_values.empty())
-					{
-						_error_offset = 0;
-						throwException(CONSUME_EXC_EMPTY_LINE);
-					}
-					std::vector<std::string>::const_iterator iter
-						= _trailer_values.begin();
-					for (; iter != _trailer_values.end(); ++iter)
-					{
-						if (*iter == "Trailer" | *iter == "Content-Length"
-							| *iter == "Transfer-Encoding")
-						{
-							_error_offset = 0;
-							throwException(CONSUME_EXC_INVALID_FIELD);
-						}
-					}
 					std::cout << "header has Trailer" << std::endl;
 					_current_state = PARSE_STATE_TRAILER;
 				}
 				else
-				{
 					_current_state = PARSE_STATE_CRLF_AFTER_CHUNK;
-					break;
-				}
 			}
-			if (rc == RETURN_TYPE_AGAIN)
+			else if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
+			else
+				;
 			break;
 
 		case PARSE_STATE_TRAILER:
 			rc = consumeTrailer(buffer);
+			std::cout << "Got return code " << code_names[rc] << std::endl;
 			if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
 			else
@@ -163,6 +185,7 @@ int HTTP::Request::parse(std::string &buffer)
 			break;
 		case PARSE_STATE_CRLF_AFTER_CHUNK:
 			rc = consumeCRLF(buffer);
+			std::cout << "Got return code " << code_names[rc] << std::endl;
 			return (rc);
 			break;
 		}
@@ -326,23 +349,23 @@ int HTTP::Request::consumeHeader(std::string &buffer)
 	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
 			  << std::endl;
 
-	return (RETURN_TYPE_OK);
+	return (RETURN_TYPE_IN_PROCESS);
 }
 
 int HTTP::Request::consumeBody(std::string &buffer)
 {
-	size_t content_length = 0; // TODO: 헤더 맵에서 Content-length 파싱해오기
+	// size_t content_length = 0; // TODO: 헤더 맵에서 Content-length 파싱해오기
 
-	if (buffer.size() < content_length)
+	if (buffer.size() < static_cast<size_t>(_content_length))
 	{
 		std::cout << __func__ << ": not enough buffer size" << std::endl;
 		return (RETURN_TYPE_AGAIN);
 	}
 
-	_body = getfrontstr(buffer, content_length);
+	_body = getfrontstr(buffer, _content_length);
 	std::cout << __func__ << ": body result in :\"" << _body << "\""
 			  << std::endl;
-	trimfrontstr(buffer, content_length);
+	trimfrontstr(buffer, _content_length);
 	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
 			  << std::endl;
 	return (RETURN_TYPE_OK);
@@ -356,24 +379,36 @@ int HTTP::Request::consumeChunk(std::string &buffer)
 		std::cout << __func__ << ": buffer doesn't have CRLF" << std::endl;
 		return (RETURN_TYPE_AGAIN);
 	}
-
-	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
+	const int content_length = strtol(buffer.c_str(), NULL, 16);
 	std::cout << __func__ << ": content length " << content_length << std::endl;
 	// TODO: content length 0일때 마지막 청크 처리
-	if (content_length > 0)
+	if (content_length < 0)
 	{
-		_body.append(buffer.substr(crlf_pos + CRLF_LEN, content_length));
-		std::cout << __func__ << ": body result in :\"" << _body << "\""
+		std::cout << __func__ << ": negative content length of chunk"
 				  << std::endl;
-		trimfrontstr(buffer, crlf_pos + CRLF_LEN + content_length);
-		std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-				  << std::endl;
+		throwException(CONSUME_EXC_INVALID_VALUE);
+	}
+	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN * 2이면 ok
+	if (buffer.size() < crlf_pos + content_length + CRLF_LEN * 2)
+	{
 		return (RETURN_TYPE_AGAIN);
 	}
-	trimfrontstr(buffer, crlf_pos + CRLF_LEN);
+	_body.append(buffer.substr(crlf_pos + CRLF_LEN, content_length));
+	std::cout << __func__ << ": body result in :\"" << _body << "\""
+			  << std::endl;
+	if (buffer.substr(crlf_pos + CRLF_LEN + content_length, CRLF_LEN) != CRLF)
+	{
+		std::cout << __func__ << ": chunk must end with CRLF" << std::endl;
+		throwException(CONSUME_EXC_INVALID_FORMAT);
+	}
+	trimfrontstr(buffer, crlf_pos + CRLF_LEN * 2 + content_length);
 	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
 			  << std::endl;
-	return (RETURN_TYPE_OK);
+
+	if (content_length == 0)
+		return (RETURN_TYPE_OK);
+	else
+		return (RETURN_TYPE_IN_PROCESS);
 }
 
 int HTTP::Request::consumeTrailer(std::string &buffer)
@@ -386,6 +421,7 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 	const std::string header_line = getfrontstr(buffer, crlf_pos);
+	std::cout << __func__ << ": header line: " << header_line << std::endl;
 	// Trailer는 헤더와 달리 끝에 CRLF가 하나 더 붙지 않아서 아래 코드
 	// 주석처리함 if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	// {
@@ -398,18 +434,27 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
+		std::cout << __func__ << ": header has invalid name" << std::endl;
 		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
-	std::vector<std::string>::const_iterator iter = _trailer_values.begin();
+	std::cout << __func__ << ": header name is " << name << std::endl;
+
+	std::vector<std::string>::iterator iter = _trailer_values.begin();
 	bool found_name = false;
 	for (; iter != _trailer_values.end(); ++iter)
 	{
 		if (*iter == name)
+		{
 			found_name = true;
+			_trailer_values.erase(iter);
+			break;
+		}
 	}
 	if (found_name == false)
 	{
+		std::cout << __func__ << ": Trailer header doesn't have " << name
+				  << std::endl;
 		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
@@ -423,20 +468,37 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 		if (value == "")
 			break;
 		vec_values.push_back(strtrim(value, " "));
+		std::cout << __func__ << ": push value " << vec_values.back()
+				  << std::endl;
 	}
 	std::string value = strtrim(std::string(&header_line[key_end_idx]), " ");
 	if (value != "")
+	{
 		vec_values.push_back(value);
+		std::cout << __func__ << ": push value " << vec_values.back()
+				  << std::endl;
+	}
 
 	/** key가 있다면, 붙여넣기 **/
 	if (!_header.hasValue(name))
+	{
+		std::cout << __func__ << ": assign to new header" << std::endl;
 		_header.assign(name, vec_values);
+	}
 	else
+	{
+		std::cout << __func__ << ": insert to existing header" << std::endl;
 		_header.insert(name, vec_values);
+	}
 
 	trimfrontstr(buffer, header_line.size() + CRLF_LEN);
+	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
+			  << std::endl;
 
-	return (RETURN_TYPE_OK);
+	if (_trailer_values.size() == 0)
+		return (RETURN_TYPE_OK);
+	else
+		return (RETURN_TYPE_IN_PROCESS);
 }
 
 int HTTP::Request::consumeCRLF(std::string &buffer)

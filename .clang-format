@@ -1,0 +1,7 @@
+---
+BasedOnStyle: Microsoft
+BreakBeforeBinaryOperators: All
+ColumnLimit: '80'
+TabWidth: '4'
+UseTab: ForContinuationAndIndentation
+...
