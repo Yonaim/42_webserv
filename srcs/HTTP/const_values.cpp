@@ -13,11 +13,11 @@ const std::string HTTP::METHOD_STR[METHOD_COUNT]
 	= {"NONE", "GET", "HEAD", "POST", "DELETE"};
 
 const std::pair<std::string, int> _METHOD[]
-	= {std::pair<std::string, int>("NONE", NONE),
-	   std::pair<std::string, int>("GET", GET),
-	   std::pair<std::string, int>("HEAD", HEAD),
-	   std::pair<std::string, int>("POST", POST),
-	   std::pair<std::string, int>("DELETE", DELETE)};
+	= {std::pair<std::string, int>("NONE", METHOD_NONE),
+	   std::pair<std::string, int>("GET", METHOD_GET),
+	   std::pair<std::string, int>("HEAD", METHOD_HEAD),
+	   std::pair<std::string, int>("POST", METHOD_POST),
+	   std::pair<std::string, int>("DELETE", METHOD_DELETE)};
 
 const std::map<std::string, int> HTTP::METHOD(
 	_METHOD, _METHOD + sizeof(_METHOD) / sizeof(_METHOD[0]));

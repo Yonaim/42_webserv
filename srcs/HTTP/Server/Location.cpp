@@ -30,8 +30,8 @@ void HTTP::Server::Location::parseDirectiveRoot(
 void HTTP::Server::Location::parseDirectiveLimitExcept(
 	const ConfigContext &location_context)
 {
-	_allowed_methods.insert(GET);
-	_allowed_methods.insert(HEAD);
+	_allowed_methods.insert(METHOD_GET);
+	_allowed_methods.insert(METHOD_HEAD);
 
 	const size_t n_limit_excepts
 		= location_context.countDirectivesByName("limit_except");
@@ -58,10 +58,10 @@ void HTTP::Server::Location::parseDirectiveLimitExcept(
 				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
 
 			const int method = it->second;
-			if (method == GET)
+			if (method == METHOD_GET)
 			{
-				_allowed_methods.insert(GET);
-				_allowed_methods.insert(HEAD);
+				_allowed_methods.insert(METHOD_GET);
+				_allowed_methods.insert(METHOD_HEAD);
 			}
 			else
 			{

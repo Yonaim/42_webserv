@@ -6,11 +6,11 @@
 
 enum e_http_method
 {
-	NONE = 0,
-	GET,
-	HEAD,
-	POST,
-	DELETE,
+	METHOD_NONE = 0,
+	METHOD_GET,
+	METHOD_HEAD,
+	METHOD_POST,
+	METHOD_DELETE,
 };
 
 namespace HTTP
