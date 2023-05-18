@@ -39,7 +39,7 @@ class Response
 
 	// setter
 	void setDate(void);
-	void setDefault(void);
+	void setDefaultValue(void);
 	void setStatus(int status_code);
 	void setConnection(void);
 	void setContentLength(void);

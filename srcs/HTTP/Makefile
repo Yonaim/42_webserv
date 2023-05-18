@@ -7,7 +7,8 @@ CXXFLAGS	= \
 SRCS	= \
 		Request/HTTPRequest.cpp \
 		Response/HTTPResponse.cpp \
-		Request/utils.cpp \
+		Response/HTTPResponseInit.cpp \
+		Response/HTTPResponseSetter.cpp \
 		Header/HTTPHeader.cpp \
 		const_values.cpp \
 		utils.cpp \
