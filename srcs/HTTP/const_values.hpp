@@ -24,6 +24,8 @@ extern const int SP_LEN;
 // method
 extern const int METHOD_COUNT;
 extern const std::string METHOD_STR[];
+// TODO: converter 모듈에서 METHOD_STR 대신 METHOD를 사용하도록 수정
+extern const std::map<std::string, int> METHOD;
 
 // status Code
 extern const std::map<int, std::string> STATUS_CODE;
