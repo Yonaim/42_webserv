@@ -167,8 +167,7 @@ HTTP::Server::Location::Location(const Location &orig)
 {
 }
 
-HTTP::Server::Location &HTTP::Server::Location::operator=(
-	const Location &orig)
+HTTP::Server::Location &HTTP::Server::Location::operator=(const Location &orig)
 {
 	_has_index = orig._has_index;
 	_do_redirection = orig._do_redirection;
