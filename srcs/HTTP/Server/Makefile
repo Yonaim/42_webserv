@@ -6,12 +6,19 @@ CXXFLAGS	= \
 
 SRCS		= \
 			Server.cpp \
-			Location.cpp \
 			ServerConstValues.cpp \
+			Location.cpp \
+			../Request/Request.cpp \
+			../Response/Response.cpp \
+			../Response/ResponseInit.cpp \
+			../Response/ResponseSetter.cpp \
+			../Header/Header.cpp \
 			../../ConfigParser/ConfigDirective.cpp \
 			../../ConfigParser/parseConfig.cpp \
 			../../ConfigParser/recursiveParser.cpp \
 			../../ConfigParser/splitIntoTokens.cpp \
+			../const_values.cpp \
+			../utils.cpp \
 
 OBJS		= $(SRCS:.cpp=.o)
 
