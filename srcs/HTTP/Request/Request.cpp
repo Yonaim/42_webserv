@@ -78,7 +78,7 @@ int HTTP::Request::parse(std::string &buffer)
 
 			if (rc == RETURN_TYPE_OK)
 			{
-				if (!_header.hasValue("Host") || !_header.hasValue("Trailer","Host"))
+				if (!_header.hasValue("Host") && !_header.hasValue("Trailer","Host"))
 				{
 					_error_offset = 0;
 					std::cout << __func__ << "Header must include Host header field" << std::endl;
