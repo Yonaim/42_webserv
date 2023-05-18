@@ -5,11 +5,11 @@ CXXFLAGS	= \
 			-std=c++98 -fsanitize=address -g \
 
 SRCS	= \
-		Request/HTTPRequest.cpp \
-		Response/HTTPResponse.cpp \
-		Response/HTTPResponseInit.cpp \
-		Response/HTTPResponseSetter.cpp \
-		Header/HTTPHeader.cpp \
+		Request/Request.cpp \
+		Response/Response.cpp \
+		Response/ResponseInit.cpp \
+		Response/ResponseSetter.cpp \
+		Header/Header.cpp \
 		const_values.cpp \
 		utils.cpp \
 
