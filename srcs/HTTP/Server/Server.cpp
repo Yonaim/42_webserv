@@ -43,29 +43,61 @@ bool isForMe(const HTTP::Request &request)
 	return (false);
 }
 
+void HTTP::Server::ensureClientConnected(int client_fd)
+{
+	if (_output_queue.find(client_fd) == _output_queue.end())
+	{
+		std::stringstream what;
+		what << "Client fd " << client_fd << " is not yet connected.";
+		throw(std::runtime_error(what.str()));
+	}
+}
+
 void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
-	(void)client_fd;
-	(void)request;
-	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+	if (_input_queue.find(client_fd) == _input_queue.end())
+	{
+		_input_queue[client_fd] = std::queue<HTTP::Request>();
+		_output_queue[client_fd] = std::queue<HTTP::Response>();
+	}
+	_input_queue[client_fd].push(request);
 }
 
 HTTP::Response HTTP::Server::retrieveResponse(int client_fd)
 {
-	(void)client_fd;
-	std::cout << "Unimplemented stub of " << __func__ << std::endl;
-	return (HTTP::Response());
+	ensureClientConnected(client_fd);
+	if (_output_queue[client_fd].empty())
+	{
+		std::stringstream what;
+		what << "No response made for client fd " << client_fd;
+		throw(std::runtime_error(what.str()));
+	}
+	HTTP::Response res = _output_queue[client_fd].front();
+	_output_queue[client_fd].pop();
+	return (res);
 }
 
 bool HTTP::Server::hasResponses(void)
 {
-	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+	for (std::map<int, std::queue<Response> >::iterator it
+		 = _output_queue.begin();
+		 it != _output_queue.end(); it++)
+	{
+		if (!it->second.empty())
+			return (true);
+	}
 	return (false);
 }
 
 bool HTTP::Server::hasResponses(int client_fd)
 {
-	(void)client_fd;
-	std::cout << "Unimplemented stub of " << __func__ << std::endl;
-	return (false);
+	ensureClientConnected(client_fd);
+	return (!_output_queue[client_fd].empty());
+}
+
+void HTTP::Server::disconnect(int client_fd)
+{
+	ensureClientConnected(client_fd);
+	_input_queue.erase(client_fd);
+	_output_queue.erase(client_fd);
 }

@@ -55,6 +55,7 @@ class Server
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);
 	void parseDirectiveLocation(const ConfigContext &server_context);
+	void ensureClientConnected(int client_fd);
 	static bool isValidStatusCode(const int &status_code);
 
   public:
@@ -69,6 +70,7 @@ class Server
 	Response retrieveResponse(int client_fd);
 	bool hasResponses(void);
 	bool hasResponses(int client_fd);
+	void disconnect(int client_fd);
 };
 } // namespace HTTP
 
