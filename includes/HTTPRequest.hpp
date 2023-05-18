@@ -23,14 +23,6 @@ enum consume_exc_e
 class Request
 {
   private:
-	enum method_type_e
-	{
-		METHOD_NONE = 0,
-		METHOD_GET,
-		METHOD_POST,
-		METHOD_DELETE
-	};
-
 	enum parse_state_e
 	{
 		PARSE_STATE_STARTLINE = 0,
