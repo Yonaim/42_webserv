@@ -5,9 +5,9 @@ CXXFLAGS	= \
 			-std=c++98 -fsanitize=address -g \
 
 SRCS		= \
-			HTTPServer.cpp \
-			HTTPLocation.cpp \
-			HTTPServerConstValues.cpp \
+			Server.cpp \
+			Location.cpp \
+			ServerConstValues.cpp \
 			../../ConfigParser/ConfigDirective.cpp \
 			../../ConfigParser/parseConfig.cpp \
 			../../ConfigParser/recursiveParser.cpp \
