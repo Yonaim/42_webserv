@@ -50,6 +50,7 @@ class Request
 	int _current_state;   // enum parse_state_e
 	size_t _error_offset; // 에러가 발생한 위치
 	std::vector<std::string> _trailer_values;
+	int _content_length;
 
 	int consumeStartLine(std::string &buffer);
 	int consumeHeader(std::string &buffer);
