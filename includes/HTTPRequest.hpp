@@ -2,7 +2,6 @@
 #define HTTPREQUEST_HPP
 
 #include "HTTPHeader.hpp"
-#include "const_values.hpp"
 #include <map>
 #include <string>
 #include <vector>
