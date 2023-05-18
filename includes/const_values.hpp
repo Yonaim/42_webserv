@@ -13,8 +13,14 @@ enum e_http_method
 
 namespace HTTP
 {
+// special token
+const std::string CRLF = "\r\n";
+const std::string SP = " ";
+const int CRLF_LEN = 2;
+const int SP_LEN = 1;
+
 // Method
-const int         METHOD_COUNT = 4;
+const int METHOD_COUNT = 4;
 const std::string METHOD_STR[METHOD_COUNT] = {"NONE", "GET", "POST", "DELETE"};
 
 // Status Code

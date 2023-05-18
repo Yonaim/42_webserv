@@ -2,17 +2,13 @@
 #define HTTPREQUEST_HPP
 
 #include "HTTPHeader.hpp"
+#include "const_values.hpp"
 #include <map>
 #include <string>
 #include <vector>
 
 namespace HTTP
 {
-// special token
-const std::string CRLF = "\r\n";
-const std::string SP = " ";
-const int CRLF_LEN = 2;
-const int SP_LEN = 1;
 
 const int kMethodCount = 4;
 const std::string kMethodStr[kMethodCount] = {"NONE", "GET", "POST", "DELETE"};
