@@ -1,32 +1,27 @@
 #include "HTTPResponse.hpp"
+#include "const_values.hpp"
+#include <iostream>
 
-HTTP::Response::Response() : _request(NULL)
-{
-}
+const std::string HTTP::Response::_http_version = "1.1";
 
-HTTP::Response::Response(HttpReq const *request) : _request(request)
+HTTP::Response::Response(void)
 {
-	// general header
 	initGeneralHeaderFields();
 	initResponseHeaderFields();
 	initEntityHeaderFields();
 }
 
-HTTP::Response::Response(Response const &other) : _request(other._request)
+HTTP::Response::Response(HTTP::Response const &other)
+	: _response(other._response), _status_code(other._status_code),
+	  _reason_phrase(other._reason_phrase), _header(other._header),
+	  _body(other._body)
 {
-	_response = other._response;
-	_status_code = other._status_code;
-	_reason_phrase = other._reason_phrase;
-	_header = other._header;
-	_body = other._body;
 }
 
-Response &HTTP::Response::operator=(Response const &other)
+HTTP::Response &HTTP::Response::operator=(HTTP::Response const &other)
 {
 	if (this != &other)
 	{
-		*(const_cast<HttpReq **>(&_request))
-			= const_cast<HttpReq *>(other._request);
 		_response = other._response;
 		_status_code = other._status_code;
 		_reason_phrase = other._reason_phrase;
@@ -36,7 +31,7 @@ Response &HTTP::Response::operator=(Response const &other)
 	return (*this);
 }
 
-HTTP::Response::~Response()
+HTTP::Response::~Response(void)
 {
 }
 
@@ -53,11 +48,13 @@ std::string HTTP::Response::toString(void)
 	return (_response);
 }
 
-bool HTTP::Response::isComplete() const
+bool HTTP::Response::isComplete(void) const
 {
+	// TODO: Implementation
+	return (true);
 }
 
-void HTTP::Response::makeStatusLine()
+void HTTP::Response::makeStatusLine(void)
 {
 	_response.append(_http_version);
 	_response.append(SP);
@@ -66,61 +63,93 @@ void HTTP::Response::makeStatusLine()
 	_response.append(_reason_phrase);
 }
 
-void HTTP::Response::makeHeader()
+void HTTP::Response::makeHeader(void)
 {
-	_header_iterator iter = _header.begin();
-
-	for (iter; iter != _header.end(); ++iter)
+	for (Header::const_iterator iter = _header.begin(); iter != _header.end();
+		 ++iter)
 	{
-		if (iter->second.length() == 0)
+		if (iter->second.empty())
 			continue;
 		_response.append(iter->first);
 		_response.append(": ");
-		_response.append(iter->second);
+		// TODO: 헤더의 값 여러개를 문자열에 추가
 		_response.append(CRLF);
 	}
 	_response.append(CRLF);
 }
 
-void HTTP::Response::makeBody()
+void HTTP::Response::makeBody(void)
 {
 	_response.append(_body);
 }
 
-void HTTP::Response::initGeneralHeaderFields()
+void HTTP::Response::setDate(void)
 {
-	_header.insert(std::make_pair("Cache-Control", ""));
-	_header.insert(std::make_pair("Connection", ""));
-	_header.insert(std::make_pair("Date", ""));
-	_header.insert(std::make_pair("Pragma", ""));
-	_header.insert(std::make_pair("Trailer", ""));
-	_header.insert(std::make_pair("Transfer-Encoding", ""));
-	_header.insert(std::make_pair("Upgrade", ""));
-	_header.insert(std::make_pair("Via", ""));
-	_header.insert(std::make_pair("Warning", ""));
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
 }
 
-void HTTP::Response::initResponseHeaderFields()
+void HTTP::Response::setDefault(void)
 {
-	_header.insert(std::make_pair("Accept-Ranges", ""));
-	_header.insert(std::make_pair("Age", ""));
-	_header.insert(std::make_pair("Etag", ""));
-	_header.insert(std::make_pair("Location", ""));
-	_header.insert(std::make_pair("Proxy-Authenticate", ""));
-	_header.insert(std::make_pair("Retry-After", ""));
-	_header.insert(std::make_pair("Server", "webserv/1.0.0"));
-	_header.insert(std::make_pair("Vary", ""));
-	_header.insert(std::make_pair("WWW-Authenticate", ""));
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
 }
 
-void HTTP::Response::initEntityHeaderFields()
+void HTTP::Response::setStatus(int status_code)
 {
-	_header.insert(std::make_pair("Allow", ""));
-	_header.insert(std::make_pair("Content-Encoding", ""));
-	_header.insert(std::make_pair("Content-Length", ""));
-	_header.insert(std::make_pair("Content-Location", ""));
-	_header.insert(std::make_pair("Content-Range", ""));
-	_header.insert(std::make_pair("Content-Type", ""));
-	_header.insert(std::make_pair("Expires", ""));
-	_header.insert(std::make_pair("Last-Modified", ""));
+	(void)status_code;
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+}
+
+void HTTP::Response::setConnection(void)
+{
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+}
+
+void HTTP::Response::setContentLength(void)
+{
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+}
+
+void HTTP::Response::setValue(std::string const &key, std::string const &val)
+{
+	(void)key;
+	(void)val;
+	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+}
+
+void HTTP::Response::initGeneralHeaderFields(void)
+{
+	_header.insert("Cache-Control", std::vector<std::string>());
+	_header.insert("Connection", std::vector<std::string>());
+	_header.insert("Date", std::vector<std::string>());
+	_header.insert("Pragma", std::vector<std::string>());
+	_header.insert("Trailer", std::vector<std::string>());
+	_header.insert("Transfer-Encoding", std::vector<std::string>());
+	_header.insert("Upgrade", std::vector<std::string>());
+	_header.insert("Via", std::vector<std::string>());
+	_header.insert("Warning", std::vector<std::string>());
+}
+
+void HTTP::Response::initResponseHeaderFields(void)
+{
+	_header.insert("Accept-Ranges", std::vector<std::string>());
+	_header.insert("Age", std::vector<std::string>());
+	_header.insert("Etag", std::vector<std::string>());
+	_header.insert("Location", std::vector<std::string>());
+	_header.insert("Proxy-Authenticate", std::vector<std::string>());
+	_header.insert("Retry-After", std::vector<std::string>());
+	_header.insert("Server", std::vector<std::string>());
+	_header.insert("Vary", std::vector<std::string>());
+	_header.insert("WWW-Authenticate", std::vector<std::string>());
+}
+
+void HTTP::Response::initEntityHeaderFields(void)
+{
+	_header.insert("Allow", std::vector<std::string>());
+	_header.insert("Content-Encoding", std::vector<std::string>());
+	_header.insert("Content-Length", std::vector<std::string>());
+	_header.insert("Content-Location", std::vector<std::string>());
+	_header.insert("Content-Range", std::vector<std::string>());
+	_header.insert("Content-Type", std::vector<std::string>());
+	_header.insert("Expires", std::vector<std::string>());
+	_header.insert("Last-Modified", std::vector<std::string>());
 }

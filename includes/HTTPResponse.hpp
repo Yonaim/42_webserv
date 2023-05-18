@@ -1,11 +1,7 @@
 #ifndef HTTPRESPONSE_HPP
 #define HTTPRESPONSE_HPP
 
-#include "HTTPRequest.hpp"
-#include "utils.hpp"
-#include <ctime>
-#include <map>
-#include <sstream>
+#include "HTTPHeader.hpp"
 
 // 시작줄 : [HTTP 버전] [상태 코드] [사유 구절] # 공백으로 띄워진다.
 // 헤더, 빈 줄, 엔티티 본문이 온다.
@@ -34,43 +30,40 @@ namespace HTTP
 class Response
 {
   public:
-	Response(Request const *request);
+	Response();
+	Response(Response const &other);
+	Response &operator=(Response const &other);
 	~Response();
 
 	std::string toString(void);
 
 	// setter
-	void setDate();
-	void setDefault();
+	void setDate(void);
+	void setDefault(void);
 	void setStatus(int status_code);
-	void setConnection();
-	void setContentLength();
+	void setConnection(void);
+	void setContentLength(void);
 	void setValue(std::string const &key, std::string const &val);
 
   private:
 	typedef std::map<std::string, std::string>::iterator _header_iterator;
 
-	Response();
-	Response(Response const &other);
-	Response &operator=(Response const &other);
-
-	void initGeneralHeaderFields();
-	void initResponseHeaderFields();
-	void initEntityHeaderFields();
-	void makeStatusLine();
-	void makeHeader();
-	void makeBody();
-	bool isComplete() const;
+	void initGeneralHeaderFields(void);
+	void initResponseHeaderFields(void);
+	void initEntityHeaderFields(void);
+	void makeStatusLine(void);
+	void makeHeader(void);
+	void makeBody(void);
+	bool isComplete(void) const;
 
 	// final
-	Request const *_request;
 	std::string _response;
 
 	// status-line
 	static const std::string _http_version;
 	std::string _status_code;
 	std::string _reason_phrase;
-	std::map<std::string, std::string> _header;
+	Header _header;
 	std::string _body;
 };
 } // namespace HTTP
