@@ -6,7 +6,7 @@ CXXFLAGS	= \
 
 SRCS		= \
 			Server.cpp \
-			ServerConstValues.cpp \
+			ServerParseDirective.cpp \
 			Location.cpp \
 			../Request/Request.cpp \
 			../Response/Response.cpp \

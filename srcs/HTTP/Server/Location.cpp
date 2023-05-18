@@ -1,3 +1,4 @@
+#include "../const_values.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTPServer.hpp"
 #include <cctype>
@@ -52,8 +53,8 @@ void HTTP::Server::Location::parseDirectiveLimitExcept(
 		for (size_t j = 0; j < n_methods; j++)
 		{
 			const std::map<std::string, int>::const_iterator it
-				= _http_methods.find(limit_except_directive.parameter(j));
-			if (it == _http_methods.end())
+				= METHOD.find(limit_except_directive.parameter(j));
+			if (it == METHOD.end())
 				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
 
 			const int method = it->second;

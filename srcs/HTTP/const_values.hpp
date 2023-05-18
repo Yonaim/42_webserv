@@ -6,7 +6,9 @@
 
 enum e_http_method
 {
-	GET = 0,
+	NONE = 0,
+	GET,
+	HEAD,
 	POST,
 	DELETE,
 };
@@ -19,11 +21,13 @@ extern const std::string SP;
 extern const int CRLF_LEN;
 extern const int SP_LEN;
 
-// Method
+// method
 extern const int METHOD_COUNT;
 extern const std::string METHOD_STR[];
+// TODO: converter 모듈에서 METHOD_STR 대신 METHOD를 사용하도록 수정
+extern const std::map<std::string, int> METHOD;
 
-// Status Code
+// status Code
 extern const std::map<int, std::string> STATUS_CODE;
 
 } // namespace HTTP

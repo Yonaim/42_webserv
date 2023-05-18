@@ -10,18 +10,6 @@
 #include <string>
 #include <vector>
 
-enum e_http_method
-{
-	GET = 0,
-	HEAD,
-	POST,
-	PUT,
-	DELETE,
-	CONNECT,
-	OPTIONS,
-	TRACE
-};
-
 namespace HTTP
 {
 class Server
