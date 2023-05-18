@@ -44,6 +44,7 @@ SRCS_HTTP_HEADER	= \
 
 SRCS_HTTP_REQUEST	= \
 						$(DIR_HTTP)/Request/Request.cpp \
+						$(DIR_HTTP)/Request/RequestConsume.cpp \
 
 SRCS_HTTP_RESPONSE	= \
 						$(DIR_HTTP)/Response/Response.cpp \
