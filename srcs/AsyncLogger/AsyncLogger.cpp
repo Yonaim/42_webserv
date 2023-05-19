@@ -3,24 +3,22 @@
 #include <cstring>
 
 std::map<std::string, AsyncLogger *> AsyncLogger::_loggers;
-std::map<int, AsyncSingleIOProcessor *> AsyncLogger::_target_default;
+std::map<int, AsyncSingleIOProcessor *> AsyncLogger::_target;
 const std::string AsyncLogger::_name_default = "root";
 int AsyncLogger::_log_level = INFO;
 const char *AsyncLogger::_level_names[]
 	= {"DEBUG  ", "VERBOSE", "INFO   ", "WARNING", "ERROR  "};
 
-AsyncLogger::AsyncLogger(void)
-	: _target(_target_default), _name(_name_default), _buf("")
+AsyncLogger::AsyncLogger(void) : _name(_name_default), _buf("")
 {
 }
 
-AsyncLogger::AsyncLogger(const std::string &name)
-	: _target(_target_default), _name(name), _buf("")
+AsyncLogger::AsyncLogger(const std::string &name) : _name(name), _buf("")
 {
 }
 
 AsyncLogger::AsyncLogger(const AsyncLogger &orig)
-	: _target(orig._target), _name(orig._name), _buf(orig._buf)
+	: _name(orig._name), _buf(orig._buf)
 {
 }
 
@@ -88,8 +86,8 @@ void AsyncLogger::setLogLevel(const std::string &log_level)
 
 void AsyncLogger::registerFd(int fd)
 {
-	if (_target_default.find(fd) == _target_default.end())
-		_target_default[fd] = new AsyncSingleIOProcessor(fd);
+	if (_target.find(fd) == _target.end())
+		_target[fd] = new AsyncSingleIOProcessor(fd);
 }
 
 AsyncLogger &AsyncLogger::getLogger(const std::string &name)

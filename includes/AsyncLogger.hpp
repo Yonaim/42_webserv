@@ -13,12 +13,11 @@ class AsyncLogger
 	typedef std::map<int, AsyncSingleIOProcessor *> _Procs;
 
 	static std::map<std::string, AsyncLogger *> _loggers;
-	static _Procs _target_default;
+	static _Procs _target;
 	static const std::string _name_default;
 	static int _log_level;
 	static const char *_level_names[];
 
-	const _Procs _target;
 	const std::string _name;
 	std::string _buf;
 
