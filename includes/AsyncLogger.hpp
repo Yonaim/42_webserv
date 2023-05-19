@@ -16,6 +16,7 @@ class AsyncLogger
 	static _Procs _target_default;
 	static const std::string _name_default;
 	static int _log_level;
+	static const char *_level_names[];
 
 	const _Procs _target;
 	const std::string _name;
@@ -52,6 +53,7 @@ class AsyncLogger
 	void log(int level);
 	static void registerFd(int fd);
 	static void setLogLevel(int log_level);
+	static void setLogLevel(const std::string &log_level);
 	static AsyncLogger &getLogger(const std::string &name);
 	static void task(void);
 	static void blockingWrite(void);

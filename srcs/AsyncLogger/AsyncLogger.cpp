@@ -1,10 +1,13 @@
 #include "AsyncLogger.hpp"
 #include "AsyncIOTaskHandler.hpp"
+#include <cstring>
 
 std::map<std::string, AsyncLogger *> AsyncLogger::_loggers;
 std::map<int, AsyncSingleIOProcessor *> AsyncLogger::_target_default;
 const std::string AsyncLogger::_name_default = "root";
 int AsyncLogger::_log_level = INFO;
+const char *AsyncLogger::_level_names[]
+	= {"DEBUG  ", "VERBOSE", "INFO   ", "WARNING", "ERROR  "};
 
 AsyncLogger::AsyncLogger(void)
 	: _target(_target_default), _name(_name_default), _buf("")
@@ -38,9 +41,7 @@ std::string AsyncLogger::getPrefix(int level)
 	char buf[64];
 	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tstruct);
 
-	static const char *level_names[]
-		= {"DEBUG  ", "VERBOSE", "INFO   ", "WARNING", "ERROR  "};
-	std::string prefix = std::string(buf) + ", " + "[" + level_names[level]
+	std::string prefix = std::string(buf) + ", " + "[" + _level_names[level]
 						 + "] " + _name + ": ";
 
 	return (prefix);
@@ -69,6 +70,20 @@ void AsyncLogger::log(int level)
 void AsyncLogger::setLogLevel(int log_filter)
 {
 	_log_level = log_filter;
+}
+
+void AsyncLogger::setLogLevel(const std::string &log_level)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		if (::strncmp(log_level.c_str(), _level_names[i], log_level.size())
+			== 0)
+		{
+			setLogLevel(i);
+			return;
+		}
+	}
+	throw(std::runtime_error("Log level " + log_level + " does not exist."));
 }
 
 void AsyncLogger::registerFd(int fd)
