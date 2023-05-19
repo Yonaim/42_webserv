@@ -1,48 +1,62 @@
-NAME			= webserv
+NAME		= webserv
 
-INC_DIR			= -I. -Iincludes
-RM				= rm -rf
-CXXFLAGS		= -Wall -Werror -Wextra -MMD -MP $(ACXXFLAGS) $(INC_DIR)
+RM			= rm -rf
 
-DIR_SRC			= srcs/
-DIR_OBJ			= objs/
+CXX			= c++
+CXXFLAGS	= \
+			-Wall -Wextra -Werror \
+			-MMD -MP -std=c++98 -fsanitize=address -g $(ACXXFLAGS) \
 
-FILENAME		= \
-				main \
-				AsyncIOProcessor/AsyncIOProcessor \
-				AsyncIOProcessor/AsyncIOTaskHandler \
-				AsyncIOProcessor/AsyncSingleIOProcessor \
-				AsyncIOProcessor/AsyncTCPIOProcessor \
-				ConfigParser/ConfigDirective \
-				ConfigParser/parseConfig \
-				ConfigParser/recursiveParser \
-				ConfigParser/splitIntoTokens \
-				HTTPServer/HTTPServer \
-				HTTPServer/HTTPServerConstValues \
+CPPFLAGS	= \
+				-I./includes
 
-SRC				= $(addprefix $(DIR_SRC), $(addsuffix .cpp, $(FILENAME)))
-OBJ				= $(addprefix $(DIR_OBJ), $(addsuffix .o, $(FILENAME)))
-DEP				= $(addprefix $(DIR_OBJ), $(addsuffix .d, $(FILENAME)))
+include filenames.mk
+
+# ------------------------------- make rules --------------------------------- #
 
 all: $(NAME)
 
-$(DIR_OBJ)%.o: $(DIR_SRC)%.cpp
+$(DIR_OBJS)%.o: $(DIR_SRCS)%.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(INC_DIR) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
 
-$(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $@ $(LDFLAGS)
+$(DIR_TESTOBJS)%.o: $(DIR_TESTSRCS)%.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
 
--include $(DEP)
+$(NAME): $(OBJS) $(DIR_SRCS)main.o
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OBJS) $(DIR_SRCS)main.o -o $@ $(LDFLAGS)
+
+test_asyncio_echo: $(OBJS) $(DIR_TESTOBJS)test_asyncio_echo.o
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asyncio_echo.o -o $@ $(LDFLAGS)
+
+test_asyncio_singleio: $(OBJS) $(DIR_TESTOBJS)test_asyncio_singleio.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asyncio_singleio.o -o $@ $(LDFLAGS)
+
+test_asynclogger: $(OBJS) $(DIR_TESTOBJS)test_asynclogger.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asynclogger.o -o $@ $(LDFLAGS)
+
+test_configparser: $(OBJS) $(DIR_TESTOBJS)test_configparser.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_configparser.o -o $@ $(LDFLAGS)
+
+test_http_request: $(OBJS) $(DIR_TESTOBJS)test_http_request.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_http_request.o -o $@ $(LDFLAGS)
+
+test_http_response: $(OBJS) $(DIR_TESTOBJS)test_http_response.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_http_response.o -o $@ $(LDFLAGS)
+
+test_http_server_constructor: $(OBJS) $(DIR_TESTOBJS)test_http_server_constructor.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_http_server_constructor.o -o $@ $(LDFLAGS)
+
+test_bidimap: $(OBJS) $(DIR_TESTOBJS)test_bidimap.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_bidimap.o -o $@ $(LDFLAGS)
+
+-include $(DEPS) $(TESTDRIVERDEPS)
 
 clean:
-	$(RM) $(DIR_OBJ)
+	$(RM) $(DIR_OBJS) $(DIR_TESTOBJS)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) $(TESTDRIVERNAMES)
 
-re:
-	@make fclean
-	@make all
-
-.PHONY: all bonus clean fclean re
+.PHONY: all clean fclean re
