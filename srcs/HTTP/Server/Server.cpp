@@ -31,6 +31,11 @@ HTTP::Server &HTTP::Server::operator=(const Server &orig)
 	return (*this);
 }
 
+int HTTP::Server::getPort(void) const
+{
+	return (_port);
+}
+
 void HTTP::Server::task(void)
 {
 	std::cout << "Unimplemented stub of " << __func__ << std::endl;

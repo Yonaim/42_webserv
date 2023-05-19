@@ -62,6 +62,7 @@ class Server
 	Server(const Server &orig);
 	Server &operator=(const Server &orig);
 
+	int getPort(void) const;
 	void task(void);
 	bool isForMe(const Request &request);
 	void registerRequest(int client_fd, const Request &request);
