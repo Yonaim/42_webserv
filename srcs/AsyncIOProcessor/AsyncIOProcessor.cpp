@@ -67,15 +67,14 @@ void AsyncIOProcessor::read(const int fd)
 {
 	char buff[_buffsize + 1];
 	ssize_t readsize = ::read(fd, buff, _buffsize);
-	if (readsize <= 0)
+	if (readsize == 0)
 	{
-		std::stringstream what;
-		if (readsize < 0)
-			what << "Error while reading from fd " << fd << ": "
-				 << strerror(errno);
-		else
-			what << "fd " << fd << " closed.";
-		throw(std::runtime_error(what.str()));
+		// TODO: fd 닫혔을 시 핸들링
+		return;
+	}
+	if (readsize < 0)
+	{
+		// TODO: 경고 메시지 출력
 		return;
 	}
 	buff[readsize] = '\0';
@@ -88,13 +87,11 @@ void AsyncIOProcessor::read(const int fd)
 void AsyncIOProcessor::write(const int fd)
 {
 	ssize_t writesize = ::write(fd, _wrbuf[fd].c_str(), _wrbuf[fd].length());
-	if (writesize <= 0)
+	if (writesize == 0)
+		throw(std::logic_error("write(2) call cannot return 0."));
+	if (writesize < 0)
 	{
-		std::stringstream what;
-		if (writesize == 0)
-			throw(std::logic_error("write(2) call cannot return 0."));
-		what << "Error while writing to fd " << fd << ": " << strerror(errno);
-		throw(std::runtime_error(what.str()));
+		// TODO: 경고 메시지 출력
 		return;
 	}
 	if (_debug)
