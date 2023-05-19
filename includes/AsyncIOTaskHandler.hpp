@@ -11,7 +11,7 @@ class AsyncIOTaskHandler
 	std::vector<AsyncIOProcessor *> _tasks;
 
 	AsyncIOTaskHandler(void);
-	~AsyncIOTaskHandler();
+	virtual ~AsyncIOTaskHandler();
 	AsyncIOTaskHandler(const AsyncIOTaskHandler &orig);
 	AsyncIOTaskHandler &operator=(const AsyncIOTaskHandler &orig);
 	static AsyncIOTaskHandler &getInstance(void);

@@ -14,7 +14,7 @@ class AsyncSingleIOProcessor : public AsyncIOProcessor
 
   public:
 	AsyncSingleIOProcessor(const int fd);
-	~AsyncSingleIOProcessor();
+	virtual ~AsyncSingleIOProcessor();
 	AsyncSingleIOProcessor(const AsyncSingleIOProcessor &orig);
 	AsyncSingleIOProcessor &operator=(const AsyncSingleIOProcessor &orig);
 	virtual void task(void);

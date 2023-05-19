@@ -36,7 +36,7 @@ class AsyncTCPIOProcessor : public AsyncIOProcessor
 
   public:
 	AsyncTCPIOProcessor(const int port = 80);
-	~AsyncTCPIOProcessor();
+	virtual ~AsyncTCPIOProcessor();
 	AsyncTCPIOProcessor(const AsyncTCPIOProcessor &orig);
 	AsyncTCPIOProcessor &operator=(const AsyncTCPIOProcessor &orig);
 	virtual void task(void);
