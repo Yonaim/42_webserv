@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 const size_t AsyncIOProcessor::_buffsize = 2048;
+bool AsyncIOProcessor::_debug = false;
 static const timespec zerosec = {0, 0};
 
 AsyncIOProcessor::AsyncIOProcessor(void)
@@ -79,7 +80,9 @@ void AsyncIOProcessor::read(const int fd)
 	}
 	buff[readsize] = '\0';
 	_rdbuf[fd] += buff;
-	std::cout << "Read \"" << buff << "\"" << std::endl;
+	if (_debug)
+		std::cout << "AsyncIOProcessor:[DEBUG]:Read " << readsize
+				  << " bytes: \"" << buff << "\"\n";
 }
 
 void AsyncIOProcessor::write(const int fd)
@@ -94,8 +97,9 @@ void AsyncIOProcessor::write(const int fd)
 		throw(std::runtime_error(what.str()));
 		return;
 	}
-	std::cout << "Wrote " << writesize
-			  << " bytes: " << _wrbuf[fd].substr(0, writesize) << std::endl;
+	if (_debug)
+		std::cout << "AsyncIOProcessor:[DEBUG]:Wrote " << writesize
+				  << " bytes: \"" << _wrbuf[fd].substr(0, writesize) << "\"\n";
 	_wrbuf[fd] = _wrbuf[fd].substr(writesize, _wrbuf[fd].length());
 }
 
@@ -107,6 +111,11 @@ void AsyncIOProcessor::blockingWrite(void)
 		while (!it->second.empty())
 			write(it->first);
 	}
+}
+
+void AsyncIOProcessor::setDebug(bool debug)
+{
+	_debug = debug;
 }
 
 struct kevent constructKevent(const int fd, const int event)

@@ -17,6 +17,8 @@ class AsyncIOProcessor
 	std::deque<struct kevent> _eventlist;
 	std::map<int, std::string> _rdbuf;
 	std::map<int, std::string> _wrbuf;
+	static bool _debug;
+
 	void initializeKQueue(void);
 	void flushKQueue(void);
 	void read(const int fd);
@@ -29,6 +31,7 @@ class AsyncIOProcessor
 	AsyncIOProcessor &operator=(const AsyncIOProcessor &orig);
 	virtual void task(void) = 0;
 	void blockingWrite(void);
+	static void setDebug(bool debug);
 };
 
 enum IOEVENT_E
