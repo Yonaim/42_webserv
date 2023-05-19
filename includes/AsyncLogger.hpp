@@ -11,10 +11,12 @@ class AsyncLogger
 {
   private:
 	typedef std::map<int, AsyncSingleIOProcessor *> _Procs;
+
 	static std::map<std::string, AsyncLogger *> _loggers;
 	static _Procs _target_default;
 	static const std::string _name_default;
 	static int _log_level;
+
 	const _Procs _target;
 	const std::string _name;
 	std::string _buf;
@@ -24,7 +26,7 @@ class AsyncLogger
 	AsyncLogger(const AsyncLogger &orig);
 	AsyncLogger &operator=(const AsyncLogger &orig);
 
-	std::string getPrefix(void);
+	std::string getPrefix(int level);
 
   public:
 	enum debug_level_e

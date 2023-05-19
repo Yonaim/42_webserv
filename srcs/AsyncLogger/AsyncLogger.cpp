@@ -31,10 +31,19 @@ AsyncLogger::~AsyncLogger()
 {
 }
 
-std::string AsyncLogger::getPrefix(void)
+std::string AsyncLogger::getPrefix(int level)
 {
-	// TODO: implementation
-	return (_name + ": ");
+	time_t now = time(NULL);
+	struct tm *tstruct = localtime(&now);
+	char buf[64];
+	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tstruct);
+
+	static const char *level_names[]
+		= {"DEBUG  ", "VERBOSE", "INFO   ", "WARNING", "ERROR  "};
+	std::string prefix = std::string(buf) + ", " + "[" + level_names[level]
+						 + "] " + _name + ": ";
+
+	return (prefix);
 }
 
 void AsyncLogger::registerLog(const std::string &content)
@@ -51,7 +60,7 @@ void AsyncLogger::log(int level)
 	}
 	for (_Procs::const_iterator it = _target.begin(); it != _target.end(); it++)
 	{
-		it->second->setWriteBuf(getPrefix());
+		it->second->setWriteBuf(getPrefix(level));
 		it->second->setWriteBuf(_buf);
 	}
 	_buf = "";
