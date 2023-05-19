@@ -73,7 +73,12 @@ class Request
 	bool hasHeaderValue(const std::string &name,
 						const std::string &value) const;
 	bool hasHeaderValue(const std::string &name) const;
+
+	// getter
 	const std::string &getHeaderValue(const std::string &name, int idx) const;
+	int getMethod(void) const;
+	const std::string &getURIPath(void) const;
+	const std::string	&getBody() const;
 };
 } // namespace HTTP
 

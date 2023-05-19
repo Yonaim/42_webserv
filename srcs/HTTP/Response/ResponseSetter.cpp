@@ -9,7 +9,7 @@ void HTTP::Response::setDefaultValue(void)
 	setContentLength();
 }
 
-void HTTP::Response::setValue(std::string const &key, std::string const &val)
+void HTTP::Response::setValue(const std::string &key, const std::string &val)
 {
 	(void)key;
 	(void)val;
@@ -76,4 +76,31 @@ void HTTP::Response::setContentLength(void)
 {
 	if (_body.length() > 0)
 		setValue("Content-Length", uintToStr(_body.length()));
+}
+
+void HTTP::Response::setContentLength(size_t length)
+{
+	if (length > 0)
+		setValue("Content-Length", uintToStr(length));
+}
+
+void HTTP::Response::setBody(const std::string &body)
+{
+	_body = body;
+}
+
+void HTTP::Response::setContentType(const std::string &file_path)
+{
+	size_t separator_idx = file_path.find_last_of('.');
+	if (separator_idx != std::string::npos)
+	{
+		const std::string extension = file_path.substr(separator_idx + 1);
+		const std::map<std::string, std::string>::const_iterator iter
+			= MIME_TYPE.find(extension);
+		if (iter == MIME_TYPE.end())
+			setValue("Content-Type",
+					 "application/octet-stream"); // default mime-type
+		else
+			setValue("Content-Type", iter->second);
+	}
 }

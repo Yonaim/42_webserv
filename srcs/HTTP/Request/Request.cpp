@@ -226,3 +226,18 @@ const std::string &HTTP::Request::getHeaderValue(std::string const &name,
 {
 	return (_header.getValue(name, idx));
 }
+
+int HTTP::Request::getMethod(void) const
+{
+	return (_method);
+}
+
+const std::string &HTTP::Request::getURIPath(void) const
+{
+	return (_uri);
+}
+
+const std::string	&HTTP::Request::getBody() const
+{
+	return (_body);
+}

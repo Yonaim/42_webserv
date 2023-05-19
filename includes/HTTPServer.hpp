@@ -39,7 +39,11 @@ class Server
 		void parseDirectiveReturn(const ConfigContext &location_context);
 		void parseDirectiveAutoIndex(const ConfigContext &location_context);
 		void parseDirectiveIndex(const ConfigContext &location_context);
-		const std::string &getPath(void);
+		const std::string &getPath(void) const;
+
+		// 추가
+		const std::string &getRoot(void) const;
+		bool isAllowedMethod(int method);
 	};
 
 	int _port;
@@ -56,6 +60,14 @@ class Server
 	void ensureClientConnected(int client_fd);
 	static bool isValidStatusCode(const int &status_code);
 
+	// 추가
+	void getMethodHandler(HTTP::Request &request, HTTP::Response &response);
+	void headMethodHandler(HTTP::Request &request, HTTP::Response &response);
+	void postMethodHandler(HTTP::Request &request, HTTP::Response &response);
+	void deleteMethodHandler(HTTP::Request &request, HTTP::Response &response);
+	std::string processURI(const HTTP::Server::Location &location,
+						   std::string uri);
+
   public:
 	Server(const ConfigContext &server_context);
 	~Server();
@@ -70,6 +82,11 @@ class Server
 	int hasResponses(void);
 	bool hasResponses(int client_fd);
 	void disconnect(int client_fd);
+
+	// 추가
+	void methodHandler(HTTP::Request &Request, int fd);
+	const Location &getLocation(const std::string &location);
+	void setErrorPage(HTTP::Response &response, int status_code);
 };
 } // namespace HTTP
 

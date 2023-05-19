@@ -30,6 +30,9 @@ extern const std::map<std::string, int> METHOD;
 // status Code
 extern const std::map<int, std::string> STATUS_CODE;
 
+// mime type
+extern const std::map<std::string, std::string> MIME_TYPE;
+
 } // namespace HTTP
 
 #endif
