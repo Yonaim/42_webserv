@@ -1,6 +1,7 @@
 #ifndef WEBSERVER_HPP
 #define WEBSERVER_HPP
 
+#include "AsyncLogger.hpp"
 #include "AsyncTCPIOProcessor.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTPRequest.hpp"
@@ -24,6 +25,7 @@ class WebServer
 	_TCPProcMap _tcp_procs;
 	_ServerMap _servers;
 	_ReqBufPortMap _request_buffer;
+	AsyncLogger &_logger;
 
 	WebServer(void);
 

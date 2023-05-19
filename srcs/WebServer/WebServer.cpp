@@ -1,9 +1,9 @@
 #include "WebServer.hpp"
 #include "../HTTP/utils.hpp" // TODO: 공용 유틸 함수 헤더 만들기
 #include "AsyncIOTaskHandler.hpp"
-#include <iostream>
+#include "AsyncLogger.hpp"
 
-WebServer::WebServer(void)
+WebServer::WebServer(void) : _logger(AsyncLogger::getLogger("WebServer"))
 {
 }
 
@@ -47,12 +47,13 @@ void WebServer::parseServer(const ConfigContext &server_context)
 {
 	HTTP::Server server(server_context);
 	int port = server.getPort();
-	std::cout << "Created Server at port " << port << std::endl;
+	_logger << "Created Server at port " << port << async::verbose;
 	if (_tcp_procs.find(port) == _tcp_procs.end())
 	{
 		_tcp_procs[port] = AsyncTCPIOProcessor(port);
 		_tcp_procs[port].initialize();
-		std::cout << "Created TCP IO Processor at port " << port << std::endl;
+		_logger << "Created TCP IO Processor at port " << port
+				<< async::verbose;
 		_servers[port] = _Servers();
 		_request_buffer[port] = _ReqBufFdMap();
 	}
@@ -60,6 +61,7 @@ void WebServer::parseServer(const ConfigContext &server_context)
 }
 
 WebServer::WebServer(const ConfigContext &root_context)
+	: _logger(AsyncLogger::getLogger("WebServer"))
 {
 	parseMaxBodySize(root_context);
 	parseUploadStore(root_context);
@@ -83,7 +85,8 @@ WebServer::~WebServer()
 }
 
 WebServer::WebServer(const WebServer &orig)
-	: _tcp_procs(orig._tcp_procs), _servers(orig._servers)
+	: _tcp_procs(orig._tcp_procs), _servers(orig._servers),
+	  _logger(orig._logger)
 {
 }
 
