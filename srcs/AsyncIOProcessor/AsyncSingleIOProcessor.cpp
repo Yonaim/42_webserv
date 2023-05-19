@@ -73,6 +73,11 @@ void AsyncSingleIOProcessor::getReadBuf(std::string &str)
 	_rdbuf[_fd] = "";
 }
 
+bool AsyncSingleIOProcessor::writeDone(void)
+{
+	return (_wrbuf[_fd].empty());
+}
+
 AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io, std::string &str)
 {
 	io.getReadBuf(str);

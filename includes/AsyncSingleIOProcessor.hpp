@@ -20,6 +20,7 @@ class AsyncSingleIOProcessor : public AsyncIOProcessor
 	virtual void task(void);
 	void setWriteBuf(const std::string &str);
 	void getReadBuf(std::string &str);
+	bool writeDone(void);
 };
 
 template <typename T>
