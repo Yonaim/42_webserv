@@ -11,8 +11,6 @@ class AsyncTCPIOProcessor : public AsyncIOProcessor
 	int _port;
 	int _listening_socket;
 
-	void initialize(void);
-	void finalize(const char *with_error);
 	void accept(void);
 	void disconnect(const int client_socket);
 
@@ -39,6 +37,9 @@ class AsyncTCPIOProcessor : public AsyncIOProcessor
 	virtual ~AsyncTCPIOProcessor();
 	AsyncTCPIOProcessor(const AsyncTCPIOProcessor &orig);
 	AsyncTCPIOProcessor &operator=(const AsyncTCPIOProcessor &orig);
+
+	void initialize(void);
+	void finalize(const char *with_error);
 	virtual void task(void);
 	std::string &rdbuf(const int fd);
 	std::string &wrbuf(const int fd);

@@ -10,25 +10,22 @@ const int AsyncTCPIOProcessor::_backlog = 8;
 
 AsyncTCPIOProcessor::AsyncTCPIOProcessor(const int port) : _port(port)
 {
-	initialize();
 }
 
 AsyncTCPIOProcessor::~AsyncTCPIOProcessor()
 {
-	finalize(NULL);
 }
 
 AsyncTCPIOProcessor::AsyncTCPIOProcessor(const AsyncTCPIOProcessor &orig)
+	: _port(orig._port), _listening_socket(orig._listening_socket)
 {
-	operator=(orig);
 }
 
 AsyncTCPIOProcessor &AsyncTCPIOProcessor::operator=(
 	const AsyncTCPIOProcessor &orig)
 {
-	finalize(NULL);
 	_port = orig._port;
-	initialize();
+	_listening_socket = orig._listening_socket;
 	return (*this);
 }
 
