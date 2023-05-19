@@ -36,7 +36,7 @@ void HTTP::Server::task(void)
 	std::cout << "Unimplemented stub of " << __func__ << std::endl;
 }
 
-bool isForMe(const HTTP::Request &request)
+bool HTTP::Server::isForMe(const HTTP::Request &request)
 {
 	(void)request;
 	std::cout << "Unimplemented stub of " << __func__ << std::endl;
