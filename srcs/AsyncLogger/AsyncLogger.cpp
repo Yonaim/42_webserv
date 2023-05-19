@@ -65,9 +65,14 @@ void AsyncLogger::setLogFilter(int log_filter)
 	_log_filter_level = log_filter;
 }
 
-void AsyncLogger::setLogLevel(int log_level)
+void AsyncLogger::setDefaultLogLevel(int log_level)
 {
 	_log_level_default = log_level;
+}
+
+void AsyncLogger::setLogLevel(int log_level)
+{
+	_log_level = log_level;
 }
 
 void AsyncLogger::registerFd(int fd)

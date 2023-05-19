@@ -7,8 +7,8 @@ int main(void)
 	AsyncLogger::setLogFilter(AsyncLogger::WARNING);
 
 	AsyncLogger &root_logger = AsyncLogger::getLogger("root");
-	AsyncLogger::setLogLevel(AsyncLogger::ERROR);
 	AsyncLogger &child_logger = AsyncLogger::getLogger("child");
+	child_logger.setLogLevel(AsyncLogger::ERROR);
 
 	root_logger << "Hello, World! " << 1 << async::endl;
 	child_logger << "Hello, World! " << 2 << async::endl;

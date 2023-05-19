@@ -19,7 +19,7 @@ class AsyncLogger
 	const _Procs _target;
 	const std::string _name;
 	bool _should_write_prefix;
-	const int _log_level;
+	int _log_level;
 
 	AsyncLogger(void);
 	AsyncLogger(const std::string &name);
@@ -52,7 +52,8 @@ class AsyncLogger
 	void setEndMark(void);
 	static void registerFd(int fd);
 	static void setLogFilter(int log_filter);
-	static void setLogLevel(int log_level);
+	static void setDefaultLogLevel(int log_level);
+	void setLogLevel(int log_level);
 	static AsyncLogger &getLogger(const std::string &name);
 	static void task(void);
 	static void blockingWrite(void);
