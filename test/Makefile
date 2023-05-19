@@ -32,6 +32,9 @@ test_http_response: $(OBJS) $(DIR_TESTSRCS)/test_http_response.o
 test_http_server_constructor: $(OBJS) $(DIR_TESTSRCS)/test_http_server_constructor.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTSRCS)/test_http_server_constructor.o -o $@ $(LDFLAGS)
 
+test_bidimap: $(OBJS) $(DIR_TESTSRCS)/test_bidimap.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTSRCS)/test_bidimap.o -o $@ $(LDFLAGS)
+
 clean:
 	$(RM) $(SRCS_ALL:.cpp=.o) $(TEST_SRCS_ALL:.cpp=.o)
 
