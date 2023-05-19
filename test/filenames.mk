@@ -63,4 +63,3 @@ SRCS_ALL			= \
 						$(SRCS_HTTP_REQUEST) \
 						$(SRCS_HTTP_RESPONSE) \
 						$(SRCS_HTTP_SERVER) \
-						$(SRCS_TEST_FILE) \
