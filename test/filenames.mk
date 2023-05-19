@@ -18,6 +18,7 @@ TEST_LIST			=	\
 						test_http_request \
 						test_http_response \
 						test_http_server_constructor \
+						test_bidimap \
 
 TEST_SRCS_ALL		= $(addsuffix .cpp, $(addprefix $(DIR_TESTSRCS)/, $(TEST_LIST)))
 
