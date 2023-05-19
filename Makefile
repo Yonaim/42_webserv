@@ -65,4 +65,7 @@ clean:
 fclean: clean
 	$(RM) $(NAME) $(TESTDRIVERNAMES)
 
+re: fclean
+	@make all
+
 .PHONY: all clean fclean re

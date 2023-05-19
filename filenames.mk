@@ -56,6 +56,7 @@ FILENAMES			= \
 					$(DIR_CONFIG_PARSER)recursiveParser \
 					$(DIR_CONFIG_PARSER)splitIntoTokens \
 					$(DIR_HTTP)const_values \
+					$(DIR_HTTP)mime_type \
 					$(DIR_HTTP)utils \
 					$(DIR_HTTP)Header/Header \
 					$(DIR_HTTP)Request/Request \
