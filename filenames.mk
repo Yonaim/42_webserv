@@ -39,6 +39,7 @@ TESTDRIVERDEPS		= $(addprefix $(DIR_TESTOBJS), $(addsuffix .d, $(TESTDRIVERNAMES
 
 FILENAMES			= \
 					$(DIR_ASYNC_IO)AsyncIOProcessor \
+					$(DIR_ASYNC_IO)AsyncIOException \
 					$(DIR_ASYNC_IO)AsyncSingleIOProcessor \
 					$(DIR_ASYNC_IO)AsyncTCPIOProcessor \
 					$(DIR_ASYNC_IO)AsyncIOTaskHandler \

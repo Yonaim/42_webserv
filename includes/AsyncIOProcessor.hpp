@@ -25,6 +25,10 @@ class AsyncIOProcessor
 	void write(const int fd);
 
   public:
+	class FileClosed;
+	class ReadError;
+	class WriteError;
+
 	AsyncIOProcessor(void);
 	virtual ~AsyncIOProcessor();
 	AsyncIOProcessor(const AsyncIOProcessor &orig);
@@ -39,6 +43,24 @@ enum IOEVENT_E
 	IOEVENT_READ = 0,
 	IOEVENT_WRITE = 1,
 	IOEVENT_ERROR = 2
+};
+
+class AsyncIOProcessor::FileClosed : public std::runtime_error
+{
+  public:
+	FileClosed(void);
+};
+
+class AsyncIOProcessor::ReadError : public std::runtime_error
+{
+  public:
+	ReadError(void);
+};
+
+class AsyncIOProcessor::WriteError : public std::runtime_error
+{
+  public:
+	WriteError(void);
 };
 
 struct kevent constructKevent(const int fd, const int event);

@@ -68,15 +68,9 @@ void AsyncIOProcessor::read(const int fd)
 	char buff[_buffsize + 1];
 	ssize_t readsize = ::read(fd, buff, _buffsize);
 	if (readsize == 0)
-	{
-		// TODO: fd 닫혔을 시 핸들링
-		return;
-	}
+		throw(AsyncIOProcessor::FileClosed());
 	if (readsize < 0)
-	{
-		// TODO: 경고 메시지 출력
-		return;
-	}
+		throw(AsyncIOProcessor::ReadError());
 	buff[readsize] = '\0';
 	_rdbuf[fd] += buff;
 	if (_debug)
@@ -90,10 +84,7 @@ void AsyncIOProcessor::write(const int fd)
 	if (writesize == 0)
 		throw(std::logic_error("write(2) call cannot return 0."));
 	if (writesize < 0)
-	{
-		// TODO: 경고 메시지 출력
-		return;
-	}
+		throw(AsyncIOProcessor::WriteError());
 	if (_debug)
 		std::cout << "AsyncIOProcessor:[DEBUG]:Wrote " << writesize
 				  << " bytes: \"" << _wrbuf[fd].substr(0, writesize) << "\"\n";
