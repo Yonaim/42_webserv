@@ -26,6 +26,8 @@ TESTDRIVERNAMES		=	\
 					test_asyncio_echo \
 					test_asyncio_singleio \
 					test_asynclogger \
+					test_asyncfilereader \
+					test_asyncfilewriter \
 					test_configparser \
 					test_http_request \
 					test_http_response \

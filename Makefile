@@ -36,6 +36,12 @@ test_asyncio_singleio: $(OBJS) $(DIR_TESTOBJS)test_asyncio_singleio.o
 test_asynclogger: $(OBJS) $(DIR_TESTOBJS)test_asynclogger.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asynclogger.o -o $@ $(LDFLAGS)
 
+test_asyncfilereader: $(OBJS) $(DIR_TESTOBJS)test_asyncfilereader.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asyncfilereader.o -o $@ $(LDFLAGS)
+
+test_asyncfilewriter: $(OBJS) $(DIR_TESTOBJS)test_asyncfilewriter.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asyncfilewriter.o -o $@ $(LDFLAGS)
+
 test_configparser: $(OBJS) $(DIR_TESTOBJS)test_configparser.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_configparser.o -o $@ $(LDFLAGS)
 
