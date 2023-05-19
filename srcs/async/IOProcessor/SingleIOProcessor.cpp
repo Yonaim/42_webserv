@@ -78,6 +78,11 @@ bool SingleIOProcessor::writeDone(void)
 	return (_wrbuf[_fd].empty());
 }
 
+int SingleIOProcessor::getFd(void)
+{
+	return (_fd);
+}
+
 SingleIOProcessor &operator>>(SingleIOProcessor &io, std::string &str)
 {
 	io.getReadBuf(str);
