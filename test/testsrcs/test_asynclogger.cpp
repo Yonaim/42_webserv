@@ -4,14 +4,15 @@
 int main(void)
 {
 	AsyncLogger::registerFd(STDOUT_FILENO);
-	AsyncLogger::setLogFilter(AsyncLogger::WARNING);
+	AsyncLogger::setLogLevel(AsyncLogger::WARNING);
 
 	AsyncLogger &root_logger = AsyncLogger::getLogger("root");
-	AsyncLogger &child_logger = AsyncLogger::getLogger("child");
-	child_logger.setLogLevel(AsyncLogger::ERROR);
 
-	root_logger << "Hello, World! " << 1 << async::endl;
-	child_logger << "Hello, World! " << 2 << async::endl;
+	root_logger << "Hello, World! " << 1 << "\n" << async::debug;
+	root_logger << "Hello, World! " << 2 << "\n" << async::verbose;
+	root_logger << "Hello, World! " << 3 << "\n" << async::info;
+	root_logger << "Hello, World! " << 4 << "\n" << async::warning;
+	root_logger << "Hello, World! " << 5 << "\n" << async::error;
 
 	AsyncLogger::blockingWrite();
 	return (0);

@@ -4,25 +4,20 @@
 std::map<std::string, AsyncLogger *> AsyncLogger::_loggers;
 std::map<int, AsyncSingleIOProcessor *> AsyncLogger::_target_default;
 const std::string AsyncLogger::_name_default = "root";
-int AsyncLogger::_log_filter_level = INFO;
-int AsyncLogger::_log_level_default = INFO;
+int AsyncLogger::_log_level = INFO;
 
 AsyncLogger::AsyncLogger(void)
-	: _target(_target_default), _name(_name_default),
-	  _should_write_prefix(true), _log_level(_log_level_default)
+	: _target(_target_default), _name(_name_default), _buf("")
 {
 }
 
 AsyncLogger::AsyncLogger(const std::string &name)
-	: _target(_target_default), _name(name), _should_write_prefix(true),
-	  _log_level(_log_level_default)
+	: _target(_target_default), _name(name), _buf("")
 {
 }
 
 AsyncLogger::AsyncLogger(const AsyncLogger &orig)
-	: _target(orig._target), _name(orig._name),
-	  _should_write_prefix(orig._should_write_prefix),
-	  _log_level(orig._log_level)
+	: _target(orig._target), _name(orig._name), _buf(orig._buf)
 {
 }
 
@@ -42,37 +37,29 @@ std::string AsyncLogger::getPrefix(void)
 	return (_name + ": ");
 }
 
-void AsyncLogger::log(const std::string &content)
+void AsyncLogger::registerLog(const std::string &content)
 {
-	if (_log_level < _log_filter_level)
+	_buf += content;
+}
+
+void AsyncLogger::log(int level)
+{
+	if (level < _log_level)
+	{
+		_buf = "";
 		return;
+	}
 	for (_Procs::const_iterator it = _target.begin(); it != _target.end(); it++)
 	{
-		if (_should_write_prefix)
-			it->second->setWriteBuf(getPrefix());
-		it->second->setWriteBuf(content);
+		it->second->setWriteBuf(getPrefix());
+		it->second->setWriteBuf(_buf);
 	}
-	_should_write_prefix = false;
+	_buf = "";
 }
 
-void AsyncLogger::setEndMark(void)
+void AsyncLogger::setLogLevel(int log_filter)
 {
-	_should_write_prefix = true;
-}
-
-void AsyncLogger::setLogFilter(int log_filter)
-{
-	_log_filter_level = log_filter;
-}
-
-void AsyncLogger::setDefaultLogLevel(int log_level)
-{
-	_log_level_default = log_level;
-}
-
-void AsyncLogger::setLogLevel(int log_level)
-{
-	_log_level = log_level;
+	_log_level = log_filter;
 }
 
 void AsyncLogger::registerFd(int fd)
@@ -103,8 +90,6 @@ void AsyncLogger::blockingWrite(void)
 
 AsyncLogger &operator<<(AsyncLogger &io, const AsyncLogger::EndMarker mark)
 {
-	if (mark.newline)
-		io.log("\n");
-	io.setEndMark();
+	io.log(mark.level);
 	return (io);
 }

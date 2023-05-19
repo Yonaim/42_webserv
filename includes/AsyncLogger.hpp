@@ -14,12 +14,10 @@ class AsyncLogger
 	static std::map<std::string, AsyncLogger *> _loggers;
 	static _Procs _target_default;
 	static const std::string _name_default;
-	static int _log_filter_level;
-	static int _log_level_default;
+	static int _log_level;
 	const _Procs _target;
 	const std::string _name;
-	bool _should_write_prefix;
-	int _log_level;
+	std::string _buf;
 
 	AsyncLogger(void);
 	AsyncLogger(const std::string &name);
@@ -40,20 +38,18 @@ class AsyncLogger
 	class EndMarker
 	{
 	  public:
-		bool newline;
-		EndMarker(bool new_line = false);
+		int level;
+		EndMarker(int _level = INFO);
 		EndMarker(const EndMarker &orig);
 		EndMarker &operator=(const EndMarker &orig);
 		~EndMarker();
 	};
 
 	~AsyncLogger();
-	void log(const std::string &content);
-	void setEndMark(void);
+	void registerLog(const std::string &content);
+	void log(int level);
 	static void registerFd(int fd);
-	static void setLogFilter(int log_filter);
-	static void setDefaultLogLevel(int log_level);
-	void setLogLevel(int log_level);
+	static void setLogLevel(int log_level);
 	static AsyncLogger &getLogger(const std::string &name);
 	static void task(void);
 	static void blockingWrite(void);
@@ -63,7 +59,7 @@ template <typename T> inline AsyncLogger &operator<<(AsyncLogger &io, T content)
 {
 	std::stringstream buf;
 	buf << content;
-	io.log(buf.str());
+	io.registerLog(buf.str());
 	return (io);
 }
 
@@ -71,7 +67,11 @@ AsyncLogger &operator<<(AsyncLogger &io, const AsyncLogger::EndMarker mark);
 
 namespace async
 {
-extern const AsyncLogger::EndMarker endl;
-};
+extern const AsyncLogger::EndMarker debug;
+extern const AsyncLogger::EndMarker verbose;
+extern const AsyncLogger::EndMarker info;
+extern const AsyncLogger::EndMarker warning;
+extern const AsyncLogger::EndMarker error;
+}; // namespace async
 
 #endif
