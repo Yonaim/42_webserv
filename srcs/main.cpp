@@ -4,6 +4,32 @@
 #include "WebServer.hpp"
 #include "parseConfig.hpp"
 #include <iostream>
+#include <unistd.h>
+
+void parseLogLevel(const ConfigContext &root_context)
+{
+	const char *dir_name = "log_level";
+
+	size_t n_directives = root_context.countDirectivesByName(dir_name);
+	if (n_directives == 0)
+		return;
+	if (n_directives > 1)
+		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+
+	const ConfigDirective &loglevel_directive
+		= root_context.getNthDirectiveByName(dir_name, 0);
+
+	if (loglevel_directive.is_context())
+		root_context.throwException(PARSINGEXC_UNDEF_DIR);
+	if (loglevel_directive.nParameters() != 1)
+		loglevel_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+
+	AsyncLogger::registerFd(STDOUT_FILENO);
+	AsyncLogger::setLogLevel(loglevel_directive.parameter(0));
+	AsyncLogger::getLogger("root")
+		<< "Set log level to " << loglevel_directive.parameter(0)
+		<< async::verbose;
+}
 
 int main(int argc, char **argv)
 {
@@ -21,6 +47,16 @@ int main(int argc, char **argv)
 	catch (const std::exception &e)
 	{
 		std::cerr << "Error while parsing config file: " << e.what() << "\n";
+		return (2);
+	}
+
+	try
+	{
+		parseLogLevel(rootConfig);
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << "Error while parsing log level: " << e.what() << "\n";
 		return (2);
 	}
 
