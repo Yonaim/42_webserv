@@ -4,6 +4,7 @@ DIR_SRCS 			= srcs/
 DIR_OBJS 			= objs/
 
 DIR_ASYNC_IO 		= AsyncIOProcessor/
+DIR_ASYNCFILE		= AsyncFileIOProcessor/
 DIR_ASYNCLOGGER		= AsyncLogger/
 DIR_CONFIG_PARSER 	= ConfigParser/
 DIR_HTTP 			= HTTP/
@@ -43,6 +44,9 @@ FILENAMES			= \
 					$(DIR_ASYNC_IO)AsyncSingleIOProcessor \
 					$(DIR_ASYNC_IO)AsyncTCPIOProcessor \
 					$(DIR_ASYNC_IO)AsyncIOTaskHandler \
+					$(DIR_ASYNCFILE)AsyncFileIOProcessor \
+					$(DIR_ASYNCFILE)AsyncFileReader \
+					$(DIR_ASYNCFILE)AsyncFileWriter \
 					$(DIR_ASYNCLOGGER)AsyncLogger \
 					$(DIR_ASYNCLOGGER)EndMarker \
 					$(DIR_CONFIG_PARSER)ConfigDirective \
