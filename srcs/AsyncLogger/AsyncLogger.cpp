@@ -114,6 +114,7 @@ void AsyncLogger::blockingWrite(void)
 
 AsyncLogger &operator<<(AsyncLogger &io, const AsyncLogger::EndMarker mark)
 {
+	io.registerLog("\n");
 	io.log(mark.level);
 	return (io);
 }
