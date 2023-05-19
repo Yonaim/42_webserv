@@ -51,7 +51,7 @@ class FileWriter : public FileIOProcessor
 	FileWriter &operator=(const FileWriter &orig);
 
   public:
-	FileWriter(unsigned int timeout_ms, int fd);
+	FileWriter(unsigned int timeout_ms, int fd, const std::string &content);
 	FileWriter(unsigned int timeout_ms, const std::string &path,
 			   const std::string &content);
 	virtual ~FileWriter();

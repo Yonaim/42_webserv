@@ -16,9 +16,11 @@ FileWriter &FileWriter::operator=(const FileWriter &orig)
 	return (*this);
 }
 
-FileWriter::FileWriter(unsigned int timeout_ms, int fd)
+FileWriter::FileWriter(unsigned int timeout_ms, int fd,
+					   const std::string &content)
 	: FileIOProcessor(timeout_ms, fd)
 {
+	_writer.setWriteBuf(content);
 }
 
 FileWriter::FileWriter(unsigned int timeout_ms, const std::string &path,
