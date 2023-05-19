@@ -99,6 +99,16 @@ void AsyncIOProcessor::write(const int fd)
 	_wrbuf[fd] = _wrbuf[fd].substr(writesize, _wrbuf[fd].length());
 }
 
+void AsyncIOProcessor::blockingWrite(void)
+{
+	for (std::map<int, std::string>::iterator it = _wrbuf.begin();
+		 it != _wrbuf.end(); it++)
+	{
+		while (!it->second.empty())
+			write(it->first);
+	}
+}
+
 struct kevent constructKevent(const int fd, const int event)
 {
 	if (event == IOEVENT_ERROR)

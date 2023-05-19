@@ -54,3 +54,11 @@ void AsyncIOTaskHandler::task(void)
 		 it++)
 		(*it)->task();
 }
+
+void AsyncIOTaskHandler::blockingWrite(void)
+{
+	AsyncIOTaskHandler &instance = getInstance();
+	for (_iterator it = instance._tasks.begin(); it != instance._tasks.end();
+		 it++)
+		(*it)->blockingWrite();
+}

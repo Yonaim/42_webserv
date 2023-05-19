@@ -13,6 +13,6 @@ int main(void)
 	root_logger << "Hello, World! " << 1 << async::endl;
 	child_logger << "Hello, World! " << 2 << async::endl;
 
-	AsyncLogger::task();
+	AsyncLogger::blockingWrite();
 	return (0);
 }

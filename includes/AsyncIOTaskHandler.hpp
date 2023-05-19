@@ -20,6 +20,7 @@ class AsyncIOTaskHandler
 	static void registerTask(AsyncIOProcessor *task);
 	static void unregisterTask(AsyncIOProcessor *task);
 	static void task(void);
+	static void blockingWrite(void);
 };
 
 #endif

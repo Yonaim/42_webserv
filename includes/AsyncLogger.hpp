@@ -55,6 +55,7 @@ class AsyncLogger
 	static void setLogLevel(int log_level);
 	static AsyncLogger &getLogger(const std::string &name);
 	static void task(void);
+	static void blockingWrite(void);
 };
 
 template <typename T> inline AsyncLogger &operator<<(AsyncLogger &io, T content)

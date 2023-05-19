@@ -28,6 +28,7 @@ class AsyncIOProcessor
 	AsyncIOProcessor(const AsyncIOProcessor &orig);
 	AsyncIOProcessor &operator=(const AsyncIOProcessor &orig);
 	virtual void task(void) = 0;
+	void blockingWrite(void);
 };
 
 enum IOEVENT_E

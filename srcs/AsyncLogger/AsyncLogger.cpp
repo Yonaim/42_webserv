@@ -91,6 +91,11 @@ void AsyncLogger::task(void)
 	AsyncIOTaskHandler::task();
 }
 
+void AsyncLogger::blockingWrite(void)
+{
+	AsyncIOTaskHandler::blockingWrite();
+}
+
 AsyncLogger &operator<<(AsyncLogger &io, const AsyncLogger::EndMarker mark)
 {
 	if (mark.newline)
