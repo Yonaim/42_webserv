@@ -2,7 +2,7 @@
 #define ASYNCSINGLEIOPROCESSOR_HPP
 
 #include "AsyncIOProcessor.hpp"
-#include <iostream>
+#include <sstream>
 
 class AsyncSingleIOProcessor : public AsyncIOProcessor
 {
@@ -22,8 +22,15 @@ class AsyncSingleIOProcessor : public AsyncIOProcessor
 	void getReadBuf(std::string &str);
 };
 
-AsyncSingleIOProcessor &operator<<(AsyncSingleIOProcessor &io,
-								   const std::string &str);
+template <typename T>
+inline AsyncSingleIOProcessor &operator<<(AsyncSingleIOProcessor &io, T content)
+{
+	std::stringstream buf;
+	buf << content;
+	io.setWriteBuf(buf.str());
+	return (io);
+}
+
 AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io,
 								   std::string &str);
 
