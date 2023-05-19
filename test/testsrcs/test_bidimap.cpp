@@ -1,27 +1,39 @@
 #include "BidiMap.hpp"
 #include <iostream>
 #include <string>
+#include <map>
 
 int main()
 {
-	BidiMap<int, std::string> bidiMap;
+	BidiMap<int, std::string> bidiMap1;
 
-	bidiMap.insert(1, "one");
-	bidiMap.insert(2, "two");
-	bidiMap.insert(3, "three");
-	bidiMap.insert(5, "five");
+	bidiMap1.insert(1, "one");
+	bidiMap1.insert(2, "two");
+	bidiMap1.insert(3, "three");
+	bidiMap1.insert(5, "five");
 
 	try
 	{
-		std::cout << bidiMap.getValueByKey(1) << '\n';
-		std::cout << bidiMap[2] << '\n';
-		std::cout << bidiMap.getKeyByValue("three") << '\n';
-		// std::cout << bidiMap.getKeyByValue("four") << '\n';
-		std::cout << bidiMap["five"] << '\n';
+		std::cout << bidiMap1.getValueByKey(1) << '\n';
+		std::cout << bidiMap1[2] << '\n';
+		std::cout << bidiMap1.getKeyByValue("three") << '\n';
+		// std::cout << bidiMap1.getKeyByValue("four") << '\n';
+		std::cout << bidiMap1["five"] << '\n';
 		std::cout.flush();
 	}
 	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << '\n';
 	}
+
+	std::map<int, std::string> map;
+	map.insert(std::pair<int, std::string>(123, "test1"));
+	map.insert(std::pair<int, std::string>(456, "test2"));
+	map.insert(std::pair<int, std::string>(789, "test3"));
+	BidiMap<int, std::string> bidiMap2(map);
+
+	std::cout << bidiMap2.getValueByKey(123) << '\n';
+	std::cout << bidiMap2.getValueByKey(456) << '\n';
+	std::cout << bidiMap2.getValueByKey(789) << '\n';
+	std::cout.flush();
 }
