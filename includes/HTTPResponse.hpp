@@ -41,9 +41,15 @@ class Response
 	void setDate(void);
 	void setDefaultValue(void);
 	void setStatus(int status_code);
+	void setContent(const std::string &content, const std::string &file_path);
 	void setConnection(void);
+
+	//
 	void setContentLength(void);
-	void setValue(std::string const &key, std::string const &val);
+	void setContentLength(size_t length);
+	void setContentType(const std::string &file_path);
+	void setBody(const std::string &body);
+	void setValue(const std::string &key, const std::string &val);
 
   private:
 	typedef std::map<std::string, std::string>::iterator _header_iterator;
