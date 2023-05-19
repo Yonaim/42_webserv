@@ -2,6 +2,7 @@
 #define ASYNCTCPIOPROCESSOR_HPP
 
 #include "AsyncIOProcessor.hpp"
+#include "AsyncLogger.hpp"
 
 class AsyncTCPIOProcessor : public AsyncIOProcessor
 {
@@ -10,6 +11,7 @@ class AsyncTCPIOProcessor : public AsyncIOProcessor
 	static const int _backlog;
 	int _port;
 	int _listening_socket;
+	AsyncLogger &_logger;
 
 	void accept(void);
 	void disconnect(const int client_socket);
