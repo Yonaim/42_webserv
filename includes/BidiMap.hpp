@@ -16,6 +16,16 @@ template <typename KeyType, typename ValueType> class BidiMap
 	BidiMap()
 	{
 	}
+	BidiMap(const _KVmap &map)
+	{
+		for (typename _KVmap::const_iterator it
+			 = map.begin();
+			 it != map.end(); it++)
+		{
+			_key_to_value_map[it->first] = it->second;
+			_value_to_key_map[it->second] = it->first;
+		}
+	}
 	BidiMap(const BidiMap &orig)
 		: _key_to_value_map(orig._key_to_value_map),
 		  _value_to_key_map(orig._value_to_key_map)
