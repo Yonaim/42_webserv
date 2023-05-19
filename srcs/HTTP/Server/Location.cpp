@@ -181,7 +181,7 @@ HTTP::Server::Location &HTTP::Server::Location::operator=(const Location &orig)
 	return (*this);
 }
 
-const std::string &HTTP::Server::Location::getPath(void)
+const std::string &HTTP::Server::Location::getPath(void) const
 {
 	return (_path);
 }

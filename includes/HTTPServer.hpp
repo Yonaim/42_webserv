@@ -39,7 +39,11 @@ class Server
 		void parseDirectiveReturn(const ConfigContext &location_context);
 		void parseDirectiveAutoIndex(const ConfigContext &location_context);
 		void parseDirectiveIndex(const ConfigContext &location_context);
-		const std::string &getPath(void);
+		const std::string &getPath(void) const;
+
+		// 추가
+		const std::string &getRoot(void) const;
+		bool isAllowedMethod(int method);
 	};
 
 	int _port;
