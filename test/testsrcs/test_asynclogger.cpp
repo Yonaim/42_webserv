@@ -1,12 +1,12 @@
-#include "AsyncLogger.hpp"
+#include "async/Logger.hpp"
 #include <unistd.h>
 
 int main(void)
 {
-	AsyncLogger::registerFd(STDOUT_FILENO);
-	AsyncLogger::setLogLevel(AsyncLogger::WARNING);
+	async::Logger::registerFd(STDOUT_FILENO);
+	async::Logger::setLogLevel(async::Logger::WARNING);
 
-	AsyncLogger &root_logger = AsyncLogger::getLogger("root");
+	async::Logger &root_logger = async::Logger::getLogger("root");
 
 	root_logger << "Hello, World! " << 1 << "\n" << async::debug;
 	root_logger << "Hello, World! " << 2 << "\n" << async::verbose;
@@ -14,6 +14,6 @@ int main(void)
 	root_logger << "Hello, World! " << 4 << "\n" << async::warning;
 	root_logger << "Hello, World! " << 5 << "\n" << async::error;
 
-	AsyncLogger::blockingWrite();
+	async::Logger::blockingWrite();
 	return (0);
 }

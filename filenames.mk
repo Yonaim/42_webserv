@@ -3,9 +3,9 @@
 DIR_SRCS 			= srcs/
 DIR_OBJS 			= objs/
 
-DIR_ASYNC_IO 		= AsyncIOProcessor/
-DIR_ASYNCFILE		= AsyncFileIOProcessor/
-DIR_ASYNCLOGGER		= AsyncLogger/
+DIR_ASYNC_IO 		= async/IOProcessor/
+DIR_ASYNCFILE		= async/FileIOProcessor/
+DIR_ASYNCLOGGER		= async/Logger/
 DIR_CONFIG_PARSER 	= ConfigParser/
 DIR_HTTP 			= HTTP/
 DIR_WEBSERVER		= WebServer/
@@ -41,15 +41,15 @@ TESTDRIVERDEPS		= $(addprefix $(DIR_TESTOBJS), $(addsuffix .d, $(TESTDRIVERNAMES
 # ---------------------- source (without main function) ---------------------- #
 
 FILENAMES			= \
-					$(DIR_ASYNC_IO)AsyncIOProcessor \
-					$(DIR_ASYNC_IO)AsyncIOException \
-					$(DIR_ASYNC_IO)AsyncSingleIOProcessor \
-					$(DIR_ASYNC_IO)AsyncTCPIOProcessor \
-					$(DIR_ASYNC_IO)AsyncIOTaskHandler \
-					$(DIR_ASYNCFILE)AsyncFileIOProcessor \
-					$(DIR_ASYNCFILE)AsyncFileReader \
-					$(DIR_ASYNCFILE)AsyncFileWriter \
-					$(DIR_ASYNCLOGGER)AsyncLogger \
+					$(DIR_ASYNC_IO)IOProcessor \
+					$(DIR_ASYNC_IO)IOException \
+					$(DIR_ASYNC_IO)SingleIOProcessor \
+					$(DIR_ASYNC_IO)TCPIOProcessor \
+					$(DIR_ASYNC_IO)IOTaskHandler \
+					$(DIR_ASYNCFILE)FileIOProcessor \
+					$(DIR_ASYNCFILE)FileReader \
+					$(DIR_ASYNCFILE)FileWriter \
+					$(DIR_ASYNCLOGGER)Logger \
 					$(DIR_ASYNCLOGGER)EndMarker \
 					$(DIR_CONFIG_PARSER)ConfigDirective \
 					$(DIR_CONFIG_PARSER)parseConfig \

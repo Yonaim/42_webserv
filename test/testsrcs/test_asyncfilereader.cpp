@@ -1,4 +1,4 @@
-#include "AsyncFileIOProcessor.hpp"
+#include "async/FileIOProcessor.hpp"
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -10,15 +10,15 @@ int main(int argc, char **argv)
 	}
 	try
 	{
-		AsyncFileReader reader(argv[1]);
+		async::FileReader reader(argv[1]);
 
 		int rc;
 		while (true)
 		{
 			rc = reader.task();
-			if (rc == AsyncFileReader::LOAD_STATUS_OK)
+			if (rc == async::FileReader::LOAD_STATUS_OK)
 				break;
-			else if (rc == AsyncFileReader::LOAD_STATUS_AGAIN)
+			else if (rc == async::FileReader::LOAD_STATUS_AGAIN)
 				continue;
 			else
 				throw(std::logic_error("Impossible return code"));

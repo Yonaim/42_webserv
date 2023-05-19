@@ -1,32 +1,34 @@
-#include "AsyncIOProcessor.hpp"
-#include "AsyncIOTaskHandler.hpp"
+#include "async/IOProcessor.hpp"
+#include "async/IOTaskHandler.hpp"
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
 
-const size_t AsyncIOProcessor::_buffsize = 2048;
-bool AsyncIOProcessor::_debug = false;
+using namespace async;
+
+const size_t IOProcessor::_buffsize = 2048;
+bool IOProcessor::_debug = false;
 static const timespec zerosec = {0, 0};
 
-AsyncIOProcessor::AsyncIOProcessor(void)
+IOProcessor::IOProcessor(void)
 {
 	initializeKQueue();
-	AsyncIOTaskHandler::registerTask(this);
+	IOTaskHandler::registerTask(this);
 }
 
-AsyncIOProcessor::~AsyncIOProcessor()
+IOProcessor::~IOProcessor()
 {
 	close(_kq);
-	AsyncIOTaskHandler::unregisterTask(this);
+	IOTaskHandler::unregisterTask(this);
 }
 
-AsyncIOProcessor::AsyncIOProcessor(const AsyncIOProcessor &orig)
+IOProcessor::IOProcessor(const IOProcessor &orig)
 {
 	initializeKQueue();
 	operator=(orig);
 }
 
-AsyncIOProcessor &AsyncIOProcessor::operator=(const AsyncIOProcessor &orig)
+IOProcessor &IOProcessor::operator=(const IOProcessor &orig)
 {
 	if (this == &orig)
 		return (*this);
@@ -40,14 +42,14 @@ AsyncIOProcessor &AsyncIOProcessor::operator=(const AsyncIOProcessor &orig)
 	return (*this);
 }
 
-void AsyncIOProcessor::initializeKQueue(void)
+void IOProcessor::initializeKQueue(void)
 {
 	_kq = kqueue();
 	if (_kq < 0)
 		throw(std::runtime_error("Failed to initialize kqueue."));
 }
 
-void AsyncIOProcessor::flushKQueue(void)
+void IOProcessor::flushKQueue(void)
 {
 	static const int size_eventbuf = 8;
 	struct kevent events[size_eventbuf];
@@ -63,35 +65,35 @@ void AsyncIOProcessor::flushKQueue(void)
 	_eventlist.insert(_eventlist.end(), events, events + n_newevents);
 }
 
-void AsyncIOProcessor::read(const int fd)
+void IOProcessor::read(const int fd)
 {
 	char buff[_buffsize + 1];
 	ssize_t readsize = ::read(fd, buff, _buffsize);
 	if (readsize == 0)
-		throw(AsyncIOProcessor::FileClosed());
+		throw(IOProcessor::FileClosed());
 	if (readsize < 0)
-		throw(AsyncIOProcessor::ReadError());
+		throw(IOProcessor::ReadError());
 	buff[readsize] = '\0';
 	_rdbuf[fd] += buff;
 	if (_debug)
-		std::cout << "AsyncIOProcessor:[DEBUG]:Read " << readsize
-				  << " bytes: \"" << buff << "\"\n";
+		std::cout << "IOProcessor:[DEBUG]:Read " << readsize << " bytes: \""
+				  << buff << "\"\n";
 }
 
-void AsyncIOProcessor::write(const int fd)
+void IOProcessor::write(const int fd)
 {
 	ssize_t writesize = ::write(fd, _wrbuf[fd].c_str(), _wrbuf[fd].length());
 	if (writesize == 0)
 		throw(std::logic_error("write(2) call cannot return 0."));
 	if (writesize < 0)
-		throw(AsyncIOProcessor::WriteError());
+		throw(IOProcessor::WriteError());
 	if (_debug)
-		std::cout << "AsyncIOProcessor:[DEBUG]:Wrote " << writesize
-				  << " bytes: \"" << _wrbuf[fd].substr(0, writesize) << "\"\n";
+		std::cout << "IOProcessor:[DEBUG]:Wrote " << writesize << " bytes: \""
+				  << _wrbuf[fd].substr(0, writesize) << "\"\n";
 	_wrbuf[fd] = _wrbuf[fd].substr(writesize, _wrbuf[fd].length());
 }
 
-void AsyncIOProcessor::blockingWrite(void)
+void IOProcessor::blockingWrite(void)
 {
 	for (std::map<int, std::string>::iterator it = _wrbuf.begin();
 		 it != _wrbuf.end(); it++)
@@ -101,7 +103,7 @@ void AsyncIOProcessor::blockingWrite(void)
 	}
 }
 
-void AsyncIOProcessor::setDebug(bool debug)
+void IOProcessor::setDebug(bool debug)
 {
 	_debug = debug;
 }

@@ -1,18 +1,20 @@
 #ifndef ASYNCLOGGER_HPP
 #define ASYNCLOGGER_HPP
 
-#include "AsyncSingleIOProcessor.hpp"
+#include "async//SingleIOProcessor.hpp"
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
-class AsyncLogger
+namespace async
+{
+class Logger
 {
   private:
-	typedef std::map<int, AsyncSingleIOProcessor *> _Procs;
+	typedef std::map<int, SingleIOProcessor *> _Procs;
 
-	static std::map<std::string, AsyncLogger *> _loggers;
+	static std::map<std::string, Logger *> _loggers;
 	static _Procs _target;
 	static const std::string _name_default;
 	static int _log_level;
@@ -21,10 +23,10 @@ class AsyncLogger
 	const std::string _name;
 	std::string _buf;
 
-	AsyncLogger(void);
-	AsyncLogger(const std::string &name);
-	AsyncLogger(const AsyncLogger &orig);
-	AsyncLogger &operator=(const AsyncLogger &orig);
+	Logger(void);
+	Logger(const std::string &name);
+	Logger(const Logger &orig);
+	Logger &operator=(const Logger &orig);
 
 	std::string getPrefix(int level);
 
@@ -47,34 +49,34 @@ class AsyncLogger
 		~EndMarker();
 	};
 
-	~AsyncLogger();
+	~Logger();
 	void registerLog(const std::string &content);
 	void log(int level);
 	static void registerFd(int fd);
 	static void setLogLevel(int log_level);
 	static void setLogLevel(const std::string &log_level);
-	static AsyncLogger &getLogger(const std::string &name);
+	static Logger &getLogger(const std::string &name);
 	static void task(void);
 	static void blockingWrite(void);
 };
 
-template <typename T> inline AsyncLogger &operator<<(AsyncLogger &io, T content)
+extern const Logger::EndMarker debug;
+extern const Logger::EndMarker verbose;
+extern const Logger::EndMarker info;
+extern const Logger::EndMarker warning;
+extern const Logger::EndMarker error;
+} // namespace async
+
+async::Logger &operator<<(async::Logger &io,
+						  const async::Logger::EndMarker mark);
+
+template <typename T>
+inline async::Logger &operator<<(async::Logger &io, T content)
 {
 	std::stringstream buf;
 	buf << content;
 	io.registerLog(buf.str());
 	return (io);
 }
-
-AsyncLogger &operator<<(AsyncLogger &io, const AsyncLogger::EndMarker mark);
-
-namespace async
-{
-extern const AsyncLogger::EndMarker debug;
-extern const AsyncLogger::EndMarker verbose;
-extern const AsyncLogger::EndMarker info;
-extern const AsyncLogger::EndMarker warning;
-extern const AsyncLogger::EndMarker error;
-}; // namespace async
 
 #endif

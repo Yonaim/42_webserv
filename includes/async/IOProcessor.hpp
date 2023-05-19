@@ -1,12 +1,14 @@
-#ifndef ASYNCIOPROCESSOR_HPP
-#define ASYNCIOPROCESSOR_HPP
+#ifndef IOPROCESSOR_HPP
+#define IOPROCESSOR_HPP
 
 #include <cstdlib>
 #include <deque>
 #include <map>
 #include <sys/event.h>
 
-class AsyncIOProcessor
+namespace async
+{
+class IOProcessor
 {
   private:
 	static const size_t _buffsize;
@@ -29,10 +31,10 @@ class AsyncIOProcessor
 	class ReadError;
 	class WriteError;
 
-	AsyncIOProcessor(void);
-	virtual ~AsyncIOProcessor();
-	AsyncIOProcessor(const AsyncIOProcessor &orig);
-	AsyncIOProcessor &operator=(const AsyncIOProcessor &orig);
+	IOProcessor(void);
+	virtual ~IOProcessor();
+	IOProcessor(const IOProcessor &orig);
+	IOProcessor &operator=(const IOProcessor &orig);
 	virtual void task(void) = 0;
 	void blockingWrite(void);
 	static void setDebug(bool debug);
@@ -45,23 +47,24 @@ enum IOEVENT_E
 	IOEVENT_ERROR = 2
 };
 
-class AsyncIOProcessor::FileClosed : public std::runtime_error
+class IOProcessor::FileClosed : public std::runtime_error
 {
   public:
 	FileClosed(void);
 };
 
-class AsyncIOProcessor::ReadError : public std::runtime_error
+class IOProcessor::ReadError : public std::runtime_error
 {
   public:
 	ReadError(void);
 };
 
-class AsyncIOProcessor::WriteError : public std::runtime_error
+class IOProcessor::WriteError : public std::runtime_error
 {
   public:
 	WriteError(void);
 };
+} // namespace async
 
 struct kevent constructKevent(const int fd, const int event);
 

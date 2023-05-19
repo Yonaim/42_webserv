@@ -1,36 +1,37 @@
-#include "AsyncTCPIOProcessor.hpp"
+#include "async/TCPIOProcessor.hpp"
 #include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
-const int AsyncTCPIOProcessor::_backlog = 8;
+using namespace async;
 
-AsyncTCPIOProcessor::AsyncTCPIOProcessor(const int port)
-	: _port(port), _logger(AsyncLogger::getLogger("AsyncTCPIOProcessor"))
+const int TCPIOProcessor::_backlog = 8;
+
+TCPIOProcessor::TCPIOProcessor(const int port)
+	: _port(port), _logger(Logger::getLogger("TCPIOProcessor"))
 {
 }
 
-AsyncTCPIOProcessor::~AsyncTCPIOProcessor()
+TCPIOProcessor::~TCPIOProcessor()
 {
 }
 
-AsyncTCPIOProcessor::AsyncTCPIOProcessor(const AsyncTCPIOProcessor &orig)
+TCPIOProcessor::TCPIOProcessor(const TCPIOProcessor &orig)
 	: _port(orig._port), _listening_socket(orig._listening_socket),
 	  _logger(orig._logger)
 {
 }
 
-AsyncTCPIOProcessor &AsyncTCPIOProcessor::operator=(
-	const AsyncTCPIOProcessor &orig)
+TCPIOProcessor &TCPIOProcessor::operator=(const TCPIOProcessor &orig)
 {
 	_port = orig._port;
 	_listening_socket = orig._listening_socket;
 	return (*this);
 }
 
-void AsyncTCPIOProcessor::task(void)
+void TCPIOProcessor::task(void)
 {
 	flushKQueue();
 	while (!_eventlist.empty())
@@ -83,7 +84,7 @@ void AsyncTCPIOProcessor::task(void)
 	}
 }
 
-void AsyncTCPIOProcessor::initialize(void)
+void TCPIOProcessor::initialize(void)
 {
 	int result;
 	_listening_socket = socket(PF_INET, SOCK_STREAM, 0);
@@ -113,10 +114,10 @@ void AsyncTCPIOProcessor::initialize(void)
 		finalize(strerror(errno));
 	_watchlist.push_back(constructKevent(_listening_socket, IOEVENT_READ));
 	flushKQueue();
-	_logger << "AsyncTCPIOProcessor initialization complete" << async::debug;
+	_logger << "TCPIOProcessor initialization complete" << async::debug;
 }
 
-void AsyncTCPIOProcessor::finalize(const char *with_error)
+void TCPIOProcessor::finalize(const char *with_error)
 {
 	close(_listening_socket);
 	_listening_socket = 0;
@@ -124,7 +125,7 @@ void AsyncTCPIOProcessor::finalize(const char *with_error)
 		throw(std::runtime_error(with_error));
 }
 
-void AsyncTCPIOProcessor::accept(void)
+void TCPIOProcessor::accept(void)
 {
 	int new_client_socket = ::accept(_listening_socket, NULL, NULL);
 	if (new_client_socket < 0)
@@ -139,7 +140,7 @@ void AsyncTCPIOProcessor::accept(void)
 	_wrbuf[new_client_socket] = "";
 }
 
-void AsyncTCPIOProcessor::disconnect(const int client_socket)
+void TCPIOProcessor::disconnect(const int client_socket)
 {
 	close(client_socket);
 	_rdbuf.erase(client_socket);
@@ -147,74 +148,71 @@ void AsyncTCPIOProcessor::disconnect(const int client_socket)
 	_logger << "Disconnected " << client_socket << async::info;
 }
 
-std::string &AsyncTCPIOProcessor::rdbuf(const int fd)
+std::string &TCPIOProcessor::rdbuf(const int fd)
 {
 	return (_rdbuf[fd]);
 }
 
-std::string &AsyncTCPIOProcessor::wrbuf(const int fd)
+std::string &TCPIOProcessor::wrbuf(const int fd)
 {
 	return (_wrbuf[fd]);
 }
 
-AsyncTCPIOProcessor::iterator AsyncTCPIOProcessor::begin(void)
+TCPIOProcessor::iterator TCPIOProcessor::begin(void)
 {
-	return (AsyncTCPIOProcessor::iterator(_wrbuf.begin()));
+	return (TCPIOProcessor::iterator(_wrbuf.begin()));
 }
 
-AsyncTCPIOProcessor::iterator AsyncTCPIOProcessor::end(void)
+TCPIOProcessor::iterator TCPIOProcessor::end(void)
 {
-	return (AsyncTCPIOProcessor::iterator(_wrbuf.end()));
+	return (TCPIOProcessor::iterator(_wrbuf.end()));
 }
 
-AsyncTCPIOProcessor::fdIterator::fdIterator()
-{
-}
-
-AsyncTCPIOProcessor::fdIterator::~fdIterator()
+TCPIOProcessor::fdIterator::fdIterator()
 {
 }
 
-AsyncTCPIOProcessor::fdIterator::fdIterator(const fdIterator &orig)
+TCPIOProcessor::fdIterator::~fdIterator()
+{
+}
+
+TCPIOProcessor::fdIterator::fdIterator(const fdIterator &orig)
 {
 	operator=(orig);
 }
 
-AsyncTCPIOProcessor::fdIterator &AsyncTCPIOProcessor::fdIterator::operator=(
-	const AsyncTCPIOProcessor::fdIterator &orig)
+TCPIOProcessor::fdIterator &TCPIOProcessor::fdIterator::operator=(
+	const TCPIOProcessor::fdIterator &orig)
 {
 	_it = orig._it;
 	return (*this);
 }
 
-AsyncTCPIOProcessor::fdIterator::fdIterator(
-	const AsyncTCPIOProcessor::_iterator &it)
+TCPIOProcessor::fdIterator::fdIterator(const TCPIOProcessor::_iterator &it)
 {
 	_it = it;
 }
 
-AsyncTCPIOProcessor::fdIterator &AsyncTCPIOProcessor::fdIterator::operator++(
-	void)
+TCPIOProcessor::fdIterator &TCPIOProcessor::fdIterator::operator++(void)
 {
 	_it++;
 	return (*this);
 }
 
-const AsyncTCPIOProcessor::fdIterator AsyncTCPIOProcessor::fdIterator::
-operator++(int)
+const TCPIOProcessor::fdIterator TCPIOProcessor::fdIterator::operator++(int)
 {
-	AsyncTCPIOProcessor::fdIterator temp(*this);
+	TCPIOProcessor::fdIterator temp(*this);
 	++(*this);
 	return (temp);
 }
 
-bool AsyncTCPIOProcessor::fdIterator::operator!=(
-	const AsyncTCPIOProcessor::fdIterator &other) const
+bool TCPIOProcessor::fdIterator::operator!=(
+	const TCPIOProcessor::fdIterator &other) const
 {
 	return (_it != other._it);
 }
 
-int AsyncTCPIOProcessor::fdIterator::operator*(void)
+int TCPIOProcessor::fdIterator::operator*(void)
 {
 	return (_it->first);
 }

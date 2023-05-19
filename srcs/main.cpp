@@ -1,7 +1,7 @@
-#include "AsyncIOTaskHandler.hpp"
-#include "AsyncSingleIOProcessor.hpp"
 #include "ConfigDirective.hpp"
 #include "WebServer.hpp"
+#include "async/IOTaskHandler.hpp"
+#include "async/SingleIOProcessor.hpp"
 #include "parseConfig.hpp"
 #include <iostream>
 #include <unistd.h>
@@ -24,9 +24,9 @@ void parseLogLevel(const ConfigContext &root_context)
 	if (loglevel_directive.nParameters() != 1)
 		loglevel_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 
-	AsyncLogger::registerFd(STDOUT_FILENO);
-	AsyncLogger::setLogLevel(loglevel_directive.parameter(0));
-	AsyncLogger::getLogger("root")
+	async::Logger::registerFd(STDOUT_FILENO);
+	async::Logger::setLogLevel(loglevel_directive.parameter(0));
+	async::Logger::getLogger("root")
 		<< "Set log level to " << loglevel_directive.parameter(0)
 		<< async::verbose;
 }

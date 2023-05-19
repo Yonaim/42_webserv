@@ -1,9 +1,9 @@
 #include "WebServer.hpp"
 #include "../HTTP/utils.hpp" // TODO: 공용 유틸 함수 헤더 만들기
-#include "AsyncIOTaskHandler.hpp"
-#include "AsyncLogger.hpp"
+#include "async/IOTaskHandler.hpp"
+#include "async/Logger.hpp"
 
-WebServer::WebServer(void) : _logger(AsyncLogger::getLogger("WebServer"))
+WebServer::WebServer(void) : _logger(async::Logger::getLogger("WebServer"))
 {
 }
 
@@ -50,7 +50,7 @@ void WebServer::parseServer(const ConfigContext &server_context)
 	_logger << "Created Server at port " << port << async::verbose;
 	if (_tcp_procs.find(port) == _tcp_procs.end())
 	{
-		_tcp_procs[port] = AsyncTCPIOProcessor(port);
+		_tcp_procs[port] = async::TCPIOProcessor(port);
 		_tcp_procs[port].initialize();
 		_logger << "Created TCP IO Processor at port " << port
 				<< async::verbose;
@@ -61,7 +61,7 @@ void WebServer::parseServer(const ConfigContext &server_context)
 }
 
 WebServer::WebServer(const ConfigContext &root_context)
-	: _logger(AsyncLogger::getLogger("WebServer"))
+	: _logger(async::Logger::getLogger("WebServer"))
 {
 	parseMaxBodySize(root_context);
 	parseUploadStore(root_context);
@@ -97,9 +97,9 @@ WebServer &WebServer::operator=(const WebServer &orig)
 	return (*this);
 }
 
-void WebServer::parseRequestForEachFd(int port, AsyncTCPIOProcessor &tcp_proc)
+void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 {
-	for (AsyncTCPIOProcessor::iterator it = tcp_proc.begin();
+	for (async::TCPIOProcessor::iterator it = tcp_proc.begin();
 		 it != tcp_proc.end(); it++)
 	{
 		int client_fd = *it;
@@ -163,7 +163,7 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 
 void WebServer::task(void)
 {
-	AsyncIOTaskHandler::task();
+	async::IOTaskHandler::task();
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
 		 it++)
 		parseRequestForEachFd(it->first, it->second);

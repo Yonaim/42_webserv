@@ -1,14 +1,14 @@
-#include "AsyncIOTaskHandler.hpp"
-#include "AsyncTCPIOProcessor.hpp"
+#include "async/IOTaskHandler.hpp"
+#include "async/TCPIOProcessor.hpp"
 #include <iostream>
 
 int main(void)
 {
-	AsyncTCPIOProcessor listener;
+	async::TCPIOProcessor listener;
 	while (true)
 	{
-		AsyncIOTaskHandler::task();
-		for (AsyncTCPIOProcessor::iterator it = listener.begin();
+		async::IOTaskHandler::task();
+		for (async::TCPIOProcessor::iterator it = listener.begin();
 			 it != listener.end(); it++)
 		{
 			int fd = *it;

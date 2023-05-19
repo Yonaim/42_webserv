@@ -1,10 +1,10 @@
 #ifndef HTTPSERVER_HPP
 #define HTTPSERVER_HPP
 
-#include "AsyncTCPIOProcessor.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
+#include "async/TCPIOProcessor.hpp"
 #include <queue>
 #include <set>
 #include <string>

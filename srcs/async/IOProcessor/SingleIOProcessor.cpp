@@ -1,37 +1,37 @@
-#include "AsyncSingleIOProcessor.hpp"
+#include "async/SingleIOProcessor.hpp"
 #include <errno.h>
 #include <fcntl.h>
 #include <sstream>
 #include <unistd.h>
 
-AsyncSingleIOProcessor::AsyncSingleIOProcessor()
+using namespace async;
+
+SingleIOProcessor::SingleIOProcessor()
 {
 }
 
-AsyncSingleIOProcessor::AsyncSingleIOProcessor(const int fd) : _fd(fd)
+SingleIOProcessor::SingleIOProcessor(const int fd) : _fd(fd)
 {
 	initialize();
 }
 
-AsyncSingleIOProcessor::~AsyncSingleIOProcessor()
+SingleIOProcessor::~SingleIOProcessor()
 {
 }
 
-AsyncSingleIOProcessor::AsyncSingleIOProcessor(
-	const AsyncSingleIOProcessor &orig)
+SingleIOProcessor::SingleIOProcessor(const SingleIOProcessor &orig)
 {
 	operator=(orig);
 }
 
-AsyncSingleIOProcessor &AsyncSingleIOProcessor::operator=(
-	const AsyncSingleIOProcessor &orig)
+SingleIOProcessor &SingleIOProcessor::operator=(const SingleIOProcessor &orig)
 {
 	_fd = orig._fd;
 	initialize();
 	return (*this);
 }
 
-void AsyncSingleIOProcessor::task(void)
+void SingleIOProcessor::task(void)
 {
 	flushKQueue();
 	while (!_eventlist.empty())
@@ -52,7 +52,7 @@ void AsyncSingleIOProcessor::task(void)
 	}
 }
 
-void AsyncSingleIOProcessor::initialize()
+void SingleIOProcessor::initialize()
 {
 	int result = fcntl(_fd, F_SETFL, O_NONBLOCK);
 	if (result < 0)
@@ -62,23 +62,23 @@ void AsyncSingleIOProcessor::initialize()
 	flushKQueue();
 }
 
-void AsyncSingleIOProcessor::setWriteBuf(const std::string &str)
+void SingleIOProcessor::setWriteBuf(const std::string &str)
 {
 	_wrbuf[_fd] += str;
 }
 
-void AsyncSingleIOProcessor::getReadBuf(std::string &str)
+void SingleIOProcessor::getReadBuf(std::string &str)
 {
 	str += _rdbuf[_fd];
 	_rdbuf[_fd] = "";
 }
 
-bool AsyncSingleIOProcessor::writeDone(void)
+bool SingleIOProcessor::writeDone(void)
 {
 	return (_wrbuf[_fd].empty());
 }
 
-AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io, std::string &str)
+SingleIOProcessor &operator>>(SingleIOProcessor &io, std::string &str)
 {
 	io.getReadBuf(str);
 	return (io);
@@ -86,7 +86,7 @@ AsyncSingleIOProcessor &operator>>(AsyncSingleIOProcessor &io, std::string &str)
 
 namespace async
 {
-AsyncSingleIOProcessor cin(STDIN_FILENO);
-AsyncSingleIOProcessor cout(STDOUT_FILENO);
-AsyncSingleIOProcessor cerr(STDERR_FILENO);
+SingleIOProcessor cin(STDIN_FILENO);
+SingleIOProcessor cout(STDOUT_FILENO);
+SingleIOProcessor cerr(STDERR_FILENO);
 } // namespace async

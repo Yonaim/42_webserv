@@ -1,17 +1,19 @@
-#ifndef ASYNCTCPIOPROCESSOR_HPP
-#define ASYNCTCPIOPROCESSOR_HPP
+#ifndef TCPIOPROCESSOR_HPP
+#define TCPIOPROCESSOR_HPP
 
-#include "AsyncIOProcessor.hpp"
-#include "AsyncLogger.hpp"
+#include "async//IOProcessor.hpp"
+#include "async//Logger.hpp"
 
-class AsyncTCPIOProcessor : public AsyncIOProcessor
+namespace async
+{
+class TCPIOProcessor : public IOProcessor
 {
   private:
 	typedef std::map<int, std::string>::iterator _iterator;
 	static const int _backlog;
 	int _port;
 	int _listening_socket;
-	AsyncLogger &_logger;
+	Logger &_logger;
 
 	void accept(void);
 	void disconnect(const int client_socket);
@@ -35,10 +37,10 @@ class AsyncTCPIOProcessor : public AsyncIOProcessor
 	};
 
   public:
-	AsyncTCPIOProcessor(const int port = 80);
-	virtual ~AsyncTCPIOProcessor();
-	AsyncTCPIOProcessor(const AsyncTCPIOProcessor &orig);
-	AsyncTCPIOProcessor &operator=(const AsyncTCPIOProcessor &orig);
+	TCPIOProcessor(const int port = 80);
+	virtual ~TCPIOProcessor();
+	TCPIOProcessor(const TCPIOProcessor &orig);
+	TCPIOProcessor &operator=(const TCPIOProcessor &orig);
 
 	void initialize(void);
 	void finalize(const char *with_error);
@@ -50,5 +52,6 @@ class AsyncTCPIOProcessor : public AsyncIOProcessor
 	iterator begin(void);
 	iterator end(void);
 };
+} // namespace async
 
 #endif
