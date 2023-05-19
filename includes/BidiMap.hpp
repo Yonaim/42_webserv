@@ -7,8 +7,10 @@
 template <typename KeyType, typename ValueType> class BidiMap
 {
   private:
-	std::map<KeyType, ValueType> _key_to_value_map;
-	std::map<ValueType, KeyType> _value_to_key_map;
+	typedef std::map<KeyType, ValueType> _KVmap;
+	typedef std::map<ValueType, KeyType> _VKmap;
+	_KVmap _key_to_value_map;
+	_VKmap _value_to_key_map;
 
   public:
 	BidiMap()
@@ -36,7 +38,7 @@ template <typename KeyType, typename ValueType> class BidiMap
 	}
 	ValueType &getValueByKey(const KeyType &key)
 	{
-		const typename std::map<KeyType, ValueType>::iterator find
+		const typename _KVmap::iterator find
 			= _key_to_value_map.find(key);
 
 		if (find == _key_to_value_map.end())
@@ -45,7 +47,7 @@ template <typename KeyType, typename ValueType> class BidiMap
 	}
 	KeyType &getKeyByValue(const ValueType &value)
 	{
-		const typename std::map<ValueType, KeyType>::iterator find
+		const typename _VKmap::iterator find
 			= _value_to_key_map.find(value);
 
 		if (find == _value_to_key_map.end())
