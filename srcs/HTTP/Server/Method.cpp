@@ -1,23 +1,52 @@
 #include "../const_values.hpp"
 #include "HTTPServer.hpp"
+#include "HTTPServerException.hpp"
+#include "async/FileIOProcessor.hpp"
 #include "utils.hpp"
+#include <fcntl.h>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <unistd.h>
+
+// read
+// parse
+// process
+// response
+// 
+
+void HTTP::Server::setErrorPage(HTTP::Response &response, int status_code)
+{
+	std::map<int, std::string>::const_iterator iter
+		= _error_pages.find(status_code);
+	std::string error_page_path;
+
+	if (iter == _error_pages.end())
+		error_page_path = _error_pages.at(0);
+	else
+		error_page_path = iter->second;
+	//TODO: error_page_path로 error_page 파일 열기
+	int fd = open(error_page_path.c_str(), O_RDONLY);
+	// TODO: error_page를 여는 것을 실패했을때 어떻게 처리할지 결정할 것
+	if (fd < 0)
+		;
+	async::FileReader reader(fd);
+
+	reader.task();
+	
+}
 
 void HTTP::Server::methodHandler(HTTP::Request &request, int fd)
 {
 	Response response;
 
-	const int method = request.getMethod();
-	const std::string uri_path = request.getURIPath();
-	const Location location = getLocation(uri_path);
-	// location이 없는 경우에 status code를 404로 설정해야함.
-	// 함수 내부에서 error를 throw? 아니면 어떤 방법으로 오류를 확인해야할까.
-	// response.setErrorPage(_error_pages, 404);
-	const std::string resource_path = location.getRoot() + uri_path;
 	try
 	{
+		const int method = request.getMethod();
+		const std::string uri_path = request.getURIPath();
+		const Location location = getLocation(uri_path);
+		const std::string resource_path = location.getRoot() + uri_path;
+
 		// TODO:
 		// server 설정에서 주어진 method가 허용 method에 속하는지 체크하는 부분
 		switch (method)
@@ -35,19 +64,18 @@ void HTTP::Server::methodHandler(HTTP::Request &request, int fd)
 			deleteMethodHandler(request, response);
 			break;
 		default:
+			throw(ServerException(501));
 			// TODO:
-			setErrorPage(response, 501);
 			// 501 not implemented 에러 반환
 			// 이전에 파싱한 부분 약간 수정해야할듯
 			// 존재하지 않는 메소드는 METHOD_NONE으로 저장해놓고 여기서 에러
 			// 핸들링하도록
 		}
 	}
-	catch (std::exception &e)
+	catch (HTTP::ServerException &e)
 	{
-		// 예상하지 못한 exception이 발생한 경우 500 Internal Server Error로
-		// 세팅
-		setErrorPage(response, 500);
+		std::cout << e.what() << std::endl;
+		setErrorPage(response, e.getStatusCode());
 	}
 	_output_queue[fd].push(response);
 }
@@ -81,7 +109,7 @@ void HTTP::Server::getMethodHandler(HTTP::Request &request,
 	std::stringstream buffer;
 
 	// 해당 파일 전체를 아직 다 안읽은 상황
-	// again을 호출하든지... 
+	// again을 호출하든지...
 	// 다 읽었으면 뒤에를 실행
 
 	if (!resource.is_open())
@@ -104,10 +132,11 @@ void HTTP::Server::getMethodHandler(HTTP::Request &request,
 void HTTP::Server::headMethodHandler(HTTP::Request &request,
 									 HTTP::Response &response)
 {
+	// TODO:
 	// resource path 구하는 로직 필요
 	// const std::string resource_path = processURI(request.getURIPath());
-	// TODO:
 	const std::string resource_path;
+
 	const std::ifstream resource(resource_path, std::ios::binary);
 	std::stringstream buffer;
 
