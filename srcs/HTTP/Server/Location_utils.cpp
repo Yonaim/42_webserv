@@ -1,8 +1,9 @@
 #include "../const_values.hpp"
 #include "HTTP/Server.hpp"
+#include "HTTPServerException.hpp"
 #include <iostream>
 
-const std::string	&HTTP::Server::Location::getRoot(void) const
+const std::string &HTTP::Server::Location::getRoot(void) const
 {
 	return (_root);
 }
@@ -21,8 +22,9 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 
 	if (iter == _locations.end())
 	{
-        std::cout << __func__ << "couldn't find the Location object" << std::endl;
-		throw(std::runtime_error("no such location found"));
+		std::cout << __func__ << "couldn't find the Location object"
+				  << std::endl;
+		throw(ServerException(404));
 	}
-    return (iter->second);
+	return (iter->second);
 }
