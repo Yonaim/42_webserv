@@ -31,12 +31,6 @@ class FileIOProcessor
 		Timeout(const int fd);
 	};
 
-	enum load_status_e
-	{
-		LOAD_STATUS_OK = 0,
-		LOAD_STATUS_AGAIN
-	};
-
 	virtual ~FileIOProcessor();
 
 	virtual int task(void) = 0;

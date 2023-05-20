@@ -1,5 +1,6 @@
 #include "async/FileIOProcessor.hpp"
-#include "../../HTTP/utils.hpp"
+#include "../../HTTP/utils.hpp" // TODO: 유틸 함수 하나로 정리
+#include "async/JobStatus.hpp"
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -21,7 +22,7 @@ FileIOProcessor::FileIOProcessor(void) : _writer(0)
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
-	: _writer(fd), _status(LOAD_STATUS_AGAIN), _buffer(""),
+	: _writer(fd), _status(JobStatus::AGAIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
 {
 }
@@ -30,7 +31,7 @@ FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
 	: _writer(::open(path.c_str(), O_RDWR | O_CREAT,
 					 S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)),
-	  _status(LOAD_STATUS_AGAIN), _buffer(""),
+	  _status(JobStatus::AGAIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(true)
 {
 }
@@ -62,7 +63,7 @@ void FileIOProcessor::checkTimeout(void)
 
 std::string FileIOProcessor::retrieve(void)
 {
-	if (_status != LOAD_STATUS_OK)
+	if (_status != JobStatus::OK)
 		throw(std::logic_error("FileIOProcessor: File is not yet loaded."));
 	return (_buffer);
 }

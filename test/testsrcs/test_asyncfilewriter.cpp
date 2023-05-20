@@ -1,4 +1,5 @@
 #include "async/FileIOProcessor.hpp"
+#include "async/JobStatus.hpp"
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -17,9 +18,9 @@ int main(int argc, char **argv)
 		while (true)
 		{
 			rc = writer.task();
-			if (rc == async::FileReader::LOAD_STATUS_OK)
+			if (rc == async::JobStatus::OK)
 				break;
-			else if (rc == async::FileReader::LOAD_STATUS_AGAIN)
+			else if (rc == async::JobStatus::AGAIN)
 				continue;
 			else
 				throw(std::logic_error("Impossible return code"));
