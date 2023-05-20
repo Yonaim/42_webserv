@@ -16,11 +16,13 @@ FileReader &FileReader::operator=(const FileReader &orig)
 	return (*this);
 }
 
-FileReader::FileReader(int fd) : FileIOProcessor(fd)
+FileReader::FileReader(unsigned int timeout_ms, int fd)
+	: FileIOProcessor(timeout_ms, fd)
 {
 }
 
-FileReader::FileReader(const std::string &path) : FileIOProcessor(path)
+FileReader::FileReader(unsigned int timeout_ms, const std::string &path)
+	: FileIOProcessor(timeout_ms, path)
 {
 }
 
@@ -32,6 +34,7 @@ int FileReader::task(void)
 {
 	if (_status == LOAD_STATUS_OK)
 		return (LOAD_STATUS_OK);
+	checkTimeout();
 	_writer.getReadBuf(_buffer);
 	try
 	{

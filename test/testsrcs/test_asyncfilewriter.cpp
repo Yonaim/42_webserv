@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 	}
 	try
 	{
-		async::FileWriter writer(argv[1], argv[2]);
+		async::FileWriter writer(0, argv[1], argv[2]);
 
 		int rc;
 		while (true)

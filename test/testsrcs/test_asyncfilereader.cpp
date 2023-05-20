@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	}
 	try
 	{
-		async::FileReader reader(argv[1]);
+		async::FileReader reader(0, argv[1]);
 
 		int rc;
 		while (true)

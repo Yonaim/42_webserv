@@ -23,6 +23,7 @@ class SingleIOProcessor : public IOProcessor
 	void setWriteBuf(const std::string &str);
 	void getReadBuf(std::string &str);
 	bool writeDone(void);
+	int getFd(void);
 };
 
 extern SingleIOProcessor cin;

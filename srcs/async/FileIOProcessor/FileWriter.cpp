@@ -16,12 +16,16 @@ FileWriter &FileWriter::operator=(const FileWriter &orig)
 	return (*this);
 }
 
-FileWriter::FileWriter(int fd) : FileIOProcessor(fd)
+FileWriter::FileWriter(unsigned int timeout_ms, int fd,
+					   const std::string &content)
+	: FileIOProcessor(timeout_ms, fd)
 {
+	_writer.setWriteBuf(content);
 }
 
-FileWriter::FileWriter(const std::string &path, const std::string &content)
-	: FileIOProcessor(path)
+FileWriter::FileWriter(unsigned int timeout_ms, const std::string &path,
+					   const std::string &content)
+	: FileIOProcessor(timeout_ms, path)
 {
 	_writer.setWriteBuf(content);
 }
@@ -34,6 +38,7 @@ int FileWriter::task(void)
 {
 	if (_status == LOAD_STATUS_OK)
 		return (LOAD_STATUS_OK);
+	checkTimeout();
 	_writer.task();
 	if (_writer.writeDone())
 	{
