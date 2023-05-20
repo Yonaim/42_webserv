@@ -1,4 +1,4 @@
-#include "HTTPResponse.hpp"
+#include "HTTP/Response.hpp"
 
 int main(void)
 {

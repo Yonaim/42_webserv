@@ -1,7 +1,7 @@
-#ifndef HTTPREQUEST_HPP
-#define HTTPREQUEST_HPP
+#ifndef REQUEST_HPP
+#define REQUEST_HPP
 
-#include "HTTPHeader.hpp"
+#include "HTTP/Header.hpp"
 #include <map>
 #include <string>
 #include <vector>

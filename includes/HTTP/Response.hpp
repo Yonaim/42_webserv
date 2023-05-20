@@ -1,7 +1,7 @@
-#ifndef HTTPRESPONSE_HPP
-#define HTTPRESPONSE_HPP
+#ifndef RESPONSE_HPP
+#define RESPONSE_HPP
 
-#include "HTTPHeader.hpp"
+#include "HTTP/Header.hpp"
 
 // 시작줄 : [HTTP 버전] [상태 코드] [사유 구절] # 공백으로 띄워진다.
 // 헤더, 빈 줄, 엔티티 본문이 온다.

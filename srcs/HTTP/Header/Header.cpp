@@ -1,4 +1,4 @@
-#include "HTTPHeader.hpp"
+#include "HTTP/Header.hpp"
 
 HTTP::Header::Header()
 {

@@ -1,5 +1,5 @@
 #include "ConfigDirective.hpp"
-#include "HTTPServer.hpp"
+#include "HTTP/Server.hpp"
 #include "../const_values.hpp"
 #include <iostream>
 #include <sstream>

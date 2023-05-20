@@ -1,6 +1,6 @@
 #include "../const_values.hpp"
 #include "ConfigDirective.hpp"
-#include "HTTPServer.hpp"
+#include "HTTP/Server.hpp"
 #include <cctype>
 #include <iostream>
 #include <sstream>

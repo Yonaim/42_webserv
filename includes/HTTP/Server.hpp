@@ -1,9 +1,10 @@
-#ifndef HTTPSERVER_HPP
-#define HTTPSERVER_HPP
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
 #include "ConfigDirective.hpp"
-#include "HTTPRequest.hpp"
-#include "HTTPResponse.hpp"
+#include "HTTP/Request.hpp"
+#include "HTTP/RequestHandler.hpp"
+#include "HTTP/Response.hpp"
 #include "async/TCPIOProcessor.hpp"
 #include <queue>
 #include <set>
@@ -50,7 +51,7 @@ class Server
 	std::set<std::string> _server_name;
 	std::map<int, std::string> _error_pages;
 	std::map<std::string, Location> _locations;
-	std::map<int, std::queue<Request> > _input_queue;
+	std::map<int, std::vector<RequestHandler> > _request_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
@@ -61,10 +62,14 @@ class Server
 	static bool isValidStatusCode(const int &status_code);
 
 	// 추가
-	void getMethodHandler(HTTP::Request &request, HTTP::Response &response);
-	void headMethodHandler(HTTP::Request &request, HTTP::Response &response);
-	void postMethodHandler(HTTP::Request &request, HTTP::Response &response);
-	void deleteMethodHandler(HTTP::Request &request, HTTP::Response &response);
+	void getMethodHandler(HTTP::Request &request, HTTP::Response &response,
+						  const std::string &resource_path);
+	void headMethodHandler(HTTP::Request &request, HTTP::Response &response,
+						   const std::string &resource_path);
+	void postMethodHandler(HTTP::Request &request, HTTP::Response &response,
+						   const std::string &resource_path);
+	void deleteMethodHandler(HTTP::Request &request, HTTP::Response &response,
+							 const std::string &resource_path);
 	std::string processURI(const HTTP::Server::Location &location,
 						   std::string uri);
 

@@ -1,4 +1,4 @@
-#include "HTTPRequest.hpp"
+#include "HTTP/Request.hpp"
 #include "../const_values.hpp"
 #include "../utils.hpp"
 #include <iostream>

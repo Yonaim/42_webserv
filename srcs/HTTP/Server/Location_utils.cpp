@@ -1,5 +1,5 @@
 #include "../const_values.hpp"
-#include "HTTPServer.hpp"
+#include "HTTP/Server.hpp"
 #include <iostream>
 
 const std::string	&HTTP::Server::Location::getRoot(void) const

@@ -2,9 +2,9 @@
 #define WEBSERVER_HPP
 
 #include "ConfigDirective.hpp"
-#include "HTTPRequest.hpp"
-#include "HTTPResponse.hpp"
-#include "HTTPServer.hpp"
+#include "HTTP/Request.hpp"
+#include "HTTP/Response.hpp"
+#include "HTTP/Server.hpp"
 #include "async/Logger.hpp"
 #include "async/TCPIOProcessor.hpp"
 #include <map>

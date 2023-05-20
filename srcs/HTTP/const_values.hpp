@@ -1,5 +1,5 @@
-#ifndef HTTPCONSTVALUES_HPP
-#define HTTPCONSTVALUES_HPP
+#ifndef CONSTVALUES_HPP
+#define CONSTVALUES_HPP
 
 #include <map>
 #include <string>

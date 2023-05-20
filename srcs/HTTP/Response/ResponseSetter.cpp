@@ -1,6 +1,6 @@
 #include "../const_values.hpp"
 #include "../utils.hpp"
-#include "HTTPResponse.hpp"
+#include "HTTP/Response.hpp"
 #include <iostream>
 
 void HTTP::Response::setDefaultValue(void)

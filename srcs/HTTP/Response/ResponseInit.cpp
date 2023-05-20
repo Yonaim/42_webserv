@@ -1,4 +1,4 @@
-#include "HTTPResponse.hpp"
+#include "HTTP/Response.hpp"
 
 void HTTP::Response::initGeneralHeaderFields(void)
 {

@@ -1,5 +1,5 @@
 #include "../const_values.hpp"
-#include "HTTPServer.hpp"
+#include "HTTP/Server.hpp"
 #include "utils.hpp"
 #include <fstream>
 #include <sstream>
