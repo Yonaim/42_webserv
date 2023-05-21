@@ -21,8 +21,9 @@ SingleIOProcessor::~SingleIOProcessor()
 }
 
 SingleIOProcessor::SingleIOProcessor(const SingleIOProcessor &orig)
+	: _fd(orig._fd)
 {
-	operator=(orig);
+	initialize();
 }
 
 SingleIOProcessor &SingleIOProcessor::operator=(const SingleIOProcessor &orig)

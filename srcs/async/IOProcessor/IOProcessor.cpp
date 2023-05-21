@@ -23,9 +23,11 @@ IOProcessor::~IOProcessor()
 }
 
 IOProcessor::IOProcessor(const IOProcessor &orig)
+	: _watchlist(orig._watchlist), _eventlist(orig._eventlist),
+	  _rdbuf(orig._rdbuf), _wrbuf(orig._wrbuf)
 {
 	initializeKQueue();
-	operator=(orig);
+	flushKQueue();
 }
 
 IOProcessor &IOProcessor::operator=(const IOProcessor &orig)

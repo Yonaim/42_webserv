@@ -179,9 +179,8 @@ TCPIOProcessor::fdIterator::~fdIterator()
 {
 }
 
-TCPIOProcessor::fdIterator::fdIterator(const fdIterator &orig)
+TCPIOProcessor::fdIterator::fdIterator(const fdIterator &orig) : _it(orig._it)
 {
-	operator=(orig);
 }
 
 TCPIOProcessor::fdIterator &TCPIOProcessor::fdIterator::operator=(
