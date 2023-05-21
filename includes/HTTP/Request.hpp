@@ -80,7 +80,7 @@ class Request
 	const std::string &getHeaderValue(const std::string &name, int idx) const;
 	int getMethod(void) const;
 	const std::string &getURIPath(void) const;
-	const std::string	&getBody() const;
+	const std::string &getBody() const;
 };
 } // namespace HTTP
 

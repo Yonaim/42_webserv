@@ -234,7 +234,7 @@ const std::string &HTTP::Request::getURIPath(void) const
 	return (_uri);
 }
 
-const std::string	&HTTP::Request::getBody() const
+const std::string &HTTP::Request::getBody() const
 {
 	return (_body);
 }
