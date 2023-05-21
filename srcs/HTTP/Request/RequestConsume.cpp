@@ -12,40 +12,41 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 
 	if (crlf_pos == std::string::npos)
 	{
-		std::cout << __func__ << ": buffer doesn't have CRLF" << std::endl;
+		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 	if (crlf_pos == 0)
 	{
-		std::cout << __func__ << ": buffer's first line is empty" << std::endl;
+		_logger << __func__ << ": buffer's first line is empty"
+				<< async::verbose;
 		_error_offset = 0;
 		throwException(CONSUME_EXC_EMPTY_LINE);
 	}
 	if (buffer[0] == ' ')
 	{
-		std::cout << __func__ << ": buffer's first character is space"
-				  << std::endl;
+		_logger << __func__ << ": buffer's first character is space"
+				<< async::verbose;
 		_error_offset = 0;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
 	const std::string start_line = getfrontstr(buffer, crlf_pos);
-	std::cout << __func__ << ": start line is \"" << start_line << "\""
-			  << std::endl;
+	_logger << __func__ << ": start line is \"" << start_line << "\""
+			<< async::debug;
 
 	/* 공백 기준 split */
 	std::vector<std::string> tokens = split(start_line, ' ');
 	if (tokens.size() != 3)
 	{
-		std::cout << __func__ << ": token count mismatch" << std::endl;
+		_logger << __func__ << ": token count mismatch" << async::verbose;
 		_error_offset = start_line.size();
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
-	std::cout << __func__ << ": split into ";
+	_logger << __func__ << ": split into ";
 	for (size_t i = 0; i < tokens.size(); i++)
-		std::cout << "\"" << tokens[i] << "\" ";
-	std::cout << std::endl;
+		_logger << "\"" << tokens[i] << "\" ";
+	_logger << async::debug;
 
 	/* method index 구하기 */
 	// TODO: const_values에 이미 저장되어있는 상수와 겹치는 상수는 삭제할 예정
@@ -57,10 +58,10 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 			break;
 		}
 	}
-	std::cout << __func__ << ": method index is " << _method << std::endl;
+	_logger << __func__ << ": method index is " << _method << async::debug;
 	if (_method == METHOD_NONE)
 	{
-		std::cout << __func__ << ": invalid method" << std::endl;
+		_logger << __func__ << ": invalid method" << async::verbose;
 		_error_offset = tokens[0].size();
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
@@ -68,14 +69,14 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 	/* uri, version 파싱 */
 	_uri = tokens[1];
 	_version_string = tokens[2];
-	std::cout << __func__ << ": URI: \"" << _uri << "\"" << std::endl;
-	std::cout << __func__ << ": version: \"" << _version_string << "\""
-			  << std::endl;
+	_logger << __func__ << ": URI: \"" << _uri << "\"" << async::debug;
+	_logger << __func__ << ": version: \"" << _version_string << "\""
+			<< async::debug;
 
 	trimfrontstr(buffer, start_line.size() + CRLF_LEN);
 
-	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-			  << std::endl;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
 	return (RETURN_TYPE_OK);
 }
 
@@ -84,32 +85,32 @@ int HTTP::Request::consumeHeader(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		std::cout << __func__ << ": buffer doesn't have CRLF" << std::endl;
+		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
-		std::cout << __func__ << ": header line only has CRLF (end of header)"
-				  << std::endl;
+		_logger << __func__ << ": header line only has CRLF (end of header)"
+				<< async::debug;
 		trimfrontstr(buffer, CRLF_LEN);
-		std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-				  << std::endl;
+		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+				<< async::debug;
 		return (RETURN_TYPE_OK);
 	}
 
 	const std::string header_line = getfrontstr(buffer, crlf_pos);
-	std::cout << __func__ << ": header line: " << header_line << std::endl;
+	_logger << __func__ << ": header line: " << header_line << async::debug;
 
 	/* name 파싱 */
 	size_t key_end_idx = 0;
 	std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
-		std::cout << __func__ << ": header has invalid name" << std::endl;
+		_logger << __func__ << ": header has invalid name" << async::verbose;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	std::cout << __func__ << ": header name is " << name << std::endl;
+	_logger << __func__ << ": header name is " << name << async::debug;
 
 	/* value 파싱 */
 	while (std::isspace(header_line[key_end_idx]))
@@ -122,32 +123,32 @@ int HTTP::Request::consumeHeader(std::string &buffer)
 		if (value == "")
 			break;
 		vec_values.push_back(strtrim(value, " "));
-		std::cout << __func__ << ": push value " << vec_values.back()
-				  << std::endl;
+		_logger << __func__ << ": push value " << vec_values.back()
+				<< async::debug;
 	}
 	std::string value = strtrim(std::string(&header_line[key_end_idx]), " ");
 	if (value != "")
 	{
 		vec_values.push_back(value);
-		std::cout << __func__ << ": push value " << vec_values.back()
-				  << std::endl;
+		_logger << __func__ << ": push value " << vec_values.back()
+				<< async::debug;
 	}
 
 	/* key가 있다면, 붙여넣기 */
 	if (!_header.hasValue(name))
 	{
-		std::cout << __func__ << ": assign to new header" << std::endl;
+		_logger << __func__ << ": assign to new header" << async::debug;
 		_header.assign(name, vec_values);
 	}
 	else
 	{
-		std::cout << __func__ << ": insert to existing header" << std::endl;
+		_logger << __func__ << ": insert to existing header" << async::debug;
 		_header.insert(name, vec_values);
 	}
 
 	trimfrontstr(buffer, header_line.size() + CRLF_LEN);
-	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-			  << std::endl;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
 
 	return (RETURN_TYPE_IN_PROCESS);
 }
@@ -158,16 +159,16 @@ int HTTP::Request::consumeBody(std::string &buffer)
 
 	if (buffer.size() < static_cast<size_t>(_content_length))
 	{
-		std::cout << __func__ << ": not enough buffer size" << std::endl;
+		_logger << __func__ << ": not enough buffer size" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	_body = getfrontstr(buffer, _content_length);
-	std::cout << __func__ << ": body result in :\"" << _body << "\""
-			  << std::endl;
+	_logger << __func__ << ": body result in :\"" << _body << "\""
+			<< async::debug;
 	trimfrontstr(buffer, _content_length);
-	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-			  << std::endl;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
 	return (RETURN_TYPE_OK);
 }
 
@@ -176,16 +177,17 @@ int HTTP::Request::consumeChunk(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		std::cout << __func__ << ": buffer doesn't have CRLF" << std::endl;
+		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 	const int content_length = strtol(buffer.c_str(), NULL, 16);
-	std::cout << __func__ << ": content length " << content_length << std::endl;
+	_logger << __func__ << ": content length " << content_length
+			<< async::debug;
 	// TODO: content length 0일때 마지막 청크 처리
 	if (content_length < 0)
 	{
-		std::cout << __func__ << ": negative content length of chunk"
-				  << std::endl;
+		_logger << __func__ << ": negative content length of chunk"
+				<< async::verbose;
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
 	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN * 2이면 ok
@@ -194,16 +196,16 @@ int HTTP::Request::consumeChunk(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 	_body.append(buffer.substr(crlf_pos + CRLF_LEN, content_length));
-	std::cout << __func__ << ": body result in :\"" << _body << "\""
-			  << std::endl;
+	_logger << __func__ << ": body result in :\"" << _body << "\""
+			<< async::debug;
 	if (buffer.substr(crlf_pos + CRLF_LEN + content_length, CRLF_LEN) != CRLF)
 	{
-		std::cout << __func__ << ": chunk must end with CRLF" << std::endl;
+		_logger << __func__ << ": chunk must end with CRLF" << async::verbose;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 	trimfrontstr(buffer, crlf_pos + CRLF_LEN * 2 + content_length);
-	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-			  << std::endl;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
 
 	if (content_length == 0)
 		return (RETURN_TYPE_OK);
@@ -217,11 +219,11 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		std::cout << __func__ << ": buffer doesn't have CRLF" << std::endl;
+		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 	const std::string header_line = getfrontstr(buffer, crlf_pos);
-	std::cout << __func__ << ": header line: " << header_line << std::endl;
+	_logger << __func__ << ": header line: " << header_line << async::debug;
 	// Trailer는 헤더와 달리 끝에 CRLF가 하나 더 붙지 않아서 아래 코드
 	// 주석처리함 if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	// {
@@ -234,11 +236,11 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
-		std::cout << __func__ << ": header has invalid name" << std::endl;
+		_logger << __func__ << ": header has invalid name" << async::verbose;
 		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
-	std::cout << __func__ << ": header name is " << name << std::endl;
+	_logger << __func__ << ": header name is " << name << async::debug;
 
 	std::vector<std::string>::iterator iter = _trailer_values.begin();
 	bool found_name = false;
@@ -253,8 +255,8 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 	}
 	if (found_name == false)
 	{
-		std::cout << __func__ << ": Trailer header doesn't have " << name
-				  << std::endl;
+		_logger << __func__ << ": Trailer header doesn't have " << name
+				<< async::verbose;
 		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
@@ -268,32 +270,32 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 		if (value == "")
 			break;
 		vec_values.push_back(strtrim(value, " "));
-		std::cout << __func__ << ": push value " << vec_values.back()
-				  << std::endl;
+		_logger << __func__ << ": push value " << vec_values.back()
+				<< async::debug;
 	}
 	std::string value = strtrim(std::string(&header_line[key_end_idx]), " ");
 	if (value != "")
 	{
 		vec_values.push_back(value);
-		std::cout << __func__ << ": push value " << vec_values.back()
-				  << std::endl;
+		_logger << __func__ << ": push value " << vec_values.back()
+				<< async::debug;
 	}
 
 	/** key가 있다면, 붙여넣기 **/
 	if (!_header.hasValue(name))
 	{
-		std::cout << __func__ << ": assign to new header" << std::endl;
+		_logger << __func__ << ": assign to new header" << async::debug;
 		_header.assign(name, vec_values);
 	}
 	else
 	{
-		std::cout << __func__ << ": insert to existing header" << std::endl;
+		_logger << __func__ << ": insert to existing header" << async::debug;
 		_header.insert(name, vec_values);
 	}
 
 	trimfrontstr(buffer, header_line.size() + CRLF_LEN);
-	std::cout << __func__ << ": buffer result in :\"" << buffer << "\""
-			  << std::endl;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
 
 	if (_trailer_values.size() == 0)
 		return (RETURN_TYPE_OK);
@@ -306,7 +308,7 @@ int HTTP::Request::consumeCRLF(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		std::cout << __func__ << ": buffer doesn't have CRLF" << std::endl;
+		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 	else if (crlf_pos == 0)
