@@ -4,6 +4,7 @@
 #include "ConfigDirective.hpp"
 #include "HTTP/Request.hpp"
 #include "HTTP/Response.hpp"
+#include "async/Logger.hpp"
 #include "async/TCPIOProcessor.hpp"
 #include <queue>
 #include <set>
@@ -31,6 +32,7 @@ class Server
 	std::map<std::string, Location> _locations;
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
+	async::Logger &_logger;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);

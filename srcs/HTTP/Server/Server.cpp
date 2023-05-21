@@ -2,10 +2,10 @@
 #include "../const_values.hpp"
 #include "ConfigDirective.hpp"
 #include <cctype>
-#include <iostream>
 #include <sstream>
 
 HTTP::Server::Server(const ConfigContext &server_context)
+	: _logger(async::Logger::getLogger("Server"))
 {
 	parseDirectiveListen(server_context);
 	parseDirectiveErrorPage(server_context);
@@ -19,7 +19,8 @@ HTTP::Server::~Server()
 
 HTTP::Server::Server(const Server &orig)
 	: _port(orig._port), _server_name(orig._server_name),
-	  _error_pages(orig._error_pages), _locations(orig._locations)
+	  _error_pages(orig._error_pages), _locations(orig._locations),
+	  _logger(async::Logger::getLogger("Server"))
 {
 }
 
@@ -64,7 +65,7 @@ void HTTP::Server::task(void)
 bool HTTP::Server::isForMe(const HTTP::Request &request)
 {
 	(void)request;
-	std::cout << "Unimplemented stub of " << __func__ << std::endl;
+	_logger << "Unimplemented stub of " << __func__ << async::error;
 	return (false);
 }
 

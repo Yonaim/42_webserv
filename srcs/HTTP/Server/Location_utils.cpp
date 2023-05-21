@@ -1,7 +1,6 @@
 #include "../const_values.hpp"
 #include "HTTP/ServerException.hpp"
 #include "HTTP/ServerLocation.hpp"
-#include <iostream>
 
 const std::string &HTTP::Server::Location::getRoot(void) const
 {
@@ -23,8 +22,8 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 
 	if (iter == _locations.end())
 	{
-		std::cout << __func__ << "couldn't find the Location object"
-				  << std::endl;
+		_logger << __func__ << "couldn't find the Location object"
+				<< async::info;
 		throw(ServerException(404));
 	}
 	return (iter->second);
