@@ -75,7 +75,8 @@ void TCPIOProcessor::task(void)
 			{
 				try
 				{
-					write(ident, data);
+					size_t len = std::min((size_t)data, _wrbuf[ident].length());
+					write(ident, len);
 				}
 				catch (const std::runtime_error &e)
 				{
