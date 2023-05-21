@@ -1,8 +1,8 @@
+#include "utils/string.hpp"
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>
-#include "utils/string.hpp"
 
 bool hasSpace(const std::string &str)
 {
@@ -36,7 +36,7 @@ void passLWS(std::string &str)
 			break;
 		++after_lws;
 	}
-	str = str.substr(after_lws, str.size() - after_lws);
+	trimfrontstr(str, after_lws);
 }
 
 std::vector<std::string> split(std::string const &s, char const c)

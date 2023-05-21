@@ -1,5 +1,6 @@
 #include "async/IOProcessor.hpp"
 #include "async/IOTaskHandler.hpp"
+#include "utils/string.hpp"
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
@@ -109,8 +110,8 @@ void IOProcessor::write(const int fd, const size_t size)
 	}
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Wrote " << writesize << " bytes: \""
-				  << _wrbuf[fd].substr(0, writesize) << "\"\n";
-	_wrbuf[fd] = _wrbuf[fd].substr(writesize, _wrbuf[fd].length() - writesize);
+				  << getfrontstr(_wrbuf[fd], writesize) << "\"\n";
+	trimfrontstr(_wrbuf[fd], writesize);
 }
 
 void IOProcessor::blockingWrite(void)

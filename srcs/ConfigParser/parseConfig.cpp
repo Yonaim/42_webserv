@@ -1,5 +1,6 @@
 #include "ConfigDirective.hpp"
 #include "parseConfigInternal.hpp"
+#include "utils/string.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -54,7 +55,7 @@ void trimComments(std::string &content)
 		if (comment_position == std::string::npos)
 			content += *line;
 		else
-			content += line->substr(0, comment_position);
+			content += getfrontstr(*line, comment_position);
 		content += "\n";
 	}
 }
