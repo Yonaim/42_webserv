@@ -32,7 +32,6 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 
 std::string HTTP::Server::getResourcePath(const Request &req) const
 {
-	const int method = req.getMethod();
 	const std::string uri_path = req.getURIPath();
 	const Location location = getLocation(uri_path);
 
