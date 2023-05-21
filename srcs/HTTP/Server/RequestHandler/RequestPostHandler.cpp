@@ -36,7 +36,6 @@ int Server::RequestPostHandler::task(void)
 	int rc = _writer.task();
 	if (rc == async::JobStatus::OK)
 	{
-		const std::string &content = _writer.retrieve();
 		_response.setStatus(200);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
