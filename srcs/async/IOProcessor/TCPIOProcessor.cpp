@@ -36,48 +36,51 @@ void TCPIOProcessor::task(void)
 	flushKQueue();
 	while (!_eventlist.empty())
 	{
-		struct kevent event = _eventlist.front();
+		int flags = _eventlist.front().flags;
+		int filter = _eventlist.front().filter;
+		int ident = _eventlist.front().ident;
+		int data = _eventlist.front().data;
 		_eventlist.pop_front();
-		if (event.flags & EV_ERROR)
+		if (flags & EV_ERROR)
 		{
-			if (static_cast<int>(event.ident) == _listening_socket)
+			if (static_cast<int>(ident) == _listening_socket)
 				finalize("Error from server socket");
 			else
 			{
 				_logger << "Error from client socket" << async::warning;
-				disconnect(event.ident);
+				disconnect(ident);
 			}
 		}
-		else if (event.filter == EVFILT_READ)
+		else if (filter == EVFILT_READ)
 		{
-			if (static_cast<int>(event.ident) == _listening_socket)
+			if (static_cast<int>(ident) == _listening_socket)
 				accept();
 			else
 			{
 				try
 				{
-					read(event.ident);
+					read(ident, data);
 				}
 				catch (const std::runtime_error &e)
 				{
-					_logger << "Error while reading from client " << event.ident
+					_logger << "Error while reading from client " << ident
 							<< ": " << e.what() << async::warning;
-					disconnect(event.ident);
+					disconnect(ident);
 				}
 			}
 		}
-		else if (event.filter == EVFILT_WRITE)
+		else if (filter == EVFILT_WRITE)
 		{
-			if (_wrbuf[event.ident].length() > 0)
+			if (_wrbuf[ident].length() > 0)
 			{
 				try
 				{
-					write(event.ident);
+					write(ident, data);
 				}
 				catch (const std::runtime_error &e)
 				{
-					_logger << "Error while writing to client " << event.ident
-							<< ": " << e.what() << async::warning;
+					_logger << "Error while writing to client " << ident << ": "
+							<< e.what() << async::warning;
 				}
 			}
 		}

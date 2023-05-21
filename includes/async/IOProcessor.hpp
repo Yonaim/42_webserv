@@ -23,8 +23,8 @@ class IOProcessor
 
 	void initializeKQueue(void);
 	void flushKQueue(void);
-	void read(const int fd);
-	void write(const int fd);
+	void read(const int fd, const size_t size);
+	void write(const int fd, const size_t size);
 
   public:
 	class FileClosed;

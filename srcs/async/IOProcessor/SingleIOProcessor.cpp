@@ -38,6 +38,7 @@ void SingleIOProcessor::task(void)
 	{
 		int flags = _eventlist.front().flags;
 		int event = _eventlist.front().filter;
+		int data = _eventlist.front().data;
 		_eventlist.pop_front();
 		if (flags & EV_ERROR)
 		{
@@ -46,9 +47,9 @@ void SingleIOProcessor::task(void)
 			throw(std::runtime_error(what.str()));
 		}
 		else if (event == EVFILT_READ)
-			read(_fd);
+			read(_fd, data);
 		else if (event == EVFILT_WRITE && _wrbuf[_fd].length() > 0)
-			write(_fd);
+			write(_fd, data);
 	}
 }
 

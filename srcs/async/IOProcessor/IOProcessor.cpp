@@ -65,24 +65,30 @@ void IOProcessor::flushKQueue(void)
 	_eventlist.insert(_eventlist.end(), events, events + n_newevents);
 }
 
-void IOProcessor::read(const int fd)
+void IOProcessor::read(const int fd, const size_t size)
 {
-	char buff[_buffsize + 1];
-	ssize_t readsize = ::read(fd, buff, _buffsize);
+	char *buff = new char[size];
+	ssize_t readsize = ::read(fd, buff, size);
 	if (readsize == 0)
+	{
+		delete[] buff;
 		throw(IOProcessor::FileClosed());
+	}
 	if (readsize < 0)
+	{
+		delete[] buff;
 		throw(IOProcessor::ReadError());
-	buff[readsize] = '\0';
-	_rdbuf[fd] += buff;
+	}
+	_rdbuf[fd] += std::string(buff, buff + readsize);
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Read " << readsize << " bytes: \""
 				  << buff << "\"\n";
+	delete[] buff;
 }
 
-void IOProcessor::write(const int fd)
+void IOProcessor::write(const int fd, const size_t size)
 {
-	ssize_t writesize = ::write(fd, _wrbuf[fd].c_str(), _wrbuf[fd].length());
+	ssize_t writesize = ::write(fd, _wrbuf[fd].c_str(), size);
 	if (writesize == 0)
 		throw(std::logic_error("write(2) call cannot return 0."));
 	if (writesize < 0)
@@ -99,7 +105,7 @@ void IOProcessor::blockingWrite(void)
 		 it != _wrbuf.end(); it++)
 	{
 		while (!it->second.empty())
-			write(it->first);
+			task();
 	}
 }
 
