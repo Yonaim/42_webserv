@@ -1,5 +1,5 @@
-#include "../const_values.hpp"
 #include "HTTP/Server.hpp"
+#include "../const_values.hpp"
 #include "ConfigDirective.hpp"
 #include <cctype>
 #include <iostream>
@@ -90,16 +90,16 @@ void HTTP::Server::registerRequest(int client_fd, const Request &request)
 	switch (request.getMethod())
 	{
 	case METHOD_GET:
-		handler = new RequestGetHandler(request);
+		handler = new RequestGetHandler(this, request);
 		break;
 	case METHOD_HEAD:
-		handler = new RequestHeadHandler(request);
+		handler = new RequestHeadHandler(this, request);
 		break;
 	case METHOD_POST:
-		handler = new RequestPostHandler(request);
+		handler = new RequestPostHandler(this, request);
 		break;
 	case METHOD_DELETE:
-		handler = new RequestDeleteHandler(request);
+		handler = new RequestDeleteHandler(this, request);
 		break;
 	default:
 		throw(ServerException(501));
