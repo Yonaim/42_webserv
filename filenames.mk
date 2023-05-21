@@ -3,9 +3,10 @@
 DIR_SRCS 			= srcs/
 DIR_OBJS 			= objs/
 
-DIR_ASYNC_IO 		= async/IOProcessor/
-DIR_ASYNCFILE		= async/FileIOProcessor/
-DIR_ASYNCLOGGER		= async/Logger/
+DIR_ASYNC			= async/
+DIR_ASYNC_IO 		= $(DIR_ASYNC)IOProcessor/
+DIR_ASYNCFILE		= $(DIR_ASYNC)FileIOProcessor/
+DIR_ASYNCLOGGER		= $(DIR_ASYNC)Logger/
 DIR_CONFIG_PARSER 	= ConfigParser/
 DIR_HTTP 			= HTTP/
 DIR_WEBSERVER		= WebServer/
@@ -41,6 +42,7 @@ TESTDRIVERDEPS		= $(addprefix $(DIR_TESTOBJS), $(addsuffix .d, $(TESTDRIVERNAMES
 # ---------------------- source (without main function) ---------------------- #
 
 FILENAMES			= \
+					$(DIR_ASYNC)JobStatus \
 					$(DIR_ASYNC_IO)IOProcessor \
 					$(DIR_ASYNC_IO)IOException \
 					$(DIR_ASYNC_IO)SingleIOProcessor \
@@ -64,9 +66,17 @@ FILENAMES			= \
 					$(DIR_HTTP)Response/Response \
 					$(DIR_HTTP)Response/ResponseInit \
 					$(DIR_HTTP)Response/ResponseSetter \
+					$(DIR_HTTP)Server/RequestHandler/RequestHandler \
+					$(DIR_HTTP)Server/RequestHandler/RequestGetHandler \
+					$(DIR_HTTP)Server/RequestHandler/RequestHeadHandler \
+					$(DIR_HTTP)Server/RequestHandler/RequestPostHandler \
+					$(DIR_HTTP)Server/RequestHandler/RequestDeleteHandler \
 					$(DIR_HTTP)Server/Location \
+					$(DIR_HTTP)Server/Location_utils \
 					$(DIR_HTTP)Server/Server \
+					$(DIR_HTTP)Server/ServerException \
 					$(DIR_HTTP)Server/ServerParseDirective \
+					$(DIR_HTTP)Server/Method \
 					$(DIR_WEBSERVER)WebServer \
 
 SRCS				= $(addprefix $(DIR_SRCS), $(addsuffix .cpp, $(FILENAMES)))
