@@ -1,12 +1,13 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef STRING_HPP
+#define STRING_HPP
 
 #include <sstream>
 #include <string>
-#include <vector>
 
 // parsing
 bool hasSpace(const std::string &key);
+bool isHTTPSpace(const char c);
+bool isUnsignedIntStr(const std::string &str);
 void passLWS(std::string &str);
 std::string strtrim(std::string str, std::string charset);
 std::vector<std::string> split(std::string const &s, char const c);

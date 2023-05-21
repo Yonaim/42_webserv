@@ -1,6 +1,6 @@
 #include "async/FileIOProcessor.hpp"
-#include "../../HTTP/utils.hpp" // TODO: 유틸 함수 하나로 정리
 #include "async/JobStatus.hpp"
+#include "utils/string.hpp"
 #include <fcntl.h>
 #include <unistd.h>
 

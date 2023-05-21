@@ -1,6 +1,6 @@
-#include "HTTP/Request.hpp"
 #include "../const_values.hpp"
-#include "../utils.hpp"
+#include "HTTP/Request.hpp"
+#include "utils/string.hpp"
 #include <iostream>
 
 int HTTP::Request::consumeStartLine(std::string &buffer)

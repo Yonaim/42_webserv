@@ -1,7 +1,7 @@
 #include "WebServer.hpp"
-#include "../HTTP/utils.hpp" // TODO: 공용 유틸 함수 헤더 만들기
 #include "async/IOTaskHandler.hpp"
 #include "async/Logger.hpp"
+#include "utils/string.hpp"
 
 WebServer::WebServer(void) : _logger(async::Logger::getLogger("WebServer"))
 {

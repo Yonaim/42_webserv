@@ -1,6 +1,6 @@
 #include "HTTP/Request.hpp"
 #include "../const_values.hpp"
-#include "../utils.hpp"
+#include "utils/string.hpp"
 #include <iostream>
 
 static const char *consume_exc_description[]
@@ -9,11 +9,6 @@ static const char *consume_exc_description[]
 
 static const char *parse_state_str[]
 	= {"start line", "header", "body", "chunk", "trailer", "CRLF after chunk"};
-
-bool isSpace(const char c)
-{
-	return (c == ' ' || c == '\t');
-}
 
 HTTP::Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE)

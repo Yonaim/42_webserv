@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "utils/string.hpp"
 
 bool hasSpace(const std::string &str)
 {
@@ -9,6 +10,19 @@ bool hasSpace(const std::string &str)
 		if (std::isspace(str[i]))
 			return (true);
 	return (false);
+}
+
+bool isHTTPSpace(const char c)
+{
+	return (c == ' ' || c == '\t');
+}
+
+bool isUnsignedIntStr(const std::string &str)
+{
+	for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+		if (std::isdigit(*it) == false)
+			return (false);
+	return (true);
 }
 
 // [CRLF] 1*( SP | HT )
@@ -152,25 +166,3 @@ void trimfrontstr(std::string &str, size_t from)
 {
 	str = str.substr(from, str.size() - from);
 }
-
-// int main(void)
-// {
-// 	std::string               str = "abc,,,, d,eee,ffasdf, f a,w,e,,f,annn,adf";
-// 	std::string               sep = " ,";
-// 	std::vector<std::string> *splitted;
-
-// 	splitted = split(str, ',');
-// 	std::cout << "=== split(str, ',') ===" << std::endl;
-// 	for (int i = 0; i < splitted->size(); i++)
-// 	{
-// 		std::cout << i << ": " << splitted->at(i) << std::endl;
-// 	}
-// 	delete splitted;
-// 	splitted = split(str, sep);
-// 	std::cout << "=== split(str, \" ,\") ===" << std::endl;
-// 	for (int i = 0; i < splitted->size(); i++)
-// 	{
-// 		std::cout << i << ": " << splitted->at(i) << std::endl;
-// 	}
-// 	delete splitted;
-// }
