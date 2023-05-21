@@ -1,3 +1,4 @@
+#include "../../HTTP/utils.hpp"
 #include "async/IOProcessor.hpp"
 
 using namespace async;
@@ -11,7 +12,17 @@ IOProcessor::ReadError::ReadError(void)
 {
 }
 
+IOProcessor::ReadError::ReadError(int fd, const std::string &why)
+	: std::runtime_error("Error while reading fd " + toStr(fd) + ": " + why)
+{
+}
+
 IOProcessor::WriteError::WriteError(void)
 	: std::runtime_error("Error while writing to file")
+{
+}
+
+IOProcessor::WriteError::WriteError(int fd, const std::string &why)
+	: std::runtime_error("Error while writing to fd " + toStr(fd) + ": " + why)
 {
 }

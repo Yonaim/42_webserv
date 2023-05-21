@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <deque>
 #include <map>
+#include <string>
 #include <sys/event.h>
 
 namespace async
@@ -57,12 +58,14 @@ class IOProcessor::ReadError : public std::runtime_error
 {
   public:
 	ReadError(void);
+	ReadError(int fd, const std::string &why);
 };
 
 class IOProcessor::WriteError : public std::runtime_error
 {
   public:
 	WriteError(void);
+	WriteError(int fd, const std::string &why);
 };
 } // namespace async
 

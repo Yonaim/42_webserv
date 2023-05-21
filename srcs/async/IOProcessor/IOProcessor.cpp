@@ -77,7 +77,12 @@ void IOProcessor::read(const int fd, const size_t size)
 	if (readsize < 0)
 	{
 		delete[] buff;
-		throw(IOProcessor::ReadError());
+		/*
+		TODO: Checking the value of errno is strictly forbidden after a read or
+		a write operation이지만 디버그 목적으로 strerror(errno) 사용하였고
+		제출본에서는 삭제해야 함
+		*/
+		throw(IOProcessor::ReadError(fd, strerror(errno)));
 	}
 	_rdbuf[fd] += std::string(buff, buff + readsize);
 	if (_debug)
@@ -92,7 +97,14 @@ void IOProcessor::write(const int fd, const size_t size)
 	if (writesize == 0)
 		throw(std::logic_error("write(2) call cannot return 0."));
 	if (writesize < 0)
-		throw(IOProcessor::WriteError());
+	{
+		/*
+		 TODO: Checking the value of errno is strictly forbidden after a read or
+		 a write operation이지만 디버그 목적으로 strerror(errno) 사용하였고
+		제출본에서는 삭제해야 함
+		 */
+		throw(IOProcessor::WriteError(fd, strerror(errno)));
+	}
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Wrote " << writesize << " bytes: \""
 				  << _wrbuf[fd].substr(0, writesize) << "\"\n";
