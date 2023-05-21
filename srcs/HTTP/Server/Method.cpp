@@ -11,25 +11,6 @@
 
 void HTTP::Server::setErrorPage(HTTP::Response &response, int status_code)
 {
-	std::map<int, std::string>::const_iterator iter
-		= _error_pages.find(status_code);
-	std::string error_page_path;
-
-	if (iter == _error_pages.end())
-		error_page_path = _error_pages.at(0);
-	else
-		error_page_path = iter->second;
-	// TODO: error_page_path로 error_page 파일 열기
-	int fd = open(error_page_path.c_str(), O_RDONLY);
-	// TODO: error_page를 여는 것을 실패했을때 어떻게 처리할지 결정할 것
-	if (fd < 0)
-		;
-
-	_reader.task();
-}
-
-void HTTP::Server::setErrorPage(HTTP::Response &response, int status_code)
-{
 	const std::map<int, std::string>::const_iterator iter
 		= _error_pages.find(status_code);
 	std::string error_page;
