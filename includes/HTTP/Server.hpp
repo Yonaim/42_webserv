@@ -3,7 +3,6 @@
 
 #include "ConfigDirective.hpp"
 #include "HTTP/Request.hpp"
-#include "HTTP/RequestHandler.hpp"
 #include "HTTP/Response.hpp"
 #include "async/TCPIOProcessor.hpp"
 #include <queue>
@@ -17,6 +16,10 @@ class Server
 {
   public:
 	class RequestHandler;
+	class RequestGetHandler;
+	class RequestHeadHandler;
+	class RequestPostHandler;
+	class RequestDeleteHandler;
 
   private:
 	class Location;
