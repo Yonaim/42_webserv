@@ -148,6 +148,7 @@ HTTP::Server::Location::Location(const ConfigContext &location_context)
 
 	if (location_context.nParameters() != 1)
 		location_context.throwException(PARSINGEXC_INVALID_N_ARG);
+	_path = location_context.parameter(0);
 
 	parseDirectiveRoot(location_context);
 	parseDirectiveLimitExcept(location_context);
