@@ -16,9 +16,10 @@ bool HTTP::Server::Location::isAllowedMethod(int method)
 }
 
 const HTTP::Server::Location &HTTP::Server::getLocation(
-	const std::string &location)
+	const std::string &location) const
 {
-	std::map<std::string, Location>::iterator iter = _locations.find(location);
+	std::map<std::string, Location>::const_iterator iter
+		= _locations.find(location);
 
 	if (iter == _locations.end())
 	{

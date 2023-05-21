@@ -55,7 +55,7 @@ class Server
 	void disconnect(int client_fd);
 
 	// 추가
-	const Location &getLocation(const std::string &location);
+	const Location &getLocation(const std::string &location) const;
 	void setErrorPage(HTTP::Response &response, int status_code);
 	std::string getResourcePath(const Request &req) const;
 };
