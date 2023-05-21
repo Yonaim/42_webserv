@@ -1,4 +1,5 @@
 #include "async/SingleIOProcessor.hpp"
+#include <algorithm>
 #include <errno.h>
 #include <fcntl.h>
 #include <sstream>
@@ -49,7 +50,7 @@ void SingleIOProcessor::task(void)
 		else if (event == EVFILT_READ)
 			read(_fd, data);
 		else if (event == EVFILT_WRITE && _wrbuf[_fd].length() > 0)
-			write(_fd, data);
+			write(_fd, std::min((size_t)data, _wrbuf[_fd].length()));
 	}
 }
 
