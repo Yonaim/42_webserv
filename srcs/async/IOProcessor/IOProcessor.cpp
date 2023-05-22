@@ -64,7 +64,8 @@ void IOProcessor::flushKQueue(void)
 							 size_eventbuf, &zerosec);
 	_watchlist.clear();
 	if (n_newevents < 0)
-		throw(std::runtime_error(strerror(errno)));
+		throw(std::runtime_error(std::string("Error while running kevent: ")
+								 + strerror(errno)));
 	_eventlist.insert(_eventlist.end(), events, events + n_newevents);
 }
 

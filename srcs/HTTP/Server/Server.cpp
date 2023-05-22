@@ -1,8 +1,8 @@
 #include "HTTP/Server.hpp"
 #include "../const_values.hpp"
 #include "ConfigDirective.hpp"
+#include "utils/string.hpp"
 #include <cctype>
-#include <sstream>
 
 HTTP::Server::Server(const ConfigContext &server_context)
 	: _logger(async::Logger::getLogger("Server"))
@@ -87,9 +87,8 @@ void HTTP::Server::ensureClientConnected(int client_fd)
 {
 	if (_output_queue.find(client_fd) == _output_queue.end())
 	{
-		std::stringstream what;
-		what << "Client fd " << client_fd << " is not yet connected.";
-		throw(std::runtime_error(what.str()));
+		throw(std::runtime_error("Client fd " + toStr(client_fd)
+								 + " is not yet connected."));
 	}
 }
 
@@ -131,11 +130,8 @@ HTTP::Response HTTP::Server::retrieveResponse(int client_fd)
 {
 	ensureClientConnected(client_fd);
 	if (_output_queue[client_fd].empty())
-	{
-		std::stringstream what;
-		what << "No response made for client fd " << client_fd;
-		throw(std::runtime_error(what.str()));
-	}
+		throw(std::runtime_error("No response made for client fd "
+								 + toStr(client_fd)));
 	HTTP::Response res = _output_queue[client_fd].front();
 	_output_queue[client_fd].pop();
 	return (res);
