@@ -141,7 +141,8 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 			return;
 		}
 	}
-	// TODO: 주인 없는 리퀘스트 처리
+	// 일치하는 Host가 없을 시 해당 포트의 첫 서버(기본값)에 등록
+	_servers[port].front().registerRequest(client_fd, request);
 }
 
 void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
