@@ -12,15 +12,25 @@ void WebServer::parseMaxBodySize(const ConfigContext &root_context)
 	const char *dir_name = "client_max_body_size";
 
 	if (root_context.countDirectivesByName(dir_name) != 1)
+	{
+		_logger << root_context.name() << " should have 1 " << dir_name
+				<< async::error;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
 
 	const ConfigDirective &body_size_directive
 		= root_context.getNthDirectiveByName(dir_name, 0);
 
 	if (body_size_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
 		root_context.throwException(PARSINGEXC_UNDEF_DIR);
+	}
 	if (body_size_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
 		body_size_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
 
 	_max_body_size = toNum<size_t>(body_size_directive.parameter(0));
 }
@@ -30,15 +40,25 @@ void WebServer::parseUploadStore(const ConfigContext &root_context)
 	const char *dir_name = "upload_store";
 
 	if (root_context.countDirectivesByName(dir_name) != 1)
+	{
+		_logger << root_context.name() << " should have 1 " << dir_name
+				<< async::error;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
 
 	const ConfigDirective &upload_directive
 		= root_context.getNthDirectiveByName(dir_name, 0);
 
 	if (upload_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
 		root_context.throwException(PARSINGEXC_UNDEF_DIR);
+	}
 	if (upload_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
 		upload_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
 
 	_upload_store = upload_directive.parameter(0);
 }
@@ -69,7 +89,11 @@ WebServer::WebServer(const ConfigContext &root_context)
 	const char *dir_name = "server";
 	size_t n_servers = root_context.countDirectivesByName(dir_name);
 	if (n_servers < 1)
+	{
+		_logger << root_context.name() << " should have 1 or more " << dir_name
+				<< async::error;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
 	for (size_t i = 0; i < n_servers; i++)
 	{
 		parseServer((const ConfigContext &)(root_context.getNthDirectiveByName(

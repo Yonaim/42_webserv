@@ -9,50 +9,82 @@ using namespace HTTP;
 
 void Server::parseDirectiveListen(const ConfigContext &server_context)
 {
+	const char *dir_name = "listen";
 	if (server_context.countDirectivesByName("listen") != 1)
+	{
+		_logger << server_context.name() << " should have 1 " << dir_name
+				<< async::error;
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
 	const ConfigDirective &listen_directive
-		= server_context.getNthDirectiveByName("listen", 0);
+		= server_context.getNthDirectiveByName(dir_name, 0);
 	if (listen_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
 		listen_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
 	if (listen_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
 		listen_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
 	const std::string &port_str = listen_directive.parameter(0);
 	if (!isUnsignedIntStr(port_str))
+	{
+		_logger << dir_name << " should have integer form parameter"
+				<< async::error;
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
+	}
 	std::stringstream ss(port_str);
 	ss >> _port;
 	if (!(0 <= _port && _port <= 65536))
+	{
+		_logger << dir_name << " has invalid port number" << async::error;
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
+	}
 	_logger << "parsed port " << _port << async::debug;
 }
 
 void Server::parseDirectiveRoot(const ConfigContext &server_context)
 {
-	if (server_context.countDirectivesByName("root") != 1)
+	const char *dir_name = "root";
+	if (server_context.countDirectivesByName(dir_name) != 1)
+	{
+		_logger << server_context.name() << " should have 1 " << dir_name
+				<< async::error;
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
 	const ConfigDirective &root_directive
-		= server_context.getNthDirectiveByName("root", 0);
+		= server_context.getNthDirectiveByName(dir_name, 0);
 	if (root_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
 		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
 	if (root_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
 		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
 	_root = root_directive.parameter(0);
 	_logger << "parsed root " << _root << async::debug;
 }
 
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 {
-	const size_t n_error_pages
-		= server_context.countDirectivesByName("error_page");
+	const char *dir_name = "error_page";
+	const size_t n_error_pages = server_context.countDirectivesByName(dir_name);
 	if (n_error_pages == 0)
 		return;
 	for (size_t i = 0; i < n_error_pages; i++)
 	{
 		const ConfigDirective &error_page_directive
-			= server_context.getNthDirectiveByName("error_page", i);
+			= server_context.getNthDirectiveByName(dir_name, i);
 		if (error_page_directive.is_context())
+		{
+			_logger << dir_name << " should not be context" << async::error;
 			error_page_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		}
 		const size_t n_arguments = error_page_directive.nParameters();
 		const std::string file_path
 			= error_page_directive.parameter(n_arguments - 1);
@@ -60,10 +92,18 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 		{
 			const std::string &code_str = error_page_directive.parameter(i);
 			if (!isUnsignedIntStr(code_str))
+			{
+				_logger << dir_name << " should have integer form parameter"
+						<< async::error;
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
+			}
 			int code = toNum<int>(code_str);
 			if (!isValidStatusCode(code))
+			{
+				_logger << dir_name << " has invalid status code"
+						<< async::error;
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
+			}
 			// TODO: 타임아웃 정해야함
 			_error_pages[code] = new async::FileReader(1000, _root + file_path);
 			_logger << "parsed error page " << _root + file_path << " for code "
@@ -74,16 +114,20 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 
 void Server::parseDirectiveServerName(const ConfigContext &server_context)
 {
+	const char *dir_name = "server_name";
 	const size_t n_server_names
-		= server_context.countDirectivesByName("server_name");
+		= server_context.countDirectivesByName(dir_name);
 	if (n_server_names == 0)
 		return;
 	for (size_t i = 0; i < n_server_names; i++)
 	{
 		const ConfigDirective &server_name_directive
-			= server_context.getNthDirectiveByName("server_name", i);
+			= server_context.getNthDirectiveByName(dir_name, i);
 		if (server_name_directive.is_context())
+		{
+			_logger << dir_name << " should not be context" << async::error;
 			server_name_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		}
 		const size_t n_arguments = server_name_directive.nParameters();
 		for (size_t i = 0; i < n_arguments; i++)
 		{
@@ -96,6 +140,7 @@ void Server::parseDirectiveServerName(const ConfigContext &server_context)
 
 void Server::parseDirectiveLocation(const ConfigContext &server_context)
 {
+	const char *dir_name = "location";
 	const size_t n_locations = server_context.countDirectivesByName("location");
 	if (n_locations == 0)
 		return;
@@ -105,11 +150,16 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 			= (const ConfigContext &)(server_context.getNthDirectiveByName(
 				"location", i));
 		if (!location_context.is_context())
+		{
+			_logger << dir_name << " should be context" << async::error;
 			location_context.throwException(PARSINGEXC_UNDEF_DIR);
-
+		}
 		Location new_location(location_context);
 		if (_locations.find(new_location.getPath()) != _locations.end())
+		{
+			_logger << dir_name << " has duplicate paths" << async::error;
 			location_context.throwException(PARSINGEXC_DUP_DIR);
+		}
 		_locations[new_location.getPath()] = new_location;
 		_logger << "parsed location " << new_location.getPath() << async::debug;
 	}
