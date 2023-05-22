@@ -46,11 +46,13 @@ void HTTP::Server::task(void)
 	{
 		int client_fd = it->first;
 		std::queue<RequestHandler *> &handlers = it->second;
-
+		if (handlers.empty())
+			continue;
 		int rc = handlers.front()->task();
 		if (rc == RequestHandler::RESPONSE_STATUS_OK)
 		{
 			_output_queue[client_fd].push(handlers.front()->retrieve());
+			delete handlers.front();
 			handlers.pop();
 		}
 		else if (rc == RequestHandler::RESPONSE_STATUS_AGAIN)
