@@ -7,6 +7,15 @@
 using namespace async;
 typedef unsigned long long ull_t;
 
+static int getFdByPath(const std::string &path)
+{
+	int fd = ::open(path.c_str(), O_RDWR | O_CREAT,
+					S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if (fd < 0)
+		throw(FileIOProcessor::FileOpeningError(path, strerror(errno)));
+	return (fd);
+}
+
 static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
 {
 	if (timeout_ms == 0)
@@ -29,9 +38,7 @@ FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
-	: _writer(::open(path.c_str(), O_RDWR | O_CREAT,
-					 S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)),
-	  _status(JobStatus::AGAIN), _buffer(""),
+	: _writer(getFdByPath(path)), _status(JobStatus::AGAIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(true)
 {
 }
@@ -70,5 +77,12 @@ std::string FileIOProcessor::retrieve(void)
 
 FileIOProcessor::Timeout::Timeout(const int fd)
 	: std::runtime_error("Timeout occured at " + toStr(fd))
+{
+}
+
+FileIOProcessor::FileOpeningError::FileOpeningError(const std::string &path,
+													const std::string &cause)
+	: std::runtime_error(std::string("Error while opening file \"") + path
+						 + "\": " + cause)
 {
 }

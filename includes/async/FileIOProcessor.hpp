@@ -30,6 +30,11 @@ class FileIOProcessor
 	  public:
 		Timeout(const int fd);
 	};
+	class FileOpeningError : public std::runtime_error
+	{
+	  public:
+		FileOpeningError(const std::string &path, const std::string &cause);
+	};
 
 	virtual ~FileIOProcessor();
 
