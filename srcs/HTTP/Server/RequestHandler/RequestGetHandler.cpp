@@ -35,6 +35,8 @@ int Server::RequestGetHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
+	// TODO: 현재 얻어진 resourcePath가 유효하지 않고, _has_index = true;인 경우
+	// 모든 index를 유효한 경로 후보로 두고 resourcePath를 새로 구하는 로직 추가
 	try
 	{
 		int rc = _reader.task();

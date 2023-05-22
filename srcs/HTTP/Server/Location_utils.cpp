@@ -33,8 +33,23 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 
 std::string HTTP::Server::getResourcePath(const Request &req) const
 {
-	const std::string uri_path = req.getURIPath();
+	const std::string &uri_path = req.getURIPath();
 	const Location &location = getLocation(uri_path);
 
+	if (uri_path.back() == '/' && location.hasIndex())
+		return (location.getRoot() + uri_path + location.getNthIndex(0));
+
 	return (location.getRoot() + uri_path);
+}
+
+bool HTTP::Server::Location::hasIndex() const
+{
+	return (_has_index);
+}
+
+const std::string &HTTP::Server::Location::getNthIndex(size_t nth) const
+{
+	if (nth > _index.size())
+		throw(std::runtime_error("exceeded the accessible range"));
+	return (_index[nth]);
 }
