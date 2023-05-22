@@ -33,22 +33,40 @@ int Server::RequestPostHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
-	int rc = _writer.task();
-	if (rc == async::status::OK)
+	try
 	{
-		_response.setStatus(200);
+		int rc = _writer.task();
+		if (rc == async::status::OK)
+		{
+			_response.setStatus(201); // Created
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+		else if (rc == async::status::AGAIN)
+		{
+			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+		}
+		else
+		{
+			// TODO: 예외 처리
+			_response.setStatus(404);
+			// _response.setBody(_error_pages.find(404)->second);
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+	}
+	catch (const async::FileIOProcessor::FileOpeningError &e)
+	{
+		// Service Unavailable
+		_response = _server->generateErrorResponse(503);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_server->_logger << e.what() << async::warning;
 	}
-	else if (rc == async::status::AGAIN)
+	catch (const std::exception &e)
 	{
-		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
-	}
-	else
-	{
-		// TODO: 예외 처리
-		_response.setStatus(404);
-		// _response.setBody(_error_pages.find(404)->second);
+		// Internal Server Error
+		_response = _server->generateErrorResponse(500);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_server->_logger << e.what() << async::warning;
 	}
+
 	return (_status);
 }
