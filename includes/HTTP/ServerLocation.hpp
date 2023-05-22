@@ -34,7 +34,7 @@ class Server::Location
 	// 추가
 	const std::string &getRoot(void) const;
 	const std::string &getNthIndex(size_t nth) const;
-	bool isAllowedMethod(int method);
+	bool isAllowedMethod(int method) const;
 	bool hasIndex() const;
 };
 } // namespace HTTP
