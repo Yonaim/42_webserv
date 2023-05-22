@@ -22,6 +22,7 @@ void HTTP::Server::parseDirectiveListen(const ConfigContext &server_context)
 	ss >> _port;
 	if (!(0 <= _port && _port <= 65536))
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
+	_logger << "parsed port " << _port << async::debug;
 }
 
 void HTTP::Server::parseDirectiveRoot(const ConfigContext &server_context)
@@ -44,8 +45,6 @@ void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 		= server_context.countDirectivesByName("error_page");
 	if (n_error_pages == 0)
 		return;
-	std::stringstream ss;
-	int code;
 	for (size_t i = 0; i < n_error_pages; i++)
 	{
 		const ConfigDirective &error_page_directive
@@ -60,11 +59,12 @@ void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			const std::string &code_str = error_page_directive.parameter(i);
 			if (!isUnsignedIntStr(code_str))
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
-			ss.str(code_str);
-			ss >> code;
+			int code = toNum<int>(code_str);
 			if (!isValidStatusCode(code))
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			_error_pages[code] = file_path;
+			_logger << "parsed error page " << file_path << " for code " << code
+					<< async::debug;
 		}
 	}
 }
@@ -83,7 +83,11 @@ void HTTP::Server::parseDirectiveServerName(const ConfigContext &server_context)
 			server_name_directive.throwException(PARSINGEXC_UNDEF_DIR);
 		const size_t n_arguments = server_name_directive.nParameters();
 		for (size_t i = 0; i < n_arguments; i++)
+		{
 			_server_name.insert(server_name_directive.parameter(i));
+			_logger << "parsed server name "
+					<< server_name_directive.parameter(i) << async::debug;
+		}
 	}
 }
 
@@ -104,6 +108,7 @@ void HTTP::Server::parseDirectiveLocation(const ConfigContext &server_context)
 		if (_locations.find(new_location.getPath()) != _locations.end())
 			location_context.throwException(PARSINGEXC_DUP_DIR);
 		_locations[new_location.getPath()] = new_location;
+		_logger << "parsed location " << new_location.getPath() << async::debug;
 	}
 }
 

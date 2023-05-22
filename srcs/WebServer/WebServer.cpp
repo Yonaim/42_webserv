@@ -155,8 +155,12 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 			int client_fd = server_it->hasResponses();
 			if (client_fd < 0)
 				break;
+			_logger << "Response for client " << client_fd << " has been found"
+					<< async::verbose;
 			HTTP::Response res = server_it->retrieveResponse(client_fd);
 			_tcp_procs[port].wrbuf(client_fd) += res.toString();
+			_logger << "Added to wrbuf: \"" << res.toString() << "\""
+					<< async::debug;
 		}
 	}
 }

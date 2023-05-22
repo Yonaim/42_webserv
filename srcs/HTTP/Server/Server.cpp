@@ -56,6 +56,8 @@ void HTTP::Server::task(void)
 			_output_queue[client_fd].push(handlers.front()->retrieve());
 			delete handlers.front();
 			handlers.pop();
+			_logger << "Response for client " << client_fd
+					<< " has been retrieved" << async::verbose;
 		}
 		else if (rc == RequestHandler::RESPONSE_STATUS_AGAIN)
 			continue;
