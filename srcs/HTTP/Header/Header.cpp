@@ -85,6 +85,13 @@ void HTTP::Header::insert(const std::string &name,
 	_values[name].insert(_values[name].end(), values.begin(), values.end());
 }
 
+void HTTP::Header::insert(const std::string &name,
+						  const std::string value)
+{
+	_values[name].insert(_values[name].end(), value);
+}
+
+
 HTTP::Header::iterator HTTP::Header::begin(void)
 {
 	return (_values.begin());

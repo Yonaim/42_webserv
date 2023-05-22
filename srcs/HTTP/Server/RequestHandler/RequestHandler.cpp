@@ -11,6 +11,10 @@ Server::RequestHandler::RequestHandler(Server const *server,
 	: _request(request), _status(RESPONSE_STATUS_AGAIN), _server(server),
 	  _resource_path(server->getResourcePath(request))
 {
+	if (_request.hasHeaderValue("Connection", "close"))
+		_response.setConnection(false);
+	else
+		_response.setConnection(true);
 }
 
 Server::RequestHandler::~RequestHandler()

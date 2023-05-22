@@ -29,28 +29,6 @@ namespace HTTP
 
 class Response
 {
-  public:
-	Response();
-	Response(Response const &other);
-	Response &operator=(Response const &other);
-	~Response();
-
-	std::string toString(void);
-
-	// setter
-	void setDate(void);
-	void setDefaultValue(void);
-	void setStatus(int status_code);
-	void setContent(const std::string &content, const std::string &file_path);
-	void setConnection(void);
-
-	//
-	void setContentLength(void);
-	void setContentLength(size_t length);
-	void setContentType(const std::string &file_path);
-	void setBody(const std::string &body);
-	void setValue(const std::string &key, const std::string &val);
-
   private:
 	typedef std::map<std::string, std::string>::iterator _header_iterator;
 
@@ -60,17 +38,34 @@ class Response
 	void makeStatusLine(void);
 	void makeHeader(void);
 	void makeBody(void);
-	bool isComplete(void) const;
 
-	// final
 	std::string _response;
 
-	// status-line
 	static const std::string _http_version;
 	std::string _status_code;
 	std::string _reason_phrase;
 	Header _header;
 	std::string _body;
+
+  public:
+	Response();
+	Response(Response const &other);
+	Response &operator=(Response const &other);
+	~Response();
+
+	std::string toString(void);
+
+	// setter
+	void setValue(const std::string &key, const std::string &val);
+
+	void setDate(void);
+	void setStatus(int status_code);
+	void setContent(const std::string &content, const std::string &file_path);
+	void setContentType(const std::string &file_path);
+	void setContentLength(void);
+	void setContentLength(size_t length);
+	void setConnection(bool is_persistent);
+	void setBody(const std::string &body);
 };
 } // namespace HTTP
 

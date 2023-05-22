@@ -38,20 +38,11 @@ HTTP::Response::~Response(void)
 // convert to string
 std::string HTTP::Response::toString(void)
 {
-	if (isComplete() == false)
-		throw(std::logic_error("needs more data to make response message"));
-	setDefaultValue();
 	_response.clear();
 	makeStatusLine();
 	makeHeader();
 	makeBody();
 	return (_response);
-}
-
-bool HTTP::Response::isComplete(void) const
-{
-	// TODO: Implementation
-	return (true);
 }
 
 void HTTP::Response::makeStatusLine(void)
@@ -65,15 +56,19 @@ void HTTP::Response::makeStatusLine(void)
 
 void HTTP::Response::makeHeader(void)
 {
-	for (Header::const_iterator iter = _header.begin(); iter != _header.end();
-		 ++iter)
+	for (Header::const_iterator it = _header.begin(); it != _header.end(); ++it)
 	{
-		if (iter->second.empty())
+		if (it->second.empty())
 			continue;
-		_response.append(iter->first);
-		_response.append(": ");
-		// TODO: 헤더의 값 여러개를 문자열에 추가
-		_response.append(CRLF);
+
+		std::string to_append(it->first + ": ");
+
+		const std::vector<std::string> values = _header.getValues(it->first);
+		for (std::vector<std::string>::const_iterator val_it = values.begin();
+			 val_it != values.end(); ++val_it)
+			to_append = *val_it + ", ";
+		to_append += CRLF;
+		_response.append(to_append);
 	}
 	_response.append(CRLF);
 }
