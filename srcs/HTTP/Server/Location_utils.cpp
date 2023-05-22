@@ -18,7 +18,15 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 	const std::string &path) const
 {
 	std::map<std::string, Location>::const_iterator iter
-		= _locations.find(path);
+		= _locations.begin();
+
+	for (; iter != _locations.end(); ++iter)
+	{
+		const std::string	key = iter->first;
+
+		if (path.find(key) == 0)
+			break ;
+	}
 
 	if (iter == _locations.end())
 	{
