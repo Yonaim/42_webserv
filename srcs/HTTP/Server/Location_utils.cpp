@@ -22,7 +22,7 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 
 	if (iter == _locations.end())
 	{
-		_logger << __func__ << "couldn't find the Location object"
+		_logger << __func__ << " couldn't find the Location object"
 				<< async::info;
 		throw(ServerException(404));
 	}
