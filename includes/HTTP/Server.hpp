@@ -28,6 +28,7 @@ class Server
 
 	int _port;
 	std::set<std::string> _server_name;
+	std::string _root;
 	std::map<int, std::string> _error_pages;
 	std::map<std::string, Location> _locations;
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
@@ -35,6 +36,7 @@ class Server
 	async::Logger &_logger;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
+	void parseDirectiveRoot(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);
 	void parseDirectiveLocation(const ConfigContext &server_context);

@@ -24,6 +24,20 @@ void HTTP::Server::parseDirectiveListen(const ConfigContext &server_context)
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 }
 
+void HTTP::Server::parseDirectiveRoot(const ConfigContext &server_context)
+{
+	if (server_context.countDirectivesByName("root") != 1)
+		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	const ConfigDirective &root_directive
+		= server_context.getNthDirectiveByName("root", 0);
+	if (root_directive.is_context())
+		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	if (root_directive.nParameters() != 1)
+		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	_root = root_directive.parameter(0);
+	_logger << "parsed root " << _root << async::debug;
+}
+
 void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 {
 	const size_t n_error_pages
