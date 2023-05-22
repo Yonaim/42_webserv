@@ -6,7 +6,9 @@
 #include <iostream>
 #include <sstream>
 
-void HTTP::Server::Location::parseDirectiveRoot(
+using namespace HTTP;
+
+void Server::Location::parseDirectiveRoot(
 	const ConfigContext &location_context)
 {
 	if (location_context.countDirectivesByName("root") != 1)
@@ -20,7 +22,7 @@ void HTTP::Server::Location::parseDirectiveRoot(
 	_root = root_directive.parameter(0);
 }
 
-void HTTP::Server::Location::parseDirectiveLimitExcept(
+void Server::Location::parseDirectiveLimitExcept(
 	const ConfigContext &location_context)
 {
 	_allowed_methods.insert(METHOD_GET);
@@ -45,7 +47,7 @@ void HTTP::Server::Location::parseDirectiveLimitExcept(
 
 		for (size_t j = 0; j < n_methods; j++)
 		{
-			const std::map<std::string, int>::const_iterator it
+			const BidiMap<std::string, int>::const_iterator it
 				= METHOD.find(limit_except_directive.parameter(j));
 			if (it == METHOD.end())
 				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
@@ -64,7 +66,7 @@ void HTTP::Server::Location::parseDirectiveLimitExcept(
 	}
 }
 
-void HTTP::Server::Location::parseDirectiveReturn(
+void Server::Location::parseDirectiveReturn(
 	const ConfigContext &location_context)
 {
 	_do_redirection = false;
@@ -87,7 +89,7 @@ void HTTP::Server::Location::parseDirectiveReturn(
 	_redirection.second = return_directive.parameter(1);
 }
 
-void HTTP::Server::Location::parseDirectiveAutoIndex(
+void Server::Location::parseDirectiveAutoIndex(
 	const ConfigContext &location_context)
 {
 	_autoindex = false;
@@ -109,7 +111,7 @@ void HTTP::Server::Location::parseDirectiveAutoIndex(
 		auto_index_directive.throwException(PARSINGEXC_UNDEF_ARG);
 }
 
-void HTTP::Server::Location::parseDirectiveIndex(
+void Server::Location::parseDirectiveIndex(
 	const ConfigContext &location_context)
 {
 	const size_t n_indexs = location_context.countDirectivesByName("index");
@@ -129,11 +131,11 @@ void HTTP::Server::Location::parseDirectiveIndex(
 	}
 }
 
-HTTP::Server::Location::Location()
+Server::Location::Location()
 {
 }
 
-HTTP::Server::Location::Location(const ConfigContext &location_context)
+Server::Location::Location(const ConfigContext &location_context)
 {
 	// 기본값
 	this->_has_index = false;
@@ -151,11 +153,11 @@ HTTP::Server::Location::Location(const ConfigContext &location_context)
 	parseDirectiveIndex(location_context);
 }
 
-HTTP::Server::Location::~Location()
+Server::Location::~Location()
 {
 }
 
-HTTP::Server::Location::Location(const Location &orig)
+Server::Location::Location(const Location &orig)
 	: _has_index(orig._has_index), _do_redirection(orig._do_redirection),
 	  _autoindex(orig._autoindex), _path(orig._path), _root(orig._root),
 	  _index(orig._index), _redirection(orig._redirection),
@@ -163,7 +165,7 @@ HTTP::Server::Location::Location(const Location &orig)
 {
 }
 
-HTTP::Server::Location &HTTP::Server::Location::operator=(const Location &orig)
+Server::Location &Server::Location::operator=(const Location &orig)
 {
 	_has_index = orig._has_index;
 	_do_redirection = orig._do_redirection;
@@ -176,7 +178,7 @@ HTTP::Server::Location &HTTP::Server::Location::operator=(const Location &orig)
 	return (*this);
 }
 
-const std::string &HTTP::Server::Location::getPath(void) const
+const std::string &Server::Location::getPath(void) const
 {
 	return (_path);
 }

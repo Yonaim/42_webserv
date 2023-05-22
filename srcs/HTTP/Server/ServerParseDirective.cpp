@@ -5,7 +5,9 @@
 #include <iostream>
 #include <sstream>
 
-void HTTP::Server::parseDirectiveListen(const ConfigContext &server_context)
+using namespace HTTP;
+
+void Server::parseDirectiveListen(const ConfigContext &server_context)
 {
 	if (server_context.countDirectivesByName("listen") != 1)
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
@@ -25,7 +27,7 @@ void HTTP::Server::parseDirectiveListen(const ConfigContext &server_context)
 	_logger << "parsed port " << _port << async::debug;
 }
 
-void HTTP::Server::parseDirectiveRoot(const ConfigContext &server_context)
+void Server::parseDirectiveRoot(const ConfigContext &server_context)
 {
 	if (server_context.countDirectivesByName("root") != 1)
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
@@ -39,7 +41,7 @@ void HTTP::Server::parseDirectiveRoot(const ConfigContext &server_context)
 	_logger << "parsed root " << _root << async::debug;
 }
 
-void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
+void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 {
 	const size_t n_error_pages
 		= server_context.countDirectivesByName("error_page");
@@ -70,7 +72,7 @@ void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 	}
 }
 
-void HTTP::Server::parseDirectiveServerName(const ConfigContext &server_context)
+void Server::parseDirectiveServerName(const ConfigContext &server_context)
 {
 	const size_t n_server_names
 		= server_context.countDirectivesByName("server_name");
@@ -92,7 +94,7 @@ void HTTP::Server::parseDirectiveServerName(const ConfigContext &server_context)
 	}
 }
 
-void HTTP::Server::parseDirectiveLocation(const ConfigContext &server_context)
+void Server::parseDirectiveLocation(const ConfigContext &server_context)
 {
 	const size_t n_locations = server_context.countDirectivesByName("location");
 	if (n_locations == 0)
@@ -113,7 +115,7 @@ void HTTP::Server::parseDirectiveLocation(const ConfigContext &server_context)
 	}
 }
 
-bool HTTP::Server::isValidStatusCode(const int &status_code)
+bool Server::isValidStatusCode(const int &status_code)
 {
-	return (HTTP::STATUS_CODE.find(status_code) != HTTP::STATUS_CODE.end());
+	return (STATUS_CODE.find(status_code) != STATUS_CODE.end());
 }

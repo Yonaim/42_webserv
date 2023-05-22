@@ -74,6 +74,8 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/Location \
 					$(DIR_HTTP)Server/Location_utils \
 					$(DIR_HTTP)Server/Server \
+					$(DIR_HTTP)Server/ServerMethods \
+					$(DIR_HTTP)Server/ServerInterfaces \
 					$(DIR_HTTP)Server/ServerParseDirective \
 					$(DIR_HTTP)Server/LocationNotFound \
 					$(DIR_WEBSERVER)WebServer \

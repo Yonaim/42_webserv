@@ -3,7 +3,9 @@
 #include "utils/string.hpp"
 #include <iostream>
 
-int HTTP::Request::consumeStartLine(std::string &buffer)
+using namespace HTTP;
+
+int Request::consumeStartLine(std::string &buffer)
 {
 	// [메소드][SP][URI][SP][HTTP-version][CRLF]
 
@@ -49,14 +51,15 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 	_logger << async::debug;
 
 	/* method index 구하기 */
-	for (int i = 0; i < METHOD_COUNT; i++)
+	for (BidiMap<std::string, int>::const_iterator it = METHOD.begin(); it != METHOD.end(); it++)
 	{
-		if (tokens[0] == METHOD_STR[i])
+		if (tokens[0] == it->first)
 		{
-			_method = i;
+			_method = it->second;
 			break;
 		}
 	}
+
 	_logger << __func__ << ": method index is " << _method << async::debug;
 	if (_method == METHOD_NONE)
 	{
@@ -79,7 +82,7 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 	return (RETURN_TYPE_OK);
 }
 
-int HTTP::Request::consumeHeader(std::string &buffer)
+int Request::consumeHeader(std::string &buffer)
 {
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
@@ -152,7 +155,7 @@ int HTTP::Request::consumeHeader(std::string &buffer)
 	return (RETURN_TYPE_IN_PROCESS);
 }
 
-int HTTP::Request::consumeBody(std::string &buffer)
+int Request::consumeBody(std::string &buffer)
 {
 	// size_t content_length = 0; // TODO: 헤더 맵에서 Content-length 파싱해오기
 
@@ -171,7 +174,7 @@ int HTTP::Request::consumeBody(std::string &buffer)
 	return (RETURN_TYPE_OK);
 }
 
-int HTTP::Request::consumeChunk(std::string &buffer)
+int Request::consumeChunk(std::string &buffer)
 {
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
@@ -212,7 +215,7 @@ int HTTP::Request::consumeChunk(std::string &buffer)
 		return (RETURN_TYPE_IN_PROCESS);
 }
 
-int HTTP::Request::consumeTrailer(std::string &buffer)
+int Request::consumeTrailer(std::string &buffer)
 {
 	/**  헤더라인 파싱하기  **/
 	const size_t crlf_pos = buffer.find(CRLF);
@@ -302,7 +305,7 @@ int HTTP::Request::consumeTrailer(std::string &buffer)
 		return (RETURN_TYPE_IN_PROCESS);
 }
 
-int HTTP::Request::consumeCRLF(std::string &buffer)
+int Request::consumeCRLF(std::string &buffer)
 {
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)

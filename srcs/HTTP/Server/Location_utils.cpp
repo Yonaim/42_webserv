@@ -1,19 +1,21 @@
 #include "../const_values.hpp"
 #include "HTTP/ServerLocation.hpp"
 
-const std::string &HTTP::Server::Location::getRoot(void) const
+using namespace HTTP;
+
+const std::string &Server::Location::getRoot(void) const
 {
 	return (_root);
 }
 
-bool HTTP::Server::Location::isAllowedMethod(int method) const
+bool Server::Location::isAllowedMethod(int method) const
 {
 	const std::set<int>::const_iterator iter = _allowed_methods.find(method);
 
 	return (iter != _allowed_methods.end());
 }
 
-const HTTP::Server::Location &HTTP::Server::getLocation(
+const Server::Location &Server::getLocation(
 	const std::string &path) const
 {
 	std::map<std::string, Location>::const_iterator iter = _locations.begin();
@@ -31,7 +33,7 @@ const HTTP::Server::Location &HTTP::Server::getLocation(
 	return (iter->second);
 }
 
-std::string HTTP::Server::getResourcePath(const Request &req) const
+std::string Server::getResourcePath(const Request &req) const
 {
 	const std::string &uri_path = req.getURIPath();
 	const Location &location = getLocation(uri_path);
@@ -42,12 +44,12 @@ std::string HTTP::Server::getResourcePath(const Request &req) const
 	return (location.getRoot() + uri_path);
 }
 
-bool HTTP::Server::Location::hasIndex() const
+bool Server::Location::hasIndex() const
 {
 	return (_has_index);
 }
 
-const std::string &HTTP::Server::Location::getNthIndex(size_t nth) const
+const std::string &Server::Location::getNthIndex(size_t nth) const
 {
 	if (nth > _index.size())
 		throw(std::runtime_error("exceeded the accessible range"));

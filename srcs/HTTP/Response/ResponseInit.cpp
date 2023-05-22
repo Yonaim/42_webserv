@@ -1,6 +1,8 @@
 #include "HTTP/Response.hpp"
 
-void HTTP::Response::initGeneralHeaderFields(void)
+using namespace HTTP;
+
+void Response::initGeneralHeaderFields(void)
 {
 	_header.insert("Cache-Control", std::vector<std::string>());
 	_header.insert("Connection", std::vector<std::string>());
@@ -13,7 +15,7 @@ void HTTP::Response::initGeneralHeaderFields(void)
 	_header.insert("Warning", std::vector<std::string>());
 }
 
-void HTTP::Response::initResponseHeaderFields(void)
+void Response::initResponseHeaderFields(void)
 {
 	_header.insert("Accept-Ranges", std::vector<std::string>());
 	_header.insert("Age", std::vector<std::string>());
@@ -26,7 +28,7 @@ void HTTP::Response::initResponseHeaderFields(void)
 	_header.insert("WWW-Authenticate", std::vector<std::string>());
 }
 
-void HTTP::Response::initEntityHeaderFields(void)
+void Response::initEntityHeaderFields(void)
 {
 	_header.insert("Allow", std::vector<std::string>());
 	_header.insert("Content-Encoding", std::vector<std::string>());

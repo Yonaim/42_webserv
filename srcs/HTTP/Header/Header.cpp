@@ -1,35 +1,37 @@
 #include "HTTP/Header.hpp"
 
-HTTP::Header::Header()
+using namespace HTTP;
+
+Header::Header()
 {
 }
 
-HTTP::Header::~Header()
+Header::~Header()
 {
 }
 
-HTTP::Header::Header(const Header &orig) : _values(orig._values)
+Header::Header(const Header &orig) : _values(orig._values)
 {
 }
 
-HTTP::Header &HTTP::Header::operator=(const HTTP::Header &orig)
+Header &Header::operator=(const Header &orig)
 {
 	_values = orig._values;
 	return (*this);
 }
 
-bool HTTP::Header::hasValue(std::string const &name) const
+bool Header::hasValue(std::string const &name) const
 {
-	HTTP::Header::const_iterator name_iter = _values.find(name);
+	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter != _values.end())
 		return (true);
 	return (false);
 }
 
-bool HTTP::Header::hasValue(const std::string &name,
+bool Header::hasValue(const std::string &name,
 							const std::string &value) const
 {
-	HTTP::Header::const_iterator name_iter = _values.find(name);
+	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
 		return (false);
 
@@ -42,7 +44,7 @@ bool HTTP::Header::hasValue(const std::string &name,
 	return (false);
 }
 
-bool HTTP::Header::hasValue(const HTTP::Header::const_iterator &iter,
+bool Header::hasValue(const Header::const_iterator &iter,
 							const std::string &value) const
 {
 	for (_list::const_iterator value_iter = iter->second.begin();
@@ -54,60 +56,60 @@ bool HTTP::Header::hasValue(const HTTP::Header::const_iterator &iter,
 	return (false);
 }
 
-const std::string &HTTP::Header::getValue(const std::string &name,
+const std::string &Header::getValue(const std::string &name,
 										  int idx) const
 {
-	HTTP::Header::const_iterator name_iter = _values.find(name);
+	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
 		throw(std::runtime_error("Header name " + name + " not found."));
 
 	return (name_iter->second.at(idx));
 }
 
-const std::vector<std::string> HTTP::Header::getValues(
+const std::vector<std::string> Header::getValues(
 	const std::string &name) const
 {
-	HTTP::Header::const_iterator name_iter = _values.find(name);
+	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
 		throw(std::runtime_error("Header name " + name + " not found."));
 	return (name_iter->second);
 }
 
-void HTTP::Header::assign(const std::string &name,
+void Header::assign(const std::string &name,
 						  const std::vector<std::string> values)
 {
 	_values[name] = values;
 }
 
-void HTTP::Header::insert(const std::string &name,
+void Header::insert(const std::string &name,
 						  const std::vector<std::string> values)
 {
 	_values[name].insert(_values[name].end(), values.begin(), values.end());
 }
 
-void HTTP::Header::insert(const std::string &name,
+void Header::insert(const std::string &name,
 						  const std::string value)
 {
 	_values[name].insert(_values[name].end(), value);
 }
 
 
-HTTP::Header::iterator HTTP::Header::begin(void)
+Header::iterator Header::begin(void)
 {
 	return (_values.begin());
 }
 
-HTTP::Header::iterator HTTP::Header::end(void)
+Header::iterator Header::end(void)
 {
 	return (_values.end());
 }
 
-HTTP::Header::const_iterator HTTP::Header::begin(void) const
+Header::const_iterator Header::begin(void) const
 {
 	return (_values.begin());
 }
 
-HTTP::Header::const_iterator HTTP::Header::end(void) const
+Header::const_iterator Header::end(void) const
 {
 	return (_values.end());
 }

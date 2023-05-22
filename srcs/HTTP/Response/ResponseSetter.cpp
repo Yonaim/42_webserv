@@ -4,12 +4,14 @@
 #include <ctime>
 #include <iostream>
 
-void HTTP::Response::setValue(const std::string &name, const std::string &value)
+using namespace HTTP;
+
+void Response::setValue(const std::string &name, const std::string &value)
 {
 	_header.insert(name, value);
 }
 
-void HTTP::Response::setDate(void)
+void Response::setDate(void)
 {
 	time_t cur_time = time(NULL);
 	tm *tm_gmt = gmtime(&cur_time);
@@ -31,7 +33,7 @@ void HTTP::Response::setDate(void)
 	setValue("Date", date);
 }
 
-void HTTP::Response::setStatus(int status_code)
+void Response::setStatus(int status_code)
 {
 	char buff[4];
 	int i = 3;
@@ -56,14 +58,14 @@ void HTTP::Response::setStatus(int status_code)
 	_reason_phrase = it->second;
 }
 
-void HTTP::Response::setContent(const std::string &content, const std::string &file_path)
+void Response::setContent(const std::string &content, const std::string &file_path)
 {
 	setContentType(file_path);
 	setContentLength(content.length());
 	setBody(content);
 }
 
-void HTTP::Response::setContentType(const std::string &file_path)
+void Response::setContentType(const std::string &file_path)
 {
 	size_t separator_idx = file_path.find_last_of('.');
 	if (separator_idx != std::string::npos)
@@ -79,19 +81,19 @@ void HTTP::Response::setContentType(const std::string &file_path)
 	}
 }
 
-void HTTP::Response::setContentLength(void)
+void Response::setContentLength(void)
 {
 	if (_body.length() > 0)
 		setValue("Content-Length", uintToStr(_body.length()));
 }
 
-void HTTP::Response::setContentLength(size_t length)
+void Response::setContentLength(size_t length)
 {
 	if (length > 0)
 		setValue("Content-Length", uintToStr(length));
 }
 
-void HTTP::Response::setConnection(bool is_persistent)
+void Response::setConnection(bool is_persistent)
 {
 	if (is_persistent)
 		setValue("Connection", "keep-alive");
@@ -99,7 +101,7 @@ void HTTP::Response::setConnection(bool is_persistent)
 		setValue("Connection", "close");
 }
 
-void HTTP::Response::setBody(const std::string &body)
+void Response::setBody(const std::string &body)
 {
 	_body = body;
 }

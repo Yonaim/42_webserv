@@ -54,7 +54,6 @@ class Server
 	Server(const Server &orig);
 	Server &operator=(const Server &orig);
 
-	int getPort(void) const;
 	void task(void);
 	bool isForMe(const Request &request);
 	void registerRequest(int client_fd, const Request &request);
@@ -63,7 +62,7 @@ class Server
 	bool hasResponses(int client_fd);
 	void disconnect(int client_fd);
 
-	// 추가
+	int getPort(void) const;
 	const Location &getLocation(const std::string &location) const;
 	std::string getResourcePath(const Request &req) const;
 };

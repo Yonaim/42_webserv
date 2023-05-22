@@ -2,23 +2,25 @@
 #include "../const_values.hpp"
 #include <iostream>
 
-const std::string HTTP::Response::_http_version = "HTTP/1.1";
+using namespace HTTP;
 
-HTTP::Response::Response(void)
+const std::string Response::_http_version = "HTTP/1.1";
+
+Response::Response(void)
 {
 	initGeneralHeaderFields();
 	initResponseHeaderFields();
 	initEntityHeaderFields();
 }
 
-HTTP::Response::Response(HTTP::Response const &other)
+Response::Response(Response const &other)
 	: _response(other._response), _status_code(other._status_code),
 	  _reason_phrase(other._reason_phrase), _header(other._header),
 	  _body(other._body)
 {
 }
 
-HTTP::Response &HTTP::Response::operator=(HTTP::Response const &other)
+Response &Response::operator=(Response const &other)
 {
 	if (this != &other)
 	{
@@ -31,12 +33,12 @@ HTTP::Response &HTTP::Response::operator=(HTTP::Response const &other)
 	return (*this);
 }
 
-HTTP::Response::~Response(void)
+Response::~Response(void)
 {
 }
 
 // convert to string
-std::string HTTP::Response::toString(void)
+std::string Response::toString(void)
 {
 	setDate();
 	_response.clear();
@@ -46,7 +48,7 @@ std::string HTTP::Response::toString(void)
 	return (_response);
 }
 
-void HTTP::Response::makeStatusLine(void)
+void Response::makeStatusLine(void)
 {
 	_response.append(_http_version);
 	_response.append(SP);
@@ -56,7 +58,7 @@ void HTTP::Response::makeStatusLine(void)
 	_response.append(CRLF);
 }
 
-void HTTP::Response::makeHeader(void)
+void Response::makeHeader(void)
 {
 	for (Header::const_iterator it = _header.begin(); it != _header.end(); ++it)
 	{
@@ -79,7 +81,7 @@ void HTTP::Response::makeHeader(void)
 	_response.append(CRLF);
 }
 
-void HTTP::Response::makeBody(void)
+void Response::makeBody(void)
 {
 	_response.append(_body);
 }

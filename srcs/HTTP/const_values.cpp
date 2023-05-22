@@ -8,10 +8,6 @@ const int HTTP::CRLF_LEN = 2;
 const int HTTP::SP_LEN = 1;
 
 // method
-const int HTTP::METHOD_COUNT = 5;
-const std::string HTTP::METHOD_STR[METHOD_COUNT]
-	= {"NONE", "GET", "HEAD", "POST", "DELETE"};
-
 const std::pair<std::string, int> _METHOD[]
 	= {std::pair<std::string, int>("NONE", METHOD_NONE),
 	   std::pair<std::string, int>("GET", METHOD_GET),
@@ -19,8 +15,8 @@ const std::pair<std::string, int> _METHOD[]
 	   std::pair<std::string, int>("POST", METHOD_POST),
 	   std::pair<std::string, int>("DELETE", METHOD_DELETE)};
 
-const std::map<std::string, int> HTTP::METHOD(
-	_METHOD, _METHOD + sizeof(_METHOD) / sizeof(_METHOD[0]));
+const BidiMap<std::string, int> HTTP::METHOD(
+	_METHOD, sizeof(_METHOD) / sizeof(_METHOD[0]));
 
 // status code
 static const std::pair<int, std::string> _STATUS_CODE[] = {
