@@ -117,6 +117,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		{
 		case HTTP::Request::RETURN_TYPE_OK:
 			registerRequest(port, client_fd, _request_buffer[port][client_fd]);
+			_request_buffer[port][client_fd] = HTTP::Request();
 			break;
 
 		case HTTP::Request::RETURN_TYPE_AGAIN:
