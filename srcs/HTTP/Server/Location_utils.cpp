@@ -36,3 +36,15 @@ std::string HTTP::Server::getResourcePath(const Request &req) const
 
 	return (location.getRoot() + uri_path);
 }
+
+bool HTTP::Server::Location::hasIndex() const
+{
+	return (_has_index);
+}
+
+const std::string &HTTP::Server::Location::getNthIndex(size_t nth) const
+{
+	if (nth > _index.size())
+		throw(std::runtime_error("exceeded the accessible range"));
+	return (_index[nth]);
+}
