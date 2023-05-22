@@ -35,16 +35,22 @@ int FileReader::task(void)
 {
 	if (_status == status::OK)
 		return (_status);
+	if (_status == status::BEGIN)
+	{
+		openFdByPath();
+		_processor = new SingleIOProcessor(_fd);
+		_status = status::AGAIN;
+	}
 
 	checkTimeout();
-	_writer.getReadBuf(_buffer);
+	_processor->getReadBuf(_buffer);
 	try
 	{
-		_writer.task();
+		_processor->task();
 	}
 	catch (const IOProcessor::FileClosed &e)
 	{
-		_writer.getReadBuf(_buffer);
+		_processor->getReadBuf(_buffer);
 		_status = status::OK;
 	}
 	return (_status);

@@ -7,13 +7,15 @@
 using namespace async;
 typedef unsigned long long ull_t;
 
-static int getFdByPath(const std::string &path)
+void FileIOProcessor::openFdByPath(void)
 {
-	int fd = ::open(path.c_str(), O_RDWR | O_CREAT,
+	if (!_should_close)
+		return;
+	int fd = ::open(_path.c_str(), O_RDWR | O_CREAT,
 					S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd < 0)
-		throw(FileIOProcessor::FileOpeningError(path, strerror(errno)));
-	return (fd);
+		throw(FileIOProcessor::FileOpeningError(_path, strerror(errno)));
+	_fd = fd;
 }
 
 static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
@@ -26,38 +28,46 @@ static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
 	return (result);
 }
 
-FileIOProcessor::FileIOProcessor(void) : _writer(0)
+FileIOProcessor::FileIOProcessor(void)
+	: _processor(NULL), _timeout_ms(0), _should_close(false)
 {
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
-	: _writer(fd), _status(status::AGAIN), _buffer(""),
+	: _processor(NULL), _fd(fd), _path(""), _status(status::BEGIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
 {
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
-	: _writer(getFdByPath(path)), _status(status::AGAIN), _buffer(""),
-	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(true)
+	: _processor(NULL), _fd(-1), _path(path), _status(status::BEGIN),
+	  _buffer(""), _timeout_ms(addTimeoutFromNow(timeout_ms)),
+	  _should_close(true)
 {
 }
 
 FileIOProcessor &FileIOProcessor::operator=(const FileIOProcessor &orig)
 {
-	_writer = orig._writer;
+	_processor = orig._processor;
+	_fd = orig._fd;
+	_status = orig._status;
+	_buffer = orig._buffer;
 	return (*this);
 }
 
 FileIOProcessor::FileIOProcessor(const FileIOProcessor &orig)
-	: _writer(orig._writer)
+	: _processor(orig._processor), _fd(orig._fd), _path(orig._path),
+	  _status(orig._status), _buffer(orig._buffer),
+	  _timeout_ms(orig._timeout_ms), _should_close(orig._should_close)
 {
 }
 
 FileIOProcessor::~FileIOProcessor()
 {
 	if (_should_close)
-		close(_writer.getFd());
+		close(_fd);
+	delete _processor;
 }
 
 void FileIOProcessor::checkTimeout(void)
@@ -65,7 +75,7 @@ void FileIOProcessor::checkTimeout(void)
 	if (_timeout_ms == 0)
 		return;
 	if (clock() > _timeout_ms)
-		throw(FileIOProcessor::Timeout(_writer.getFd()));
+		throw(FileIOProcessor::Timeout(_fd));
 }
 
 std::string FileIOProcessor::retrieve(void)

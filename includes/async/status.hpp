@@ -8,6 +8,7 @@ namespace status
 enum job_status_e
 {
 	OK = 0,
+	BEGIN,
 	AGAIN,
 	INVALID
 };

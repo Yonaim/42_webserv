@@ -10,11 +10,13 @@ namespace async
 class FileIOProcessor
 {
   protected:
-	SingleIOProcessor _writer;
+	SingleIOProcessor *_processor;
+	int _fd;
+	const std::string _path;
 	int _status;
 	std::string _buffer;
-	clock_t _timeout_ms;
-	bool _should_close;
+	const clock_t _timeout_ms;
+	const bool _should_close; // 소멸자 호출시 fd를 close()해야하는지 여부
 
 	FileIOProcessor(void);
 	FileIOProcessor &operator=(const FileIOProcessor &orig);
@@ -23,6 +25,7 @@ class FileIOProcessor
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
 	void checkTimeout(void);
+	void openFdByPath(void);
 
   public:
 	class Timeout : public std::runtime_error
@@ -45,6 +48,8 @@ class FileIOProcessor
 class FileWriter : public FileIOProcessor
 {
   private:
+	const std::string _content;
+
 	FileWriter();
 	FileWriter(const FileWriter &orig);
 	FileWriter &operator=(const FileWriter &orig);
