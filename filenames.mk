@@ -75,7 +75,7 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/Location_utils \
 					$(DIR_HTTP)Server/Server \
 					$(DIR_HTTP)Server/ServerParseDirective \
-					$(DIR_HTTP)Server/Method \
+					$(DIR_HTTP)Server/LocationNotFound \
 					$(DIR_WEBSERVER)WebServer \
 
 SRCS				= $(addprefix $(DIR_SRCS), $(addsuffix .cpp, $(FILENAMES)))
