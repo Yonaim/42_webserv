@@ -88,7 +88,11 @@ void HTTP::Server::task(void)
 		else if (rc == RequestHandler::RESPONSE_STATUS_AGAIN)
 			continue;
 		else
-			registerErrorResponse(client_fd, 500); // Internal Server Error
+		{
+			delete handlers.front();
+			handlers.pop();
+			registerErrorResponse(client_fd, 500); // Internal Server Error}
+		}
 	}
 }
 
