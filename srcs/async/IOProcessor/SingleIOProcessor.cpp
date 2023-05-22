@@ -1,8 +1,8 @@
 #include "async/SingleIOProcessor.hpp"
+#include "utils/string.hpp"
 #include <algorithm>
 #include <errno.h>
 #include <fcntl.h>
-#include <sstream>
 #include <unistd.h>
 
 using namespace async;
@@ -44,9 +44,8 @@ void SingleIOProcessor::task(void)
 		_eventlist.pop_front();
 		if (flags & EV_ERROR)
 		{
-			std::stringstream what;
-			what << "I/O Error from fd " << _fd;
-			throw(std::runtime_error(what.str()));
+			throw(std::runtime_error(std::string("I/O Error from fd ")
+									 + toStr(_fd)));
 		}
 		else if (event == EVFILT_READ)
 		{
@@ -68,7 +67,8 @@ void SingleIOProcessor::initialize()
 {
 	int result = fcntl(_fd, F_SETFL, O_NONBLOCK);
 	if (result < 0)
-		throw(std::runtime_error(strerror(errno)));
+		throw(std::runtime_error(std::string("Error while running fcntl at fd ")
+								 + toStr(_fd) + ": " + strerror(errno)));
 	_watchlist.push_back(constructKevent(_fd, IOEVENT_READ));
 	_watchlist.push_back(constructKevent(_fd, IOEVENT_WRITE));
 	flushKQueue();

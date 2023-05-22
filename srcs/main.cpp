@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
+		async::IOTaskHandler::blockingWrite();
 		std::cerr << "Error while parsing config file: " << e.what() << "\n";
 		return (2);
 	}
@@ -56,6 +57,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
+		async::IOTaskHandler::blockingWrite();
 		std::cerr << "Error while parsing log level: " << e.what() << "\n";
 		return (2);
 	}
@@ -68,7 +70,8 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << e.what() << '\n';
+		async::IOTaskHandler::blockingWrite();
+		std::cerr << "Error while running WebServer: " << e.what() << '\n';
 	}
 
 	return (0);

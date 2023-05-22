@@ -5,7 +5,7 @@
 #include "HTTP/Response.hpp"
 #include "HTTP/Server.hpp"
 #include "async/FileIOProcessor.hpp"
-#include "async/JobStatus.hpp"
+#include "async/status.hpp"
 
 namespace HTTP
 {

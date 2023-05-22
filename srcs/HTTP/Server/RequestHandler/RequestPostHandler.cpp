@@ -34,12 +34,12 @@ int Server::RequestPostHandler::task(void)
 		return (_status);
 
 	int rc = _writer.task();
-	if (rc == async::JobStatus::OK)
+	if (rc == async::status::OK)
 	{
 		_response.setStatus(200);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
-	else if (rc == async::JobStatus::AGAIN)
+	else if (rc == async::status::AGAIN)
 	{
 		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
 	}

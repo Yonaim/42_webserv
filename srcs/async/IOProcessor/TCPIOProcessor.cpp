@@ -93,7 +93,8 @@ void TCPIOProcessor::initialize(void)
 	int result;
 	_listening_socket = socket(PF_INET, SOCK_STREAM, 0);
 	if (_listening_socket < 0)
-		throw(std::runtime_error(strerror(errno)));
+		throw(std::runtime_error(std::string("Error while creating socket: ")
+								 + strerror(errno)));
 	_logger << "Created socket " << _listening_socket << async::verbose;
 
 	struct sockaddr_in addr;

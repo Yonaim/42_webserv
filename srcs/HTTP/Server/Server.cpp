@@ -1,8 +1,8 @@
 #include "HTTP/Server.hpp"
 #include "../const_values.hpp"
 #include "ConfigDirective.hpp"
+#include "utils/string.hpp"
 #include <cctype>
-#include <sstream>
 
 HTTP::Server::Server(const ConfigContext &server_context)
 	: _logger(async::Logger::getLogger("Server"))
@@ -64,8 +64,22 @@ void HTTP::Server::task(void)
 
 bool HTTP::Server::isForMe(const HTTP::Request &request)
 {
-	(void)request;
-	_logger << "Unimplemented stub of " << __func__ << async::error;
+	if (!request.hasHeaderValue("Host"))
+		throw(std::runtime_error(
+			"HTTP Request has no header field with name \"Host\""));
+	// TODO: Host 헤더 필드가 여러개일 때 예외 처리
+	const std::string &host = request.getHeaderValue("Host", 0);
+	_logger << "Request is for host \"" << host << "\"" << async::debug;
+	for (std::set<std::string>::iterator it = _server_name.begin();
+		 it != _server_name.end(); it++)
+	{
+		if (*it == host)
+		{
+			_logger << "Request host match with \"" << host << "\""
+					<< async::debug;
+			return (true);
+		}
+	}
 	return (false);
 }
 
@@ -73,20 +87,13 @@ void HTTP::Server::ensureClientConnected(int client_fd)
 {
 	if (_output_queue.find(client_fd) == _output_queue.end())
 	{
-		std::stringstream what;
-		what << "Client fd " << client_fd << " is not yet connected.";
-		throw(std::runtime_error(what.str()));
+		throw(std::runtime_error("Client fd " + toStr(client_fd)
+								 + " is not yet connected."));
 	}
 }
 
 void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
-	if (_request_handlers.find(client_fd) == _request_handlers.end())
-	{
-		_request_handlers[client_fd] = std::queue<RequestHandler *>();
-		_output_queue[client_fd] = std::queue<Response>();
-	}
-
 	RequestHandler *handler;
 	switch (request.getMethod())
 	{
@@ -110,18 +117,23 @@ void HTTP::Server::registerRequest(int client_fd, const Request &request)
 		// 존재하지 않는 메소드는 METHOD_NONE으로 저장해놓고 여기서 에러
 		// 핸들링하도록
 	}
+
+	if (_request_handlers.find(client_fd) == _request_handlers.end())
+	{
+		_request_handlers[client_fd] = std::queue<RequestHandler *>();
+		_output_queue[client_fd] = std::queue<Response>();
+	}
 	_request_handlers[client_fd].push(handler);
+	_logger << "Registered RequestHandler for "
+			<< METHOD_STR[request.getMethod()] << async::debug;
 }
 
 HTTP::Response HTTP::Server::retrieveResponse(int client_fd)
 {
 	ensureClientConnected(client_fd);
 	if (_output_queue[client_fd].empty())
-	{
-		std::stringstream what;
-		what << "No response made for client fd " << client_fd;
-		throw(std::runtime_error(what.str()));
-	}
+		throw(std::runtime_error("No response made for client fd "
+								 + toStr(client_fd)));
 	HTTP::Response res = _output_queue[client_fd].front();
 	_output_queue[client_fd].pop();
 	return (res);
