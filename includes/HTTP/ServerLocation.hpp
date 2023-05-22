@@ -16,6 +16,7 @@ class Server::Location
 	std::vector<std::string> _index;
 	std::pair<int, std::string> _redirection;
 	std::set<int> _allowed_methods;
+	async::Logger &_logger;
 
   public:
 	Location();
