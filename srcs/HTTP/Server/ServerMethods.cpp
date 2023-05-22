@@ -27,8 +27,10 @@ Response Server::generateErrorResponse(const int code)
 	Response response;
 
 	std::string body = getErrorPage(code);
-	response.setBody(body);
 	response.setStatus(code);
+	response.setBody(body);
+	response.setContentLength(body.length());
+	response.setContentType("text/html");
 	return (response);
 }
 
