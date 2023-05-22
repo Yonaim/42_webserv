@@ -59,6 +59,7 @@ FILENAMES			= \
 					$(DIR_CONFIG_PARSER)splitIntoTokens \
 					$(DIR_HTTP)const_values \
 					$(DIR_HTTP)mime_type \
+					$(DIR_HTTP)error_pages \
 					$(DIR_HTTP)Header/Header \
 					$(DIR_HTTP)Request/Request \
 					$(DIR_HTTP)Request/RequestConsume \
