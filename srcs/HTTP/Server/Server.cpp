@@ -94,12 +94,6 @@ void HTTP::Server::ensureClientConnected(int client_fd)
 
 void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
-	if (_request_handlers.find(client_fd) == _request_handlers.end())
-	{
-		_request_handlers[client_fd] = std::queue<RequestHandler *>();
-		_output_queue[client_fd] = std::queue<Response>();
-	}
-
 	RequestHandler *handler;
 	switch (request.getMethod())
 	{
@@ -123,7 +117,15 @@ void HTTP::Server::registerRequest(int client_fd, const Request &request)
 		// 존재하지 않는 메소드는 METHOD_NONE으로 저장해놓고 여기서 에러
 		// 핸들링하도록
 	}
+
+	if (_request_handlers.find(client_fd) == _request_handlers.end())
+	{
+		_request_handlers[client_fd] = std::queue<RequestHandler *>();
+		_output_queue[client_fd] = std::queue<Response>();
+	}
 	_request_handlers[client_fd].push(handler);
+	_logger << "Registered RequestHandler for "
+			<< METHOD_STR[request.getMethod()] << async::debug;
 }
 
 HTTP::Response HTTP::Server::retrieveResponse(int client_fd)
