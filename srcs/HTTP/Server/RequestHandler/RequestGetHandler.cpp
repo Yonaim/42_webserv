@@ -3,7 +3,7 @@
 
 using namespace HTTP;
 
-Server::RequestGetHandler::RequestGetHandler(Server const *server,
+Server::RequestGetHandler::RequestGetHandler(Server *server,
 											 const Request &request)
 	: RequestHandler(server, request), _reader(1000, _resource_path)
 {

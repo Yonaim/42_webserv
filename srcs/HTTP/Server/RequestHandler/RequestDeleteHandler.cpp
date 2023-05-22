@@ -3,7 +3,7 @@
 
 using namespace HTTP;
 
-Server::RequestDeleteHandler::RequestDeleteHandler(Server const *server,
+Server::RequestDeleteHandler::RequestDeleteHandler(Server *server,
 												   const Request &request)
 	: RequestHandler(server, request)
 {

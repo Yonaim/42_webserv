@@ -6,8 +6,7 @@ Server::RequestHandler::RequestHandler(void)
 {
 }
 
-Server::RequestHandler::RequestHandler(Server const *server,
-									   const Request &request)
+Server::RequestHandler::RequestHandler(Server *server, const Request &request)
 	: _request(request), _status(RESPONSE_STATUS_AGAIN), _server(server),
 	  _resource_path(server->getResourcePath(request))
 {

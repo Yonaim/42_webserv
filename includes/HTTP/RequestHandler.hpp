@@ -20,7 +20,7 @@ class Server::RequestHandler
 	const Request _request;
 	Response _response;
 	int _status;
-	Server const *_server;
+	Server *_server;
 	std::string _resource_path;
 
   public:
@@ -30,7 +30,7 @@ class Server::RequestHandler
 		RESPONSE_STATUS_AGAIN
 	};
 
-	RequestHandler(Server const *server, const Request &request);
+	RequestHandler(Server *server, const Request &request);
 	virtual ~RequestHandler();
 
 	virtual int task(void) = 0;
@@ -45,7 +45,7 @@ class Server::RequestGetHandler : public Server::RequestHandler
 	RequestGetHandler &operator=(const RequestGetHandler &orig);
 
   public:
-	RequestGetHandler(Server const *server, const Request &request);
+	RequestGetHandler(Server *server, const Request &request);
 	virtual ~RequestGetHandler();
 
 	virtual int task(void);
@@ -59,7 +59,7 @@ class Server::RequestHeadHandler : public Server::RequestHandler
 	RequestHeadHandler &operator=(const RequestHeadHandler &orig);
 
   public:
-	RequestHeadHandler(Server const *server, const Request &request);
+	RequestHeadHandler(Server *server, const Request &request);
 	virtual ~RequestHeadHandler();
 
 	virtual int task(void);
@@ -73,7 +73,7 @@ class Server::RequestPostHandler : public Server::RequestHandler
 	RequestPostHandler &operator=(const RequestPostHandler &orig);
 
   public:
-	RequestPostHandler(Server const *server, const Request &request);
+	RequestPostHandler(Server *server, const Request &request);
 	virtual ~RequestPostHandler();
 
 	virtual int task(void);
@@ -86,7 +86,7 @@ class Server::RequestDeleteHandler : public Server::RequestHandler
 	RequestDeleteHandler &operator=(const RequestDeleteHandler &orig);
 
   public:
-	RequestDeleteHandler(Server const *server, const Request &request);
+	RequestDeleteHandler(Server *server, const Request &request);
 	virtual ~RequestDeleteHandler();
 
 	virtual int task(void);

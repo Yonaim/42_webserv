@@ -2,7 +2,7 @@
 
 using namespace HTTP;
 
-Server::RequestHeadHandler::RequestHeadHandler(Server const *server,
+Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 											   const Request &request)
 	: RequestHandler(server, request), _reader(1000, _resource_path)
 {
