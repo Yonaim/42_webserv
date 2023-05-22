@@ -91,7 +91,7 @@ void IOProcessor::read(const int fd, const size_t size)
 	_rdbuf[fd] += std::string(buff, buff + readsize);
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Read " << readsize << " bytes: \""
-				  << buff << "\"\n";
+				  << std::string(buff, buff + readsize) << "\"\n";
 	delete[] buff;
 }
 
