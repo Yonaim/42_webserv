@@ -49,11 +49,11 @@ void HTTP::Response::setStatus(int status_code)
 		throw(std::runtime_error("wrong status code"));
 	_status_code = buff;
 
-	std::map<int, std::string>::const_iterator iter
+	std::map<int, std::string>::const_iterator it
 		= STATUS_CODE.find(status_code);
-	if (iter == STATUS_CODE.end())
+	if (it == STATUS_CODE.end())
 		throw(std::runtime_error("wrong status code"));
-	_reason_phrase = iter->second;
+	_reason_phrase = it->second;
 }
 
 void HTTP::Response::setContent(const std::string &content, const std::string &file_path)
@@ -69,13 +69,13 @@ void HTTP::Response::setContentType(const std::string &file_path)
 	if (separator_idx != std::string::npos)
 	{
 		const std::string extension = file_path.substr(separator_idx + 1);
-		const std::map<std::string, std::string>::const_iterator iter
+		const std::map<std::string, std::string>::const_iterator it
 			= MIME_TYPE.find(extension);
-		if (iter == MIME_TYPE.end())
+		if (it == MIME_TYPE.end())
 			// default mime-type
 			setValue("Content-Type", "application/octet-stream");
 		else
-			setValue("Content-Type", iter->second);
+			setValue("Content-Type", it->second);
 	}
 }
 

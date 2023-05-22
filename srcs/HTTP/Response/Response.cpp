@@ -52,6 +52,7 @@ void HTTP::Response::makeStatusLine(void)
 	_response.append(_status_code);
 	_response.append(SP);
 	_response.append(_reason_phrase);
+	_response.append(CRLF);
 }
 
 void HTTP::Response::makeHeader(void)
@@ -66,7 +67,11 @@ void HTTP::Response::makeHeader(void)
 		const std::vector<std::string> values = _header.getValues(it->first);
 		for (std::vector<std::string>::const_iterator val_it = values.begin();
 			 val_it != values.end(); ++val_it)
-			to_append = *val_it + ", ";
+		{
+			to_append += *val_it;
+			if (val_it + 1 != values.end())
+				to_append += ", ";
+		}
 		to_append += CRLF;
 		_response.append(to_append);
 	}
