@@ -31,25 +31,38 @@ int Server::RequestHeadHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
-	int rc = _reader.task();
-	if (rc == async::status::OK)
+	try
 	{
-		const std::string &content = _reader.retrieve();
-		_response.setStatus(200);
-		_response.setContentLength(content.length());
-		_response.setContentType(_resource_path);
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		int rc = _reader.task();
+		if (rc == async::status::OK)
+		{
+			const std::string &content = _reader.retrieve();
+			_response.setStatus(200);
+			_response.setContentLength(content.length());
+			_response.setContentType(_resource_path);
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+		else if (rc == async::status::AGAIN)
+		{
+			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+		}
+		else
+		{
+			// TODO: 예외 처리
+		}
 	}
-	else if (rc == async::status::AGAIN)
+	catch (const async::FileIOProcessor::FileOpeningError &e)
 	{
-		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
-	}
-	else
-	{
-		// TODO: 예외 처리
-		_response.setStatus(404);
-		// _response.setBody(_error_pages.find(404)->second);
+		_response = _server->generateErrorResponse(404); // Not Found;
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_server->_logger << e.what() << async::warning;
+	}
+	catch (const std::exception &e)
+	{
+		// Internal Server Error
+		_response = _server->generateErrorResponse(500);
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_server->_logger << e.what() << async::warning;
 	}
 	return (_status);
 }
