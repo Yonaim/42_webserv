@@ -7,7 +7,7 @@ const std::string &HTTP::Server::Location::getRoot(void) const
 	return (_root);
 }
 
-bool HTTP::Server::Location::isAllowedMethod(int method)
+bool HTTP::Server::Location::isAllowedMethod(int method) const
 {
 	const std::set<int>::const_iterator iter = _allowed_methods.find(method);
 
