@@ -31,6 +31,7 @@ class Header
 
 	void assign(const std::string &name, const std::vector<std::string> values);
 	void insert(const std::string &name, const std::vector<std::string> values);
+	void insert(const std::string &name, const std::string value);
 
 	iterator begin(void);
 	iterator end(void);
