@@ -38,7 +38,16 @@ template <typename T> std::string toStr(T num)
 	return (ss.str());
 }
 
-template <typename T> T toNum(std::string str)
+template <typename T> T toNum(std::string &str)
+{
+	T num;
+	std::istringstream ss(str);
+
+	ss >> num;
+	return (num);
+}
+
+template <typename T> T toNum(const std::string &str)
 {
 	T num;
 	std::istringstream ss(str);
