@@ -33,7 +33,7 @@ class Server::Location
 
 	// 추가
 	const std::string &getRoot(void) const;
-	bool isAllowedMethod(int method);
+	bool isAllowedMethod(int method) const;
 };
 } // namespace HTTP
 #endif

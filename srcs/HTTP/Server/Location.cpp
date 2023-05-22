@@ -115,6 +115,7 @@ void HTTP::Server::Location::parseDirectiveIndex(
 	const size_t n_indexs = location_context.countDirectivesByName("index");
 	if (n_indexs == 0)
 		return;
+	_has_index = true;
 	for (size_t i = 0; i < n_indexs; i++)
 	{
 		const ConfigDirective &index_directive

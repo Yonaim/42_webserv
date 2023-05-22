@@ -121,10 +121,11 @@ int HTTP::Request::parse(std::string &buffer)
 				else if (_header.hasValue("Content-Length"))
 				{
 					// Content-length >= 0이라면
+					if (_method == METHOD_GET || _method == METHOD_HEAD || _method == METHOD_DELETE)
+						throwException(CONSUME_EXC_INVALID_FIELD);
 					const std::string &content_length
 						= getHeaderValue("Content-Length", 0);
 					_logger << "header has Content-Length" << async::debug;
-
 					_logger << "content-length : " << content_length
 							<< async::debug;
 					_content_length = toNum<int>(content_length);
@@ -135,6 +136,8 @@ int HTTP::Request::parse(std::string &buffer)
 						_current_state = PARSE_STATE_BODY;
 					}
 				}
+				else if (_method == METHOD_POST)
+					throwException(CONSUME_EXC_INVALID_FIELD);
 				else
 					return (RETURN_TYPE_OK);
 			}

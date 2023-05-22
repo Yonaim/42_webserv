@@ -38,6 +38,7 @@ HTTP::Response::~Response(void)
 // convert to string
 std::string HTTP::Response::toString(void)
 {
+	setDate();
 	_response.clear();
 	makeStatusLine();
 	makeHeader();

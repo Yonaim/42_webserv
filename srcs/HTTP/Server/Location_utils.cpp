@@ -6,7 +6,7 @@ const std::string &HTTP::Server::Location::getRoot(void) const
 	return (_root);
 }
 
-bool HTTP::Server::Location::isAllowedMethod(int method)
+bool HTTP::Server::Location::isAllowedMethod(int method) const
 {
 	const std::set<int>::const_iterator iter = _allowed_methods.find(method);
 
@@ -16,8 +16,15 @@ bool HTTP::Server::Location::isAllowedMethod(int method)
 const HTTP::Server::Location &HTTP::Server::getLocation(
 	const std::string &path) const
 {
-	std::map<std::string, Location>::const_iterator iter
-		= _locations.find(path);
+	std::map<std::string, Location>::const_iterator iter = _locations.begin();
+
+	for (; iter != _locations.end(); ++iter)
+	{
+		const std::string key = iter->first;
+
+		if (path.find(key) == 0)
+			break;
+	}
 
 	if (iter == _locations.end())
 		throw(LocationNotFound(path));

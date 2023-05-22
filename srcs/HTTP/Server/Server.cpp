@@ -124,10 +124,19 @@ void HTTP::Server::ensureClientConnected(int client_fd)
 
 void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
+	const Server::Location &location = getLocation(request.getURIPath());
+	const int method = request.getMethod();
+	if (!location.isAllowedMethod(method))
+	{
+		_logger << "Method " << METHOD_STR[method] << " is not allowed"
+				<< async::info;
+		registerErrorResponse(client_fd, 405); // Method Not Allowed
+	}
+
 	RequestHandler *handler;
 	try
 	{
-		switch (request.getMethod())
+		switch (method)
 		{
 		case METHOD_GET:
 			handler = new RequestGetHandler(this, request);
