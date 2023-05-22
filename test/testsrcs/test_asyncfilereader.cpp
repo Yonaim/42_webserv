@@ -1,5 +1,5 @@
 #include "async/FileIOProcessor.hpp"
-#include "async/JobStatus.hpp"
+#include "async/status.hpp"
 #include <iostream>
 
 int main(int argc, char **argv)
@@ -17,9 +17,9 @@ int main(int argc, char **argv)
 		while (true)
 		{
 			rc = reader.task();
-			if (rc == async::JobStatus::OK)
+			if (rc == async::status::OK)
 				break;
-			else if (rc == async::JobStatus::AGAIN)
+			else if (rc == async::status::AGAIN)
 				continue;
 			else
 				throw(std::logic_error("Impossible return code"));

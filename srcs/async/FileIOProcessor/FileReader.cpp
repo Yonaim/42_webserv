@@ -1,5 +1,5 @@
 #include "async/FileIOProcessor.hpp"
-#include "async/JobStatus.hpp"
+#include "async/status.hpp"
 
 using namespace async;
 
@@ -33,7 +33,7 @@ FileReader::~FileReader()
 
 int FileReader::task(void)
 {
-	if (_status == JobStatus::OK)
+	if (_status == status::OK)
 		return (_status);
 
 	checkTimeout();
@@ -45,7 +45,7 @@ int FileReader::task(void)
 	catch (const IOProcessor::FileClosed &e)
 	{
 		_writer.getReadBuf(_buffer);
-		_status = JobStatus::OK;
+		_status = status::OK;
 	}
 	return (_status);
 }

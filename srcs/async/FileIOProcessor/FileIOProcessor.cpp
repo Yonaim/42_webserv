@@ -1,5 +1,5 @@
 #include "async/FileIOProcessor.hpp"
-#include "async/JobStatus.hpp"
+#include "async/status.hpp"
 #include "utils/string.hpp"
 #include <fcntl.h>
 #include <unistd.h>
@@ -31,14 +31,14 @@ FileIOProcessor::FileIOProcessor(void) : _writer(0)
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
-	: _writer(fd), _status(JobStatus::AGAIN), _buffer(""),
+	: _writer(fd), _status(status::AGAIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
 {
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
-	: _writer(getFdByPath(path)), _status(JobStatus::AGAIN), _buffer(""),
+	: _writer(getFdByPath(path)), _status(status::AGAIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(true)
 {
 }
@@ -70,7 +70,7 @@ void FileIOProcessor::checkTimeout(void)
 
 std::string FileIOProcessor::retrieve(void)
 {
-	if (_status != JobStatus::OK)
+	if (_status != status::OK)
 		throw(std::logic_error("FileIOProcessor: File is not yet loaded."));
 	return (_buffer);
 }

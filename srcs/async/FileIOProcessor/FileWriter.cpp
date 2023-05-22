@@ -1,5 +1,5 @@
 #include "async/FileIOProcessor.hpp"
-#include "async/JobStatus.hpp"
+#include "async/status.hpp"
 
 using namespace async;
 
@@ -37,12 +37,12 @@ FileWriter::~FileWriter()
 
 int FileWriter::task(void)
 {
-	if (_status == JobStatus::OK)
+	if (_status == status::OK)
 		return (_status);
 
 	checkTimeout();
 	_writer.task();
 	if (_writer.writeDone())
-		_status = JobStatus::OK;
+		_status = status::OK;
 	return (_status);
 }

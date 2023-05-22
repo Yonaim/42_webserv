@@ -32,7 +32,7 @@ int Server::RequestHeadHandler::task(void)
 		return (_status);
 
 	int rc = _reader.task();
-	if (rc == async::JobStatus::OK)
+	if (rc == async::status::OK)
 	{
 		const std::string &content = _reader.retrieve();
 		_response.setStatus(200);
@@ -40,7 +40,7 @@ int Server::RequestHeadHandler::task(void)
 		_response.setContentType(_resource_path);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
-	else if (rc == async::JobStatus::AGAIN)
+	else if (rc == async::status::AGAIN)
 	{
 		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
 	}
