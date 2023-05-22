@@ -1,4 +1,5 @@
 #include "HTTP/RequestHandler.hpp"
+#include <errno.h>
 #include <unistd.h>
 
 using namespace HTTP;
@@ -36,9 +37,18 @@ int Server::RequestDeleteHandler::task(void)
 
 	if (unlink(_resource_path.c_str()) == -1)
 	{
-		_response.setStatus(404);
-		// _response.setBody(_error_pages.find(404)->second);
-		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+		switch (errno)
+		{
+		case ENOENT:
+			// Not Found;
+			_response = _server->generateErrorResponse(404);
+			break;
+		default:
+			// Internal Server Error;
+			_response = _server->generateErrorResponse(500);
+			break;
+		}
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
 	else
 	{
