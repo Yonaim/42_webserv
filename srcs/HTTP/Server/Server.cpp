@@ -1,5 +1,6 @@
 #include "HTTP/Server.hpp"
 #include "../const_values.hpp"
+#include "../error_pages.hpp"
 #include "ConfigDirective.hpp"
 #include "utils/string.hpp"
 #include <cctype>
@@ -40,6 +41,31 @@ int HTTP::Server::getPort(void) const
 	return (_port);
 }
 
+std::string HTTP::Server::getErrorPage(const int code)
+{
+	if (_error_pages.find(code) == _error_pages.end())
+		return (generateErrorPage(code));
+	int rc = _error_pages[code]->task();
+	if (rc != async::status::OK)
+		return (generateErrorPage(code));
+	return (_error_pages[code]->retrieve());
+}
+
+HTTP::Response HTTP::Server::generateErrorResponse(const int code)
+{
+	Response response;
+
+	std::string body = getErrorPage(code);
+	response.setBody(body);
+	response.setStatus(code);
+	return (response);
+}
+
+void HTTP::Server::registerErrorResponse(const int fd, const int code)
+{
+	_output_queue[fd].push(generateErrorResponse(code));
+}
+
 void HTTP::Server::task(void)
 {
 	for (std::map<int, std::queue<RequestHandler *> >::iterator it
@@ -62,9 +88,7 @@ void HTTP::Server::task(void)
 		else if (rc == RequestHandler::RESPONSE_STATUS_AGAIN)
 			continue;
 		else
-		{
-			// TODO: 예외 처리
-		}
+			registerErrorResponse(client_fd, 500); // Internal Server Error
 	}
 }
 
@@ -100,28 +124,41 @@ void HTTP::Server::ensureClientConnected(int client_fd)
 
 void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
-	RequestHandler *handler;
-	switch (request.getMethod())
+	const Server::Location &location = getLocation(request.getURIPath());
+	const int method = request.getMethod();
+	if (!location.isAllowedMethod(method))
 	{
-	case METHOD_GET:
-		handler = new RequestGetHandler(this, request);
-		break;
-	case METHOD_HEAD:
-		handler = new RequestHeadHandler(this, request);
-		break;
-	case METHOD_POST:
-		handler = new RequestPostHandler(this, request);
-		break;
-	case METHOD_DELETE:
-		handler = new RequestDeleteHandler(this, request);
-		break;
-	default:
-		throw(ServerException(501));
-		// TODO:
-		// 501 not implemented 에러 반환
-		// 이전에 파싱한 부분 약간 수정해야할듯
-		// 존재하지 않는 메소드는 METHOD_NONE으로 저장해놓고 여기서 에러
-		// 핸들링하도록
+		_logger << "Method " << METHOD_STR[method] << " is not allowed"
+				<< async::info;
+		registerErrorResponse(client_fd, 405); // Method Not Allowed
+	}
+
+	RequestHandler *handler;
+	try
+	{
+		switch (method)
+		{
+		case METHOD_GET:
+			handler = new RequestGetHandler(this, request);
+			break;
+		case METHOD_HEAD:
+			handler = new RequestHeadHandler(this, request);
+			break;
+		case METHOD_POST:
+			handler = new RequestPostHandler(this, request);
+			break;
+		case METHOD_DELETE:
+			handler = new RequestDeleteHandler(this, request);
+			break;
+		default:
+			registerErrorResponse(client_fd, 501); // Not Implemented
+			return;
+		}
+	}
+	catch (const LocationNotFound &e)
+	{
+		_logger << e.what() << async::warning;
+		registerErrorResponse(client_fd, 404); // Not Found
 	}
 
 	if (_request_handlers.find(client_fd) == _request_handlers.end())

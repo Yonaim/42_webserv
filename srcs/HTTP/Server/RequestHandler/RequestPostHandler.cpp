@@ -3,7 +3,7 @@
 
 using namespace HTTP;
 
-Server::RequestPostHandler::RequestPostHandler(Server const *server,
+Server::RequestPostHandler::RequestPostHandler(Server *server,
 											   const Request &request)
 	: RequestHandler(server, request),
 	  _writer(1000, _resource_path, request.getBody())
