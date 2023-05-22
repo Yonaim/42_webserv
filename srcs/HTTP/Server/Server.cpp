@@ -100,8 +100,13 @@ void HTTP::Server::ensureClientConnected(int client_fd)
 
 void HTTP::Server::registerRequest(int client_fd, const Request &request)
 {
+	const Server::Location &location = getLocation(request.getURIPath());
+	const int method = request.getMethod();
+	if (!location.isAllowedMethod(method))
+		throw(ServerException(405));
+
 	RequestHandler *handler;
-	switch (request.getMethod())
+	switch (method)
 	{
 	case METHOD_GET:
 		handler = new RequestGetHandler(this, request);
