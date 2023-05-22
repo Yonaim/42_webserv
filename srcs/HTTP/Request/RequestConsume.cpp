@@ -53,7 +53,7 @@ int HTTP::Request::consumeStartLine(std::string &buffer)
 	{
 		if (tokens[0] == METHOD_STR[i])
 		{
-			_method = i + 1;
+			_method = i;
 			break;
 		}
 	}
