@@ -64,5 +64,12 @@ int Server::RequestGetHandler::task(void)
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		_server->_logger << e.what() << async::warning;
 	}
+	catch (const std::exception &e)
+	{
+		// Internal Server Error
+		_response = _server->generateErrorResponse(500);
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_server->_logger << e.what() << async::warning;
+	}
 	return (_status);
 }
