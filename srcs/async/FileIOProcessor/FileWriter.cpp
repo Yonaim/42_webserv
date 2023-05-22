@@ -1,5 +1,6 @@
 #include "async/FileIOProcessor.hpp"
 #include "async/status.hpp"
+#include <fcntl.h>
 
 using namespace async;
 
@@ -39,7 +40,7 @@ int FileWriter::task(void)
 		return (_status);
 	if (_status == status::BEGIN)
 	{
-		openFdByPath();
+		openFdByPath(O_WRONLY | O_CREAT);
 		_processor = new SingleIOProcessor(_fd);
 		_processor->setWriteBuf(_content);
 		_status = status::AGAIN;

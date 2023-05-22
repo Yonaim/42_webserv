@@ -7,12 +7,12 @@
 using namespace async;
 typedef unsigned long long ull_t;
 
-void FileIOProcessor::openFdByPath(void)
+void FileIOProcessor::openFdByPath(int oflag)
 {
 	if (!_should_close)
 		return;
-	int fd = ::open(_path.c_str(), O_RDWR | O_CREAT,
-					S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	int fd
+		= ::open(_path.c_str(), oflag, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd < 0)
 		throw(FileIOProcessor::FileOpeningError(_path, strerror(errno)));
 	_fd = fd;

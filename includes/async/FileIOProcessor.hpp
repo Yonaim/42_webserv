@@ -25,7 +25,7 @@ class FileIOProcessor
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
 	void checkTimeout(void);
-	void openFdByPath(void);
+	void openFdByPath(int oflag);
 
   public:
 	class Timeout : public std::runtime_error
