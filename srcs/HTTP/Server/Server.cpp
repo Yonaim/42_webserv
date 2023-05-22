@@ -64,8 +64,22 @@ void HTTP::Server::task(void)
 
 bool HTTP::Server::isForMe(const HTTP::Request &request)
 {
-	(void)request;
-	_logger << "Unimplemented stub of " << __func__ << async::error;
+	if (!request.hasHeaderValue("Host"))
+		throw(std::runtime_error(
+			"HTTP Request has no header field with name \"Host\""));
+	// TODO: Host 헤더 필드가 여러개일 때 예외 처리
+	const std::string &host = request.getHeaderValue("Host", 0);
+	_logger << "Request is for host \"" << host << "\"" << async::debug;
+	for (std::set<std::string>::iterator it = _server_name.begin();
+		 it != _server_name.end(); it++)
+	{
+		if (*it == host)
+		{
+			_logger << "Request host match with \"" << host << "\""
+					<< async::debug;
+			return (true);
+		}
+	}
 	return (false);
 }
 
