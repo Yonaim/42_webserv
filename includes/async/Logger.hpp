@@ -1,7 +1,7 @@
 #ifndef ASYNCLOGGER_HPP
 #define ASYNCLOGGER_HPP
 
-#include "async//SingleIOProcessor.hpp"
+#include "async/SingleIOProcessor.hpp"
 #include <map>
 #include <sstream>
 #include <string>

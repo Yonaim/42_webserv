@@ -1,8 +1,8 @@
 #ifndef TCPIOPROCESSOR_HPP
 #define TCPIOPROCESSOR_HPP
 
-#include "async//IOProcessor.hpp"
-#include "async//Logger.hpp"
+#include "async/IOProcessor.hpp"
+#include "async/Logger.hpp"
 
 namespace async
 {
