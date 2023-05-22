@@ -4,6 +4,7 @@
 #include "ConfigDirective.hpp"
 #include "HTTP/Request.hpp"
 #include "HTTP/Response.hpp"
+#include "async/FileIOProcessor.hpp"
 #include "async/Logger.hpp"
 #include "async/TCPIOProcessor.hpp"
 #include <queue>
@@ -24,12 +25,11 @@ class Server
 
   private:
 	class Location;
-	class ServerException;
 
 	int _port;
 	std::set<std::string> _server_name;
 	std::string _root;
-	std::map<int, std::string> _error_pages;
+	std::map<int, async::FileReader *> _error_pages;
 	std::map<std::string, Location> _locations;
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
@@ -42,8 +42,13 @@ class Server
 	void parseDirectiveLocation(const ConfigContext &server_context);
 	void ensureClientConnected(int client_fd);
 	static bool isValidStatusCode(const int &status_code);
+	std::string getErrorPage(const int code);
+	Response generateErrorResponse(const int code);
+	void registerErrorResponse(const int fd, const int code);
 
   public:
+	class LocationNotFound;
+
 	Server(const ConfigContext &server_context);
 	~Server();
 	Server(const Server &orig);
@@ -60,12 +65,11 @@ class Server
 
 	// 추가
 	const Location &getLocation(const std::string &location) const;
-	void setErrorPage(HTTP::Response &response, int status_code);
 	std::string getResourcePath(const Request &req) const;
 };
 } // namespace HTTP
 
-#include "HTTP/ServerException.hpp"
+#include "HTTP/ServerExceptions.hpp"
 #include "HTTP/ServerLocation.hpp"
 #include "RequestHandler.hpp"
 

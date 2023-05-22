@@ -1,10 +1,11 @@
+#include "./error_pages.hpp"
 #include "./const_values.hpp"
 #include "utils/string.hpp"
 #include <sstream>
 
 using namespace HTTP;
 
-std::string generateErrorPage(const int code)
+std::string HTTP::generateErrorPage(const int code)
 {
 	if (code < 300 || code >= 600)
 		throw(std::runtime_error(std::string(__func__)

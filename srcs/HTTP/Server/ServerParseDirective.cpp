@@ -62,9 +62,10 @@ void HTTP::Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			int code = toNum<int>(code_str);
 			if (!isValidStatusCode(code))
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
-			_error_pages[code] = file_path;
-			_logger << "parsed error page " << file_path << " for code " << code
-					<< async::debug;
+			// TODO: 타임아웃 정해야함
+			_error_pages[code] = new async::FileReader(1000, _root + file_path);
+			_logger << "parsed error page " << _root + file_path << " for code "
+					<< code << async::debug;
 		}
 	}
 }

@@ -58,8 +58,7 @@ int Server::RequestGetHandler::task(void)
 	}
 	catch (const async::FileIOProcessor::FileOpeningError &e)
 	{
-		_response.setStatus(404);
-		// _response.setBody(_error_pages.find(404)->second);
+		_response = _server->generateErrorResponse(404); // Not Found;
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		_server->_logger << e.what() << async::warning;
 	}
