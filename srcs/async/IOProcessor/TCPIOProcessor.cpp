@@ -95,6 +95,9 @@ void TCPIOProcessor::initialize(void)
 	if (_listening_socket < 0)
 		throw(std::runtime_error(std::string("Error while creating socket: ")
 								 + strerror(errno)));
+	int option = 1;
+	setsockopt(_listening_socket, SOL_SOCKET, SO_REUSEADDR, &option,
+			   sizeof(option));
 	_logger << "Created socket " << _listening_socket << async::verbose;
 
 	struct sockaddr_in addr;
