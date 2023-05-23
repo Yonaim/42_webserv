@@ -63,7 +63,8 @@ class Server::RequestHeadHandler : public Server::RequestHandler
 class Server::RequestPostHandler : public Server::RequestHandler
 {
   private:
-	async::FileWriter _writer;
+	async::FileWriter *_writer;
+	void *_cgi_handler;
 
   public:
 	RequestPostHandler(Server *server, const Request &request,
