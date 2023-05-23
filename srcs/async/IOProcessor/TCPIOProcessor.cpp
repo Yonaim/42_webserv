@@ -127,10 +127,12 @@ void TCPIOProcessor::initialize(void)
 
 void TCPIOProcessor::finalize(const char *with_error)
 {
+	_logger << "Finalize TCPIOProcessor" << async::verbose;
 	close(_listening_socket);
 	_listening_socket = 0;
 	if (with_error)
-		throw(std::runtime_error(with_error));
+		throw(std::runtime_error(std::string("Error from TCPIOProcessor: ")
+								 + with_error));
 }
 
 void TCPIOProcessor::accept(void)
