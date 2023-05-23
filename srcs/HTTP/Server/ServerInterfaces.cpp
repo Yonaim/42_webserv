@@ -75,16 +75,16 @@ void Server::registerRequest(int client_fd, const Request &request)
 		switch (method)
 		{
 		case METHOD_GET:
-			handler = new RequestGetHandler(this, request);
+			handler = new RequestGetHandler(this, request, location);
 			break;
 		case METHOD_HEAD:
-			handler = new RequestHeadHandler(this, request);
+			handler = new RequestHeadHandler(this, request, location);
 			break;
 		case METHOD_POST:
-			handler = new RequestPostHandler(this, request);
+			handler = new RequestPostHandler(this, request, location);
 			break;
 		case METHOD_DELETE:
-			handler = new RequestDeleteHandler(this, request);
+			handler = new RequestDeleteHandler(this, request, location);
 			break;
 		default:
 			registerErrorResponse(client_fd, 501); // Not Implemented
@@ -103,8 +103,8 @@ void Server::registerRequest(int client_fd, const Request &request)
 		_output_queue[client_fd] = std::queue<Response>();
 	}
 	_request_handlers[client_fd].push(handler);
-	_logger << "Registered RequestHandler for "
-			<< METHOD[request.getMethod()] << async::debug;
+	_logger << "Registered RequestHandler for " << METHOD[request.getMethod()]
+			<< async::debug;
 }
 
 Response Server::retrieveResponse(int client_fd)

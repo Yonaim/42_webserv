@@ -4,30 +4,15 @@
 
 using namespace HTTP;
 
-Server::RequestDeleteHandler::RequestDeleteHandler(Server *server,
-												   const Request &request)
-	: RequestHandler(server, request)
+Server::RequestDeleteHandler::RequestDeleteHandler(
+	Server *server, const Request &request, const Server::Location &location)
+	: RequestHandler(server, request, location)
 {
 	//
 }
 
 Server::RequestDeleteHandler::~RequestDeleteHandler()
 {
-}
-
-// 호출 금지
-Server::RequestDeleteHandler::RequestDeleteHandler(
-	const RequestDeleteHandler &orig)
-	: Server::RequestHandler(orig._server, orig._request)
-{
-}
-
-// 호출 금지
-Server::RequestDeleteHandler &Server::RequestDeleteHandler::operator=(
-	const RequestDeleteHandler &orig)
-{
-	(void)orig;
-	return (*this);
 }
 
 int Server::RequestDeleteHandler::task(void)

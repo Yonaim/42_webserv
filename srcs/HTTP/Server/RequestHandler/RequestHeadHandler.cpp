@@ -3,27 +3,14 @@
 using namespace HTTP;
 
 Server::RequestHeadHandler::RequestHeadHandler(Server *server,
-											   const Request &request)
-	: RequestHandler(server, request), _reader(1000, _resource_path)
+											   const Request &request,
+											   const Server::Location &location)
+	: RequestHandler(server, request, location), _reader(1000, _resource_path)
 {
 }
 
 Server::RequestHeadHandler::~RequestHeadHandler()
 {
-}
-
-// 호출 금지
-Server::RequestHeadHandler::RequestHeadHandler(const RequestHeadHandler &orig)
-	: Server::RequestHandler(orig._server, orig._request), _reader(0, 0)
-{
-}
-
-// 호출 금지
-Server::RequestHeadHandler &Server::RequestHeadHandler::operator=(
-	const RequestHeadHandler &orig)
-{
-	(void)orig;
-	return (*this);
 }
 
 int Server::RequestHeadHandler::task(void)

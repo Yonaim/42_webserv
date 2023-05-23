@@ -4,28 +4,15 @@
 using namespace HTTP;
 
 Server::RequestPostHandler::RequestPostHandler(Server *server,
-											   const Request &request)
-	: RequestHandler(server, request),
+											   const Request &request,
+											   const Server::Location &location)
+	: RequestHandler(server, request, location),
 	  _writer(1000, _resource_path, request.getBody())
 {
 }
 
 Server::RequestPostHandler::~RequestPostHandler()
 {
-}
-
-// 호출 금지
-Server::RequestPostHandler::RequestPostHandler(const RequestPostHandler &orig)
-	: Server::RequestHandler(orig._server, orig._request), _writer(0, 0, 0)
-{
-}
-
-// 호출 금지
-Server::RequestPostHandler &Server::RequestPostHandler::operator=(
-	const RequestPostHandler &orig)
-{
-	(void)orig;
-	return (*this);
 }
 
 int Server::RequestPostHandler::task(void)

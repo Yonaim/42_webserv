@@ -4,27 +4,14 @@
 using namespace HTTP;
 
 Server::RequestGetHandler::RequestGetHandler(Server *server,
-											 const Request &request)
-	: RequestHandler(server, request), _reader(1000, _resource_path)
+											 const Request &request,
+											 const Server::Location &location)
+	: RequestHandler(server, request, location), _reader(1000, _resource_path)
 {
 }
 
 Server::RequestGetHandler::~RequestGetHandler()
 {
-}
-
-// 호출 금지
-Server::RequestGetHandler::RequestGetHandler(const RequestGetHandler &orig)
-	: Server::RequestHandler(orig._server, orig._request), _reader(0, 0)
-{
-}
-
-// 호출 금지
-Server::RequestGetHandler &Server::RequestGetHandler::operator=(
-	const RequestGetHandler &orig)
-{
-	(void)orig;
-	return (*this);
 }
 
 // uri = <스킴>://<사용자
