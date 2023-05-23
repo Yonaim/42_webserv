@@ -51,7 +51,8 @@ int Request::consumeStartLine(std::string &buffer)
 	_logger << async::debug;
 
 	/* method index 구하기 */
-	for (BidiMap<std::string, int>::const_iterator it = METHOD.begin(); it != METHOD.end(); it++)
+	for (BidiMap<std::string, int>::const_iterator it = METHOD.begin();
+		 it != METHOD.end(); it++)
 	{
 		if (tokens[0] == it->first)
 		{
@@ -157,8 +158,6 @@ int Request::consumeHeader(std::string &buffer)
 
 int Request::consumeBody(std::string &buffer)
 {
-	// size_t content_length = 0; // TODO: 헤더 맵에서 Content-length 파싱해오기
-
 	if (buffer.size() < static_cast<size_t>(_content_length))
 	{
 		_logger << __func__ << ": not enough buffer size" << async::debug;
@@ -182,10 +181,10 @@ int Request::consumeChunk(std::string &buffer)
 		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
+
 	const int content_length = strtol(buffer.c_str(), NULL, 16);
 	_logger << __func__ << ": content length " << content_length
 			<< async::debug;
-	// TODO: content length 0일때 마지막 청크 처리
 	if (content_length < 0)
 	{
 		_logger << __func__ << ": negative content length of chunk"
@@ -195,8 +194,10 @@ int Request::consumeChunk(std::string &buffer)
 	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN * 2이면 ok
 	if (buffer.size() < crlf_pos + content_length + CRLF_LEN * 2)
 	{
+		_logger << __func__ << ": not enough buffer size" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
+	_content_length += content_length;
 	_body.append(buffer.substr(crlf_pos + CRLF_LEN, content_length));
 	_logger << __func__ << ": body result in :\"" << _body << "\""
 			<< async::debug;
@@ -224,15 +225,19 @@ int Request::consumeTrailer(std::string &buffer)
 		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
+	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
+	{
+		_logger << __func__ << ": header line only has CRLF (end of header)"
+				<< async::debug;
+		trimfrontstr(buffer, CRLF_LEN);
+		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+				<< async::debug;
+		return (RETURN_TYPE_OK);
+	}
+
 	const std::string header_line = getfrontstr(buffer, crlf_pos);
 	_logger << __func__ << ": header line: " << header_line << async::debug;
-	// Trailer는 헤더와 달리 끝에 CRLF가 하나 더 붙지 않아서 아래 코드
-	// 주석처리함 if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
-	// {
-	// 	trimfrontstr(buffer, CRLF_LEN);
-	// 	return (RETURN_TYPE_OK);
-	// }
-
+	
 	/** name 파싱 **/
 	size_t key_end_idx = 0;
 	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
@@ -303,26 +308,4 @@ int Request::consumeTrailer(std::string &buffer)
 		return (RETURN_TYPE_OK);
 	else
 		return (RETURN_TYPE_IN_PROCESS);
-}
-
-int Request::consumeCRLF(std::string &buffer)
-{
-	const size_t crlf_pos = buffer.find(CRLF);
-	if (crlf_pos == std::string::npos)
-	{
-		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
-		return (RETURN_TYPE_AGAIN);
-	}
-	else if (crlf_pos == 0)
-	{
-		trimfrontstr(buffer, CRLF_LEN);
-		return (RETURN_TYPE_OK);
-	}
-	else
-	{
-		_error_offset = 0;
-		throwException(CONSUME_EXC_INVALID_FORMAT);
-	}
-	/* unreachable */
-	return (RETURN_TYPE_INVALID);
 }

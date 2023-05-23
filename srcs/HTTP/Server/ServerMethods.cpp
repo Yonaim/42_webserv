@@ -22,6 +22,7 @@ std::string Server::getErrorPage(const int code)
 	else if (rc == async::status::AGAIN)
 		return (generateErrorPage(code));
 	// TODO: 예외 처리
+	return ("");
 }
 
 Response Server::generateErrorResponse(const int code)

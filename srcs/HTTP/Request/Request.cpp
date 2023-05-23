@@ -4,14 +4,14 @@
 
 static const char *consume_exc_description[]
 	= {"Empty line found", "Invalid format", "Invalid header field",
-	   "Invalid header value"};
+	   "Invalid header value", "Invalid body size"};
 
 static const char *parse_state_str[]
-	= {"start line", "header", "body", "chunk", "trailer", "CRLF after chunk"};
+	= {"start line", "header", "body", "chunk", "trailer"};
 
 HTTP::Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE),
-	  _logger(async::Logger::getLogger("Request"))
+	  _content_length(0), _logger(async::Logger::getLogger("Request"))
 {
 }
 
@@ -23,7 +23,8 @@ HTTP::Request::Request(const Request &orig)
 	: _method(orig._method), _uri(orig._uri),
 	  _version_string(orig._version_string), _version(orig._version),
 	  _header(orig._header), _body(orig._body),
-	  _current_state(orig._current_state), _logger(orig._logger)
+	  _current_state(orig._current_state),
+	  _content_length(orig._content_length), _logger(orig._logger)
 {
 }
 
@@ -38,15 +39,16 @@ HTTP::Request &HTTP::Request::operator=(const HTTP::Request &orig)
 		_header = orig._header;
 		_body = orig._body;
 		_current_state = orig._current_state;
+		_content_length = orig._content_length;
 	}
 	return (*this);
 }
 
-int HTTP::Request::parse(std::string &buffer)
+int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 {
 	// TODO: 디버그 완료 후 하단 변수 삭제
 	const char *state_names[] = {"STARTLINE", "HEADER",  "BODY",
-								 "CHUNK",     "TRAILER", "CRLF AFTER CHUNK"};
+								 "CHUNK",     "TRAILER"};
 	const char *code_names[] = {"OK", "INVALID", "AGAIN", "IN PROCESS"};
 
 	while (true)
@@ -120,15 +122,31 @@ int HTTP::Request::parse(std::string &buffer)
 				}
 				else if (_header.hasValue("Content-Length"))
 				{
-					// Content-length >= 0이라면
-					if (_method == METHOD_GET || _method == METHOD_HEAD || _method == METHOD_DELETE)
+					if (_method == METHOD_GET || _method == METHOD_HEAD
+						|| _method == METHOD_DELETE)
 						throwException(CONSUME_EXC_INVALID_FIELD);
 					const std::string &content_length
 						= getHeaderValue("Content-Length", 0);
 					_logger << "header has Content-Length" << async::debug;
 					_logger << "content-length : " << content_length
 							<< async::debug;
-					_content_length = toNum<int>(content_length);
+					try
+					{
+						_content_length = toNum<size_t>(content_length);
+					}
+					catch (const std::exception &e)
+					{
+						throwException(CONSUME_EXC_INVALID_VALUE);
+					}
+
+					if (_content_length > client_max_body_size)
+					{
+						_error_offset = 0;
+						_logger << __func__
+								<< ": exceeds the client_max_body_size"
+								<< async::debug;
+						throwException(CONSUME_EXC_INVALID_SIZE);
+					}
 					if (_content_length >= 0)
 					{
 						_logger << "header has Content-Length >= 0"
@@ -153,12 +171,14 @@ int HTTP::Request::parse(std::string &buffer)
 			rc = consumeBody(buffer);
 			_logger << "Got return code " << code_names[rc] << async::debug;
 			return (rc);
-			break;
 
 		case PARSE_STATE_CHUNK:
 			rc = consumeChunk(buffer);
 			_logger << "Got return code " << code_names[rc] << async::debug;
-
+			_logger << "total content length " << _content_length << async::debug;
+			_logger << "client max body size " << client_max_body_size << async::debug;
+			if (_content_length > client_max_body_size)
+				throwException(CONSUME_EXC_INVALID_SIZE);
 			if (rc == RETURN_TYPE_OK)
 			{
 				if (_header.hasValue("Trailer"))
@@ -167,7 +187,7 @@ int HTTP::Request::parse(std::string &buffer)
 					_current_state = PARSE_STATE_TRAILER;
 				}
 				else
-					_current_state = PARSE_STATE_CRLF_AFTER_CHUNK;
+					return (RETURN_TYPE_OK);
 			}
 			else if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
@@ -178,16 +198,7 @@ int HTTP::Request::parse(std::string &buffer)
 		case PARSE_STATE_TRAILER:
 			rc = consumeTrailer(buffer);
 			_logger << "Got return code " << code_names[rc] << async::debug;
-			if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
-			else
-				_current_state = PARSE_STATE_CRLF_AFTER_CHUNK;
-			break;
-		case PARSE_STATE_CRLF_AFTER_CHUNK:
-			rc = consumeCRLF(buffer);
-			_logger << "Got return code " << code_names[rc] << async::debug;
 			return (rc);
-			break;
 		}
 	}
 }
@@ -196,7 +207,7 @@ void HTTP::Request::throwException(int code) const
 {
 	std::stringstream what;
 
-	if (code < 0 || code > CONSUME_EXC_INVALID_VALUE)
+	if (code < 0 || code > CONSUME_EXC_INVALID_SIZE)
 		what << "Unknown error";
 	else
 		what << consume_exc_description[code];
