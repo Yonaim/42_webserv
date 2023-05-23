@@ -40,7 +40,7 @@ int Server::RequestGetHandler::task(void)
 		// _status = _cgi_handler->task();
 	}
 
-	if (_cgi_handler)
+	if (_reader)
 	{
 		/* TODO: 현재 얻어진 resourcePath가 유효하지 않고, _has_index =
 		 * true;인경우 모든 index를 유효한 경로 후보로 두고 resourcePath를 새로
