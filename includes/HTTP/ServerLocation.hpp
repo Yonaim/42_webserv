@@ -11,11 +11,15 @@ class Server::Location
 	bool _has_index;
 	bool _do_redirection;
 	bool _autoindex;
+	bool _upload_allowed;
+	bool _cgi_enabled;
 	std::string _path;
 	std::string _root;
 	std::vector<std::string> _index;
 	std::pair<int, std::string> _redirection;
 	std::set<int> _allowed_methods;
+	std::string _upload_store_path;
+	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
 	async::Logger &_logger;
 
   public:
@@ -30,6 +34,8 @@ class Server::Location
 	void parseDirectiveReturn(const ConfigContext &location_context);
 	void parseDirectiveAutoIndex(const ConfigContext &location_context);
 	void parseDirectiveIndex(const ConfigContext &location_context);
+	void parseDirectiveUpload(const ConfigContext &location_context);
+	void parseDirectiveCGI(const ConfigContext &location_context);
 	const std::string &getPath(void) const;
 
 	// 추가

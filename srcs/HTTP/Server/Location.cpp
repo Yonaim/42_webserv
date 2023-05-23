@@ -185,18 +185,91 @@ void Server::Location::parseDirectiveIndex(
 	}
 }
 
+void Server::Location::parseDirectiveUpload(
+	const ConfigContext &location_context)
+{
+	const char *dir_name = "upload_path";
+	const size_t n_indexs = location_context.countDirectivesByName(dir_name);
+	if (n_indexs == 0)
+		return;
+	if (n_indexs > 1)
+	{
+		_logger << location_context.name() << " should have 0 or 1 " << dir_name
+				<< async::error;
+		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+	_upload_allowed = true;
+	_logger << "Uploading to " << _root << " enabled" << async::verbose;
+	const ConfigDirective &upload_directive
+		= location_context.getNthDirectiveByName(dir_name, 0);
+	if (upload_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		upload_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	if (upload_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		upload_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	_upload_store_path = upload_directive.parameter(0);
+}
+
+void Server::Location::parseDirectiveCGI(const ConfigContext &location_context)
+{
+	const char *dir_name = "cgi_extension";
+	const size_t n_indexs = location_context.countDirectivesByName(dir_name);
+	if (n_indexs == 0)
+		return;
+	if (n_indexs > 1)
+	{
+		_logger << location_context.name() << " should have 0 or 1 " << dir_name
+				<< async::error;
+		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+	_cgi_enabled = true;
+	const ConfigDirective &cgi_directive
+		= location_context.getNthDirectiveByName(dir_name, 0);
+	if (cgi_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		cgi_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	// 맨대토리 버젼, 1개의 아규먼트만 허용
+	if (cgi_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	_cgi_extensions.insert(cgi_directive.parameter(0));
+	_logger << "CGI call to " << _root << " in " << cgi_directive.parameter(0)
+			<< " enabled" << async::verbose;
+	/*
+	보너스 대비한 버젼
+	if (cgi_directive.nParameters() < 1)
+	{
+		_logger << dir_name << " should have more than 0 parameter(s)"
+				<< async::error;
+		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	for (size_t i = 0; i < cgi_directive.nParameters(); i++)
+	{
+		_cgi_extensions.insert(cgi_directive.parameter(i));
+		_logger << "CGI call to " << _root << " in "
+				<< cgi_directive.parameter(i) << " enabled" << async::verbose;
+	}
+	*/
+}
+
 Server::Location::Location() : _logger(async::Logger::getLogger("Location"))
 {
 }
 
 Server::Location::Location(const ConfigContext &location_context)
-	: _logger(async::Logger::getLogger("Location"))
+	: _has_index(false), _do_redirection(false), _autoindex(false),
+	  _upload_allowed(false), _cgi_enabled(false),
+	  _logger(async::Logger::getLogger("Location"))
 {
-	// 기본값
-	this->_has_index = false;
-	this->_do_redirection = false;
-	this->_autoindex = false;
-
 	if (location_context.nParameters() != 1)
 		location_context.throwException(PARSINGEXC_INVALID_N_ARG);
 	_path = location_context.parameter(0);
@@ -206,6 +279,8 @@ Server::Location::Location(const ConfigContext &location_context)
 	parseDirectiveReturn(location_context);
 	parseDirectiveAutoIndex(location_context);
 	parseDirectiveIndex(location_context);
+	parseDirectiveUpload(location_context);
+	parseDirectiveCGI(location_context);
 }
 
 Server::Location::~Location()
@@ -214,10 +289,12 @@ Server::Location::~Location()
 
 Server::Location::Location(const Location &orig)
 	: _has_index(orig._has_index), _do_redirection(orig._do_redirection),
-	  _autoindex(orig._autoindex), _path(orig._path), _root(orig._root),
+	  _autoindex(orig._autoindex), _upload_allowed(orig._upload_allowed),
+	  _cgi_enabled(orig._cgi_enabled), _path(orig._path), _root(orig._root),
 	  _index(orig._index), _redirection(orig._redirection),
 	  _allowed_methods(orig._allowed_methods),
-	  _logger(async::Logger::getLogger("Location"))
+	  _upload_store_path(orig._upload_store_path),
+	  _cgi_extensions(orig._cgi_extensions), _logger(orig._logger)
 {
 }
 
@@ -226,11 +303,15 @@ Server::Location &Server::Location::operator=(const Location &orig)
 	_has_index = orig._has_index;
 	_do_redirection = orig._do_redirection;
 	_autoindex = orig._autoindex;
+	_upload_allowed = orig._upload_allowed;
+	_cgi_enabled = orig._cgi_enabled;
 	_path = orig._path;
 	_root = orig._root;
 	_index = orig._index;
 	_redirection = orig._redirection;
 	_allowed_methods = orig._allowed_methods;
+	_upload_store_path = orig._upload_store_path;
+	_cgi_extensions = orig._cgi_extensions;
 	return (*this);
 }
 
