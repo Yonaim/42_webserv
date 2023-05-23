@@ -67,6 +67,14 @@ void Server::registerRequest(int client_fd, const Request &request)
 		_logger << "Method " << METHOD[method] << " is not allowed"
 				<< async::info;
 		registerErrorResponse(client_fd, 405); // Method Not Allowed
+		return;
+	}
+	if (location.doRedirect())
+	{
+		_logger << "Location " << location.getRoot() << " redirect the request"
+				<< async::debug;
+		registerRedirectResponse(client_fd, location);
+		return;
 	}
 
 	RequestHandler *handler;
