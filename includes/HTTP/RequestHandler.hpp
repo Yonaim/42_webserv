@@ -37,7 +37,8 @@ class Server::RequestHandler
 class Server::RequestGetHandler : public Server::RequestHandler
 {
   private:
-	async::FileReader _reader;
+	async::FileReader *_reader;
+	void *_cgi_handler;
 
   public:
 	RequestGetHandler(Server *server, const Request &request,
