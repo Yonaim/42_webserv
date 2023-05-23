@@ -123,7 +123,7 @@ void Server::Location::parseDirectiveReturn(
 void Server::Location::parseDirectiveAutoIndex(
 	const ConfigContext &location_context)
 {
-	const char *dir_name = "auto_index";
+	const char *dir_name = "autoindex";
 	_autoindex = false;
 	const size_t n_auto_indexs
 		= location_context.countDirectivesByName(dir_name);
@@ -143,9 +143,15 @@ void Server::Location::parseDirectiveAutoIndex(
 		auto_index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	if (auto_index_directive.parameter(0) == "off")
+	{
+		_logger << "autoindex set to off" << async::debug;
 		return;
+	}
 	else if (auto_index_directive.parameter(0) == "on")
+	{
+		_logger << "autoindex set to on" << async::debug;
 		_autoindex = true;
+	}
 	else
 	{
 		_logger << dir_name << " should have parameter either \"on\" or \"off\""
