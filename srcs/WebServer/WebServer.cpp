@@ -135,7 +135,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			_request_buffer[port][client_fd] = HTTP::Request();
 
 		int rc
-			= _request_buffer[port][client_fd].parse(tcp_proc.rdbuf(client_fd));
+			= _request_buffer[port][client_fd].parse(tcp_proc.rdbuf(client_fd), _max_body_size);
 
 		switch (rc)
 		{

@@ -14,7 +14,9 @@ enum consume_exc_e
 	CONSUME_EXC_EMPTY_LINE = 0,
 	CONSUME_EXC_INVALID_FORMAT,
 	CONSUME_EXC_INVALID_FIELD,
-	CONSUME_EXC_INVALID_VALUE
+	CONSUME_EXC_INVALID_VALUE,
+	CONSUME_EXC_INVALID_SIZE,
+
 };
 
 class Request
@@ -38,7 +40,7 @@ class Request
 	int _current_state;   // enum parse_state_e
 	size_t _error_offset; // 에러가 발생한 위치
 	std::vector<std::string> _trailer_values;
-	int _content_length;
+	size_t _content_length;
 	async::Logger &_logger;
 
 	int consumeStartLine(std::string &buffer);
@@ -61,7 +63,7 @@ class Request
 	Request(const Request &orig);
 	Request &operator=(const Request &orig);
 
-	int parse(std::string &buffer);
+	int parse(std::string &buffer, size_t client_max_body_size);
 
 	bool hasHeaderValue(const Header::const_iterator &name_iter,
 						const std::string &value) const;

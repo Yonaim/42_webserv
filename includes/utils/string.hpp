@@ -43,7 +43,16 @@ template <typename T> T toNum(std::string &str)
 	T num;
 	std::istringstream ss(str);
 
-	ss >> num;
+	if (!(ss >> num))
+	{
+		throw std::invalid_argument("Invalid input: '" + str + "'");
+	}
+
+	char remaining;
+	if (ss >> remaining)
+	{
+		throw std::invalid_argument("Invalid input: '" + str + "'");
+	}
 	return (num);
 }
 
@@ -52,7 +61,16 @@ template <typename T> T toNum(const std::string &str)
 	T num;
 	std::istringstream ss(str);
 
-	ss >> num;
+	if (!(ss >> num))
+	{
+		throw std::invalid_argument("Invalid input: '" + str + "'");
+	}
+
+	char remaining;
+	if (ss >> remaining)
+	{
+		throw std::invalid_argument("Invalid input: '" + str + "'");
+	}
 	return (num);
 }
 
