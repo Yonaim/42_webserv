@@ -179,6 +179,43 @@ void Server::Location::parseDirectiveIndex(
 	}
 }
 
+void Server::Location::parseDirectiveCgiExtension(
+	const ConfigContext &location_context)
+{
+	const char *dir_name = "cgi_extension";
+	const size_t n_cgi_extensions
+		= location_context.countDirectivesByName(dir_name);
+	if (n_cgi_extensions == 0)
+		return;
+
+	const ConfigDirective &cgi_extension_directive
+		= location_context.getNthDirectiveByName(dir_name, 0);
+	if (n_cgi_extensions > 1)
+	{
+		_logger << location_context.name() << " should have 0 or 1 " << dir_name
+				<< async::error;
+		cgi_extension_directive.throwException(PARSINGEXC_DUP_DIR);
+	}
+	if (cgi_extension_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		cgi_extension_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+
+	const size_t n_extension = cgi_extension_directive.nParameters();
+	if (n_extension == 0)
+	{
+		_logger << dir_name << " should have more than 0 parameter(s)"
+				<< async::error;
+		cgi_extension_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+
+	for (size_t j = 0; j < n_extension; j++)
+	{
+		_cgi_extensions.push_back(cgi_extension_directive.parameter(j));
+	}
+}
+
 Server::Location::Location() : _logger(async::Logger::getLogger("Location"))
 {
 }
