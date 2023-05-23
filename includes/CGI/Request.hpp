@@ -35,8 +35,8 @@ class Request
 	Request();
 	~Request();
 	Request(const HTTP::Request &http_request);
-	Request(const Request &cgi_request);
-	const Request &operator=(const Request &cgi_request);
+	Request(const Request &orig);
+	const Request &operator=(const Request &orig);
 
 	// 생성자에서 사용할 파싱 메서드 추가 예정
 };
