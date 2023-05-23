@@ -9,6 +9,7 @@ DIR_ASYNCFILE		= $(DIR_ASYNC)FileIOProcessor/
 DIR_ASYNCLOGGER		= $(DIR_ASYNC)Logger/
 DIR_CONFIG_PARSER 	= ConfigParser/
 DIR_HTTP 			= HTTP/
+DIR_CGI 			= CGI/
 DIR_WEBSERVER		= WebServer/
 
 DIR_TESTSRCS 		= test/testsrcs/
@@ -79,6 +80,8 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/ServerInterfaces \
 					$(DIR_HTTP)Server/ServerParseDirective \
 					$(DIR_HTTP)Server/LocationNotFound \
+					$(DIR_CGI)Request \
+					$(DIR_CGI)Response \
 					$(DIR_WEBSERVER)WebServer \
 
 SRCS				= $(addprefix $(DIR_SRCS), $(addsuffix .cpp, $(FILENAMES)))
