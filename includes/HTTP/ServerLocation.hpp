@@ -22,13 +22,6 @@ class Server::Location
 	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
 	async::Logger &_logger;
 
-  public:
-	Location();
-	Location(const ConfigContext &location_context);
-	~Location();
-	Location(const Location &orig);
-	Location &operator=(const Location &orig);
-
 	void parseDirectiveRoot(const ConfigContext &location_context);
 	void parseDirectiveLimitExcept(const ConfigContext &location_context);
 	void parseDirectiveReturn(const ConfigContext &location_context);
@@ -36,9 +29,15 @@ class Server::Location
 	void parseDirectiveIndex(const ConfigContext &location_context);
 	void parseDirectiveUpload(const ConfigContext &location_context);
 	void parseDirectiveCGI(const ConfigContext &location_context);
-	const std::string &getPath(void) const;
 
-	// 추가
+  public:
+	Location();
+	Location(const ConfigContext &location_context);
+	~Location();
+	Location(const Location &orig);
+	Location &operator=(const Location &orig);
+
+	const std::string &getPath(void) const;
 	const std::string &getRoot(void) const;
 	const std::string &getNthIndex(size_t nth) const;
 	bool isAllowedMethod(int method) const;
