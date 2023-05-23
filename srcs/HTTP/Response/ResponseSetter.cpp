@@ -14,22 +14,10 @@ void Response::setValue(const std::string &name, const std::string &value)
 void Response::setDate(void)
 {
 	time_t cur_time = time(NULL);
-	tm *tm_gmt = gmtime(&cur_time);
+	tm *gmt_time = gmtime(&cur_time);
+	static char date[100];
 
-	static const std::string month[]
-		= {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-		   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-	static const std::string day_name[]
-		= {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-
-	std::string date(day_name[tm_gmt->tm_wday] + ", ");
-
-	date.append(toStr(tm_gmt->tm_mday / 10, tm_gmt->tm_mday % 10) + " ");
-	date.append(month[tm_gmt->tm_mon] + " ");
-	date.append(toStr(tm_gmt->tm_year + 1900) + " ");
-	date.append(toStr(tm_gmt->tm_hour / 10, tm_gmt->tm_hour % 10) + ":");
-	date.append(toStr(tm_gmt->tm_min / 10, tm_gmt->tm_min % 10) + ":");
-	date.append(toStr(tm_gmt->tm_sec / 10, tm_gmt->tm_sec % 10) + " GMT");
+	strftime(date, sizeof(date), "%a, %d %b %Y %T GMT", gmt_time);
 	setValue("Date", date);
 }
 
