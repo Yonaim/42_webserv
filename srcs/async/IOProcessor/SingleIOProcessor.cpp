@@ -44,8 +44,9 @@ void SingleIOProcessor::task(void)
 		_eventlist.pop_front();
 		if (flags & EV_ERROR)
 		{
-			throw(std::runtime_error(std::string("I/O Error from fd ")
-									 + toStr(_fd)));
+			throw(std::runtime_error(
+				std::string("Failed to register EVFILT code " + toStr(event)
+							+ " into kqueue, data " + toStr(data))));
 		}
 		else if (event == EVFILT_READ)
 		{

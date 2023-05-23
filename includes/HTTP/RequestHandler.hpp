@@ -53,7 +53,8 @@ class Server::RequestGetHandler : public Server::RequestHandler
 class Server::RequestHeadHandler : public Server::RequestHandler
 {
   private:
-	async::FileReader _reader;
+	async::FileReader *_reader;
+	void *_cgi_handler;
 
   public:
 	RequestHeadHandler(Server *server, const Request &request,
