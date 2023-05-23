@@ -18,6 +18,7 @@ std::string getfrontstr(const std::string &str, size_t until);
 void trimbackstr(std::string &str, size_t until);
 std::string getbackstr(const std::string &str, size_t from);
 void trimfrontstr(std::string &str, size_t from);
+std::string getExtension(const std::string &filename);
 
 // conversion
 std::string uintToStr(size_t num);

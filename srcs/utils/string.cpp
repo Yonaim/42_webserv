@@ -166,3 +166,11 @@ void trimfrontstr(std::string &str, size_t from)
 {
 	str = str.substr(from, str.size() - from);
 }
+
+std::string getExtension(const std::string &filename)
+{
+	size_t pos = filename.rfind('.');
+	if (pos != std::string::npos)
+		return (filename.substr(pos + 1));
+	return ("");
+}
