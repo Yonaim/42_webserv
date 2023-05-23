@@ -7,7 +7,7 @@ static const char *consume_exc_description[]
 	   "Invalid header value"};
 
 static const char *parse_state_str[]
-	= {"start line", "header", "body", "chunk", "trailer", "CRLF after chunk"};
+	= {"start line", "header", "body", "chunk", "trailer"};
 
 HTTP::Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE),
@@ -46,7 +46,7 @@ int HTTP::Request::parse(std::string &buffer)
 {
 	// TODO: 디버그 완료 후 하단 변수 삭제
 	const char *state_names[] = {"STARTLINE", "HEADER",  "BODY",
-								 "CHUNK",     "TRAILER", "CRLF AFTER CHUNK"};
+								 "CHUNK",     "TRAILER"};
 	const char *code_names[] = {"OK", "INVALID", "AGAIN", "IN PROCESS"};
 
 	while (true)
@@ -167,7 +167,7 @@ int HTTP::Request::parse(std::string &buffer)
 					_current_state = PARSE_STATE_TRAILER;
 				}
 				else
-					_current_state = PARSE_STATE_CRLF_AFTER_CHUNK;
+					return (RETURN_TYPE_OK);
 			}
 			else if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
@@ -178,16 +178,8 @@ int HTTP::Request::parse(std::string &buffer)
 		case PARSE_STATE_TRAILER:
 			rc = consumeTrailer(buffer);
 			_logger << "Got return code " << code_names[rc] << async::debug;
-			if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
-			else
-				_current_state = PARSE_STATE_CRLF_AFTER_CHUNK;
-			break;
-		case PARSE_STATE_CRLF_AFTER_CHUNK:
-			rc = consumeCRLF(buffer);
-			_logger << "Got return code " << code_names[rc] << async::debug;
 			return (rc);
-			break;
+
 		}
 	}
 }

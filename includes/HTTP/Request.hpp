@@ -26,8 +26,7 @@ class Request
 		PARSE_STATE_HEADER,
 		PARSE_STATE_BODY,
 		PARSE_STATE_CHUNK,
-		PARSE_STATE_TRAILER,
-		PARSE_STATE_CRLF_AFTER_CHUNK
+		PARSE_STATE_TRAILER
 	};
 
 	int _method;
@@ -46,7 +45,6 @@ class Request
 	int consumeHeader(std::string &buffer);
 	int consumeBody(std::string &buffer);
 	int consumeChunk(std::string &buffer);
-	int consumeCRLF(std::string &buffer);
 	int consumeTrailer(std::string &buffer);
 	void throwException(int code) const;
 
