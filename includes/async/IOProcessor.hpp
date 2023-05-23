@@ -29,6 +29,7 @@ class IOProcessor
 
   public:
 	class FileClosed;
+	class FileIsDirectory;
 	class ReadError;
 	class WriteError;
 
@@ -52,6 +53,13 @@ class IOProcessor::FileClosed : public std::runtime_error
 {
   public:
 	FileClosed(void);
+};
+
+class IOProcessor::FileIsDirectory : public std::runtime_error
+{
+  public:
+	FileIsDirectory(void);
+	FileIsDirectory(const std::string &path);
 };
 
 class IOProcessor::ReadError : public std::runtime_error
