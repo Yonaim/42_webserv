@@ -42,6 +42,9 @@ class Server::Location
 	const std::string &getNthIndex(size_t nth) const;
 	bool isAllowedMethod(int method) const;
 	bool hasIndex() const;
+	bool uploadAllowed() const;
+	bool cgiEnabled() const;
+	bool isCGIextension(const std::string &path) const;
 };
 } // namespace HTTP
 #endif

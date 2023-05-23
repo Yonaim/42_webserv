@@ -87,3 +87,21 @@ bool Server::Location::hasIndex() const
 {
 	return (_has_index);
 }
+
+bool Server::Location::uploadAllowed() const
+{
+	return (_upload_allowed);
+}
+
+bool Server::Location::cgiEnabled() const
+{
+	return (_cgi_enabled);
+}
+
+bool Server::Location::isCGIextension(const std::string &path) const
+{
+	std::string ext = getExtension(path);
+	if (ext == "")
+		return (false);
+	return (_cgi_extensions.find(ext) != _cgi_extensions.end());
+}
