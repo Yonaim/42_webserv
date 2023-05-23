@@ -28,8 +28,8 @@ class Response
 	Response();
 	~Response();
 	Response(const std::string &cgi_output);
-	Response(const Response &cgi_response);
-	const Response &operator=(const Response &cgi_response);
+	Response(const Response &orig);
+	const Response &operator=(const Response &orig);
 
 	// getter
 	int getType() const;
