@@ -44,38 +44,41 @@ void Server::Location::parseDirectiveLimitExcept(
 		return;
 	_allowed_methods.clear();
 
-	for (size_t i = 0; i < n_limit_excepts; i++)
+	const ConfigDirective &limit_except_directive
+		= location_context.getNthDirectiveByName(dir_name, 0);
+	if (n_limit_excepts > 1)
 	{
-		const ConfigDirective &limit_except_directive
-			= location_context.getNthDirectiveByName(dir_name, i);
-		if (limit_except_directive.is_context())
-		{
-			_logger << dir_name << " should not be context" << async::error;
-			limit_except_directive.throwException(PARSINGEXC_UNDEF_DIR);
-		}
+		_logger << location_context.name() << " should have 0 or 1 " << dir_name
+				<< async::error;
+		limit_except_directive.throwException(PARSINGEXC_DUP_DIR);
+	}
+	if (limit_except_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		limit_except_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
 
-		const size_t n_methods = limit_except_directive.nParameters();
-		if (n_methods == 0)
+	const size_t n_methods = limit_except_directive.nParameters();
+	if (n_methods == 0)
+	{
+		_logger << dir_name << " should have more than 0 parameter(s)"
+				<< async::error;
+		limit_except_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+
+	for (size_t j = 0; j < n_methods; j++)
+	{
+		const BidiMap<std::string, int>::const_iterator it
+			= METHOD.find(limit_except_directive.parameter(j));
+		if (it == METHOD.end())
 		{
-			_logger << dir_name << " should have more than 0 parameter(s)"
+			_logger << dir_name << " has invalid HTTP method"
 					<< async::error;
-			limit_except_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+			limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
 		}
 
-		for (size_t j = 0; j < n_methods; j++)
-		{
-			const BidiMap<std::string, int>::const_iterator it
-				= METHOD.find(limit_except_directive.parameter(j));
-			if (it == METHOD.end())
-			{
-				_logger << dir_name << " has invalid HTTP method"
-						<< async::error;
-				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
-			}
-
-			const int method = it->second;
-				_allowed_methods.insert(method);
-		}
+		const int method = it->second;
+		_allowed_methods.insert(method);
 	}
 }
 
