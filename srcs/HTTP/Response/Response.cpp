@@ -90,6 +90,18 @@ void Response::makeBody(void)
 	_response.append(_body);
 }
 
+void Response::alignAutoIndex(size_t minus_len, int to_align)
+{
+	if (!(AUTOINDEX_ALIGN_FILE_NAME <= to_align
+		  && to_align <= AUTOINDEX_ALIGN_FILE_SIZE))
+		throw std::runtime_error("alignAutoIndex: wrong argument(to_align)");
+
+	const int size[] = {51, 20};
+	int align_size = size[to_align] - minus_len;
+	for (int i = 0; i < align_size; ++i)
+		_body.append(" ");
+}
+
 void Response::makeDirectoryListing(const std::string &path,
 									const std::string &uri)
 {
@@ -112,6 +124,7 @@ void Response::makeDirectoryListing(const std::string &path,
 	struct dirent *dir_info;
 	std::string file_name;
 	std::string file_path;
+	std::string file_size;
 	char birth_time[50];
 
 	dir_stream = opendir(path.c_str());
@@ -124,15 +137,22 @@ void Response::makeDirectoryListing(const std::string &path,
 	{
 		file_name = dir_info->d_name;
 		file_path = path + "/" + file_name;
-		std::cerr << "file_name : " << file_name << std::endl;
-		_body.append("<a href=\"" + file_name + "\">" + file_name + "</a>");
 		if (stat(file_path.c_str(), &file_info) == 0)
 		{
+			if (file_info.st_mode & S_IFDIR)
+				file_name += '/';
+			_body.append("<a href=\"" + file_name + "\">" + file_name + "</a>");
 			strftime(birth_time, sizeof(birth_time), "%d-%b-%Y %R",
-					gmtime(&file_info.st_birthtimespec.tv_sec));
-			_body.append("                                         ");
+					 gmtime(&file_info.st_mtimespec.tv_sec));
+			alignAutoIndex(file_name.length(), AUTOINDEX_ALIGN_FILE_NAME);
 			_body.append(birth_time);
-			_body.append("                 " + toStr(file_info.st_size) + "\n");
+			if (file_info.st_mode & S_IFDIR)
+				file_size = "-";
+			else
+				file_size = toStr(file_info.st_size);
+			alignAutoIndex(file_size.length(), AUTOINDEX_ALIGN_FILE_SIZE);
+			_body.append(file_size);
+			_body.append("\n");
 		}
 	}
 	closedir(dir_stream);
@@ -142,14 +162,3 @@ void Response::makeDirectoryListing(const std::string &path,
 
 	setContentLength(_body.length());
 }
-
-// 	_body.append("<html>\n"
-// "<head><title>Index of /</title></head>\n"
-// "<body>\n"
-// "<h1>Index of /</h1><hr><pre><a href=\"../\">../</a>\n"
-// "<a href=\"1/\">1/</a>                                                 23-May-2023 05:31                   -\n"
-// "<a href=\"2/\">2/</a>                                                 23-May-2023 05:31                   -\n"
-// "<a href=\"3/\">3/</a>                                                 23-May-2023 05:31                   -\n"
-// "<a href=\"index.html\">index.html</a>                                         23-May-2023 05:26                 107\n"
-// "</pre><hr></body>\n"
-// "</html>\n");

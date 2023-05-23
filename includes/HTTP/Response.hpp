@@ -38,6 +38,7 @@ class Response
 	void makeStatusLine(void);
 	void makeHeader(void);
 	void makeBody(void);
+	void alignAutoIndex(size_t minus_len, int to_align);
 
 	std::string _response;
 
@@ -46,6 +47,12 @@ class Response
 	std::string _reason_phrase;
 	Header _header;
 	std::string _body;
+
+	enum e_autoindex
+	{
+		AUTOINDEX_ALIGN_FILE_NAME,
+		AUTOINDEX_ALIGN_FILE_SIZE
+	};
 
   public:
 	Response();
