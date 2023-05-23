@@ -58,3 +58,27 @@ const std::string &Server::Location::getPath(void) const
 {
 	return (_path);
 }
+
+const std::string &Server::Location::getRoot(void) const
+{
+	return (_root);
+}
+
+const std::string &Server::Location::getNthIndex(size_t nth) const
+{
+	if (nth > _index.size())
+		throw(std::runtime_error("exceeded the accessible range"));
+	return (_index[nth]);
+}
+
+bool Server::Location::isAllowedMethod(int method) const
+{
+	const std::set<int>::const_iterator iter = _allowed_methods.find(method);
+
+	return (iter != _allowed_methods.end());
+}
+
+bool Server::Location::hasIndex() const
+{
+	return (_has_index);
+}

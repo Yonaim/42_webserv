@@ -33,8 +33,6 @@ class Server::Location
 	void parseDirectiveIndex(const ConfigContext &location_context);
 	void parseDirectiveCgiExtension(const ConfigContext &location_context);
 	const std::string &getPath(void) const;
-
-	// 추가
 	const std::string &getRoot(void) const;
 	const std::string &getNthIndex(size_t nth) const;
 	bool isAllowedMethod(int method) const;
