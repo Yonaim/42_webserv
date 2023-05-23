@@ -1,5 +1,6 @@
 #include "async/FileIOProcessor.hpp"
 #include "async/status.hpp"
+#include "utils/file.hpp"
 #include "utils/string.hpp"
 #include <fcntl.h>
 #include <unistd.h>
@@ -11,6 +12,8 @@ void FileIOProcessor::openFdByPath(int oflag)
 {
 	if (!_should_close)
 		return;
+	if (isDirectory(_path))
+		throw(IOProcessor::FileIsDirectory(_path));
 	int fd
 		= ::open(_path.c_str(), oflag, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd < 0)
