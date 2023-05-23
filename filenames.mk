@@ -82,6 +82,7 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/LocationNotFound \
 					$(DIR_CGI)Request \
 					$(DIR_CGI)Response \
+					$(DIR_CGI)RequestHandler \
 					$(DIR_WEBSERVER)WebServer \
 
 SRCS				= $(addprefix $(DIR_SRCS), $(addsuffix .cpp, $(FILENAMES)))

@@ -9,12 +9,16 @@
 
 namespace CGI
 {
-class Handler
+class RequestHandler
 {
   private:
 	async::FileReader *_reader;
 	async::FileWriter *_writer;
+	Request _request;
 	Response _response;
+	std::string _cgi_path;
+	int _status;
+	int _pipe_fd[2];
 
   public:
 	enum response_status_e
@@ -23,8 +27,8 @@ class Handler
 		CGI_RESPONSE_STATUS_AGAIN
 	};
 
-	Handler(const Request &request);
-	~Handler();
+	RequestHandler(const HTTP::Request &http_request);
+	~RequestHandler();
 
 	int task(void);
 	const CGI::Response &retrieve(void);
