@@ -15,7 +15,7 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 		// _cgi_handler = new CGIHandler(args);
 		return;
 	}
-	if (0)
+	if (location.uploadAllowed())
 	{
 		_writer
 			= new async::FileWriter(1000, _resource_path, request.getBody());
