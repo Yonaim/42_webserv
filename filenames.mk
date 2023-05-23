@@ -73,7 +73,6 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/RequestHandler/RequestDeleteHandler \
 					$(DIR_HTTP)Server/Location \
 					$(DIR_HTTP)Server/LocationParseDirective \
-					$(DIR_HTTP)Server/Location_utils \
 					$(DIR_HTTP)Server/Server \
 					$(DIR_HTTP)Server/ServerMethods \
 					$(DIR_HTTP)Server/ServerInterfaces \
