@@ -66,6 +66,7 @@ class Response
 	void setContentLength(size_t length);
 	void setConnection(bool is_persistent);
 	void setBody(const std::string &body);
+	void setLocation(const std::string &uri);
 };
 } // namespace HTTP
 

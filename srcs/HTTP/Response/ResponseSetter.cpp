@@ -58,7 +58,8 @@ void Response::setStatus(int status_code)
 	_reason_phrase = it->second;
 }
 
-void Response::setContent(const std::string &content, const std::string &file_path)
+void Response::setContent(const std::string &content,
+						  const std::string &file_path)
 {
 	setContentType(file_path);
 	setContentLength(content.length());
@@ -104,4 +105,10 @@ void Response::setConnection(bool is_persistent)
 void Response::setBody(const std::string &body)
 {
 	_body = body;
+}
+
+void Response::setLocation(const std::string &uri)
+{
+	std::vector<std::string> uri_list(1, uri);
+	_header.assign("Location", uri_list);
 }
