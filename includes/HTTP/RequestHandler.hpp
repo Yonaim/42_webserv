@@ -32,6 +32,8 @@ class Server::RequestHandler
 
 	virtual int task(void) = 0;
 	Response retrieve(void);
+	bool isDirectory(void) const;
+	bool isInvalidDirectoryFormat(void) const;
 };
 
 class Server::RequestGetHandler : public Server::RequestHandler

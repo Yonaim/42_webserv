@@ -67,6 +67,7 @@ class Response
 	void setConnection(bool is_persistent);
 	void setBody(const std::string &body);
 	void setLocation(const std::string &uri);
+	void makeDirectoryListing(const std::string &path, const std::string &uri);
 };
 } // namespace HTTP
 

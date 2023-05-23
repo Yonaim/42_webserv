@@ -35,6 +35,14 @@ int Server::RequestGetHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
+	if (isInvalidDirectoryFormat())
+	{
+		_response = _server->generateErrorResponse(301); // Not Found;
+		_response.setValue("Location", _request.getURIPath() + "/");
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_server->_logger << "invalid directory format" << async::warning;
+		return (_status);
+	}
 	if (_cgi_handler)
 	{
 		// _status = _cgi_handler->task();
@@ -74,10 +82,19 @@ int Server::RequestGetHandler::task(void)
 		}
 		catch (const std::exception &e)
 		{
-			// Internal Server Error
-			_response = _server->generateErrorResponse(500);
 			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			_server->_logger << e.what() << async::warning;
+			if (isDirectory() && _location.hasAutoIndex() == true)
+			{
+				_response.makeDirectoryListing(_resource_path,
+											   _request.getURIPath());
+				_server->_logger << "directory listing" << async::verbose;
+			}
+			else
+			{
+				// Internal Server Error
+				_response = _server->generateErrorResponse(500);
+				_server->_logger << e.what() << async::warning;
+			}
 		}
 	}
 
