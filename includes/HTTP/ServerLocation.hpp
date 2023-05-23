@@ -39,10 +39,10 @@ class Server::Location
 
 	const std::string &getPath(void) const;
 	const std::string &getRoot(void) const;
-	const bool 		   getAutoIndex(void) const;
 	const std::string &getNthIndex(size_t nth) const;
 	bool isAllowedMethod(int method) const;
 	bool hasIndex() const;
+	bool hasAutoIndex(void) const;
 	bool doRedirect() const;
 	bool uploadAllowed() const;
 	bool cgiEnabled() const;

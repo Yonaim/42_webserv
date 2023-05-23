@@ -69,11 +69,6 @@ const std::string &Server::Location::getRoot(void) const
 	return (_root);
 }
 
-const bool 		   Server::Location::getAutoIndex(void) const
-{
-	return (_autoindex);
-}
-
 const std::string &Server::Location::getNthIndex(size_t nth) const
 {
 	if (nth > _index.size())
@@ -91,6 +86,11 @@ bool Server::Location::isAllowedMethod(int method) const
 bool Server::Location::hasIndex() const
 {
 	return (_has_index);
+}
+
+bool Server::Location::hasAutoIndex(void) const
+{
+	return (_autoindex);
 }
 
 bool Server::Location::doRedirect() const
