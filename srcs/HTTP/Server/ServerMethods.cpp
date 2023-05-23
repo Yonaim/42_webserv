@@ -17,9 +17,11 @@ std::string Server::getErrorPage(const int code)
 	if (_error_pages.find(code) == _error_pages.end())
 		return (generateErrorPage(code));
 	int rc = _error_pages[code]->task();
-	if (rc != async::status::OK)
+	if (rc == async::status::OK)
+		return (_error_pages[code]->retrieve());
+	else if (rc == async::status::AGAIN)
 		return (generateErrorPage(code));
-	return (_error_pages[code]->retrieve());
+	// TODO: 예외 처리
 }
 
 Response Server::generateErrorResponse(const int code)
