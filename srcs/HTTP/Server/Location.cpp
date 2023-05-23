@@ -88,6 +88,11 @@ bool Server::Location::hasIndex() const
 	return (_has_index);
 }
 
+bool Server::Location::doRedirect() const
+{
+	return (_do_redirection);
+}
+
 bool Server::Location::uploadAllowed() const
 {
 	return (_upload_allowed);
@@ -104,4 +109,12 @@ bool Server::Location::isCGIextension(const std::string &path) const
 	if (ext == "")
 		return (false);
 	return (_cgi_extensions.find(ext) != _cgi_extensions.end());
+}
+
+Response Server::Location::generateRedirectResponse(void) const
+{
+	Response response;
+	response.setStatus(_redirection.first);
+	response.setLocation(_redirection.second);
+	return (response);
 }
