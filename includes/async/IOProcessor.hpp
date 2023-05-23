@@ -1,5 +1,5 @@
-#ifndef IOPROCESSOR_HPP
-#define IOPROCESSOR_HPP
+#ifndef ASYNC_IOPROCESSOR_HPP
+#define ASYNC_IOPROCESSOR_HPP
 
 #include <cstdlib>
 #include <deque>

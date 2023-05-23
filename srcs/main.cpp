@@ -28,7 +28,7 @@ void parseLogLevel(const ConfigContext &root_context)
 	async::Logger::setLogLevel(loglevel_directive.parameter(0));
 	async::Logger::getLogger("root")
 		<< "Set log level to " << loglevel_directive.parameter(0)
-		<< async::verbose;
+		<< async::info;
 }
 
 int main(int argc, char **argv)

@@ -44,14 +44,14 @@ bool Server::isForMe(const Request &request)
 			"HTTP Request has no header field with name \"Host\""));
 	// TODO: Host 헤더 필드가 여러개일 때 예외 처리
 	const std::string &host = request.getHeaderValue("Host", 0);
-	_logger << "Request is for host \"" << host << "\"" << async::debug;
+	_logger << "Request is for host \"" << host << "\"" << async::verbose;
 	for (std::set<std::string>::iterator it = _server_name.begin();
 		 it != _server_name.end(); it++)
 	{
 		if (*it == host)
 		{
 			_logger << "Request host match with \"" << host << "\""
-					<< async::debug;
+					<< async::verbose;
 			return (true);
 		}
 	}
@@ -72,7 +72,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	if (location.doRedirect())
 	{
 		_logger << "Location " << location.getRoot() << " redirect the request"
-				<< async::debug;
+				<< async::verbose;
 		registerRedirectResponse(client_fd, location);
 		return;
 	}
@@ -112,7 +112,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	}
 	_request_handlers[client_fd].push(handler);
 	_logger << "Registered RequestHandler for " << METHOD[request.getMethod()]
-			<< async::debug;
+			<< async::verbose;
 }
 
 Response Server::retrieveResponse(int client_fd)

@@ -42,7 +42,7 @@ void Server::parseDirectiveListen(const ConfigContext &server_context)
 		_logger << dir_name << " has invalid port number" << async::error;
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 	}
-	_logger << "parsed port " << _port << async::debug;
+	_logger << "parsed port " << _port << async::verbose;
 }
 
 void Server::parseDirectiveRoot(const ConfigContext &server_context)
@@ -67,7 +67,7 @@ void Server::parseDirectiveRoot(const ConfigContext &server_context)
 		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	_root = root_directive.parameter(0);
-	_logger << "parsed root " << _root << async::debug;
+	_logger << "parsed root " << _root << async::verbose;
 }
 
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
@@ -107,7 +107,7 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			// TODO: 타임아웃 정해야함
 			_error_pages[code] = new async::FileReader(1000, _root + file_path);
 			_logger << "parsed error page " << _root + file_path << " for code "
-					<< code << async::debug;
+					<< code << async::verbose;
 		}
 	}
 }
@@ -133,7 +133,7 @@ void Server::parseDirectiveServerName(const ConfigContext &server_context)
 		{
 			_server_name.insert(server_name_directive.parameter(i));
 			_logger << "parsed server name "
-					<< server_name_directive.parameter(i) << async::debug;
+					<< server_name_directive.parameter(i) << async::verbose;
 		}
 	}
 }
@@ -161,7 +161,8 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 			location_context.throwException(PARSINGEXC_DUP_DIR);
 		}
 		_locations[new_location.getPath()] = new_location;
-		_logger << "parsed location " << new_location.getPath() << async::debug;
+		_logger << "parsed location " << new_location.getPath()
+				<< async::verbose;
 	}
 }
 

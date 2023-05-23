@@ -1,5 +1,5 @@
-#ifndef IOTASKHANDLER_HPP
-#define IOTASKHANDLER_HPP
+#ifndef ASYNC_IOTASKHANDLER_HPP
+#define ASYNC_IOTASKHANDLER_HPP
 
 #include "async/IOProcessor.hpp"
 #include <vector>

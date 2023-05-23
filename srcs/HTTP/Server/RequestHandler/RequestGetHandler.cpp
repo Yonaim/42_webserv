@@ -71,14 +71,18 @@ int Server::RequestGetHandler::task(void)
 			}
 			else
 			{
-				// TODO: 예외 처리
+				// TODO: 세분화된 예외 처리
+				_response = _server->generateErrorResponse(500);
+				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 			}
+		}
+		catch (const async::IOProcessor::FileIsDirectory &e)
+		{
+			registerErrorResponse(404, e); // Not Found
 		}
 		catch (const async::FileIOProcessor::FileOpeningError &e)
 		{
-			_response = _server->generateErrorResponse(404); // Not Found;
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			_server->_logger << e.what() << async::warning;
+			registerErrorResponse(404, e); // Not Found
 		}
 		catch (const std::exception &e)
 		{
@@ -91,9 +95,7 @@ int Server::RequestGetHandler::task(void)
 			}
 			else
 			{
-				// Internal Server Error
-				_response = _server->generateErrorResponse(500);
-				_server->_logger << e.what() << async::warning;
+				registerErrorResponse(500, e); // Internal Server Error
 			}
 		}
 	}

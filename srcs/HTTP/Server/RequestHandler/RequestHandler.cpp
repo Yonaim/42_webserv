@@ -19,6 +19,14 @@ Server::RequestHandler::~RequestHandler()
 {
 }
 
+void Server::RequestHandler::registerErrorResponse(const int code,
+												   const std::exception &e)
+{
+	_response = _server->generateErrorResponse(code);
+	_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+	_server->_logger << e.what() << async::warning;
+}
+
 Response Server::RequestHandler::retrieve(void)
 {
 	if (_status != RESPONSE_STATUS_OK)

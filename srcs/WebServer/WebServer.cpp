@@ -67,7 +67,7 @@ void WebServer::parseServer(const ConfigContext &server_context)
 {
 	HTTP::Server server(server_context);
 	int port = server.getPort();
-	_logger << "Created Server at port " << port << async::verbose;
+	_logger << "Created Server at port " << port << async::info;
 	if (_tcp_procs.find(port) == _tcp_procs.end())
 	{
 		_tcp_procs[port] = async::TCPIOProcessor(port);

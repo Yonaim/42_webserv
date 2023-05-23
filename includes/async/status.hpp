@@ -1,5 +1,5 @@
-#ifndef STATUS_HPP
-#define STATUS_HPP
+#ifndef ASYNC_STATUS_HPP
+#define ASYNC_STATUS_HPP
 
 namespace async
 {

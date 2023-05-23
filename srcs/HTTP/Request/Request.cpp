@@ -81,14 +81,14 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 					_error_offset = 0;
 					_logger << __func__
 							<< "Header must include Host header field"
-							<< async::verbose;
+							<< async::warning;
 					throwException(CONSUME_EXC_INVALID_VALUE);
 				}
 				if (_header.hasValue("Transfer-Encoding", "chunked"))
 				{
 					// Transfer coding == chunked라면
 					_logger << "header has Transfer-Encoding == chunked"
-							<< async::debug;
+							<< async::verbose;
 					if (_header.hasValue("Trailer"))
 					{
 						/** 유효한 Trailer 헤더 필드 값을 가지고 있는지 확인**/
@@ -109,7 +109,7 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 								throwException(CONSUME_EXC_INVALID_FIELD);
 							}
 						}
-						_logger << "header has Trailer" << async::debug;
+						_logger << "header has Trailer" << async::verbose;
 					}
 					_current_state = PARSE_STATE_CHUNK;
 				}
@@ -117,7 +117,7 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 				{
 					_error_offset = 0;
 					_logger << __func__ << ": Trailer with no Transfer-Encoding"
-							<< async::debug;
+							<< async::warning;
 					throwException(CONSUME_EXC_INVALID_VALUE);
 				}
 				else if (_header.hasValue("Content-Length"))
@@ -127,9 +127,9 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 						throwException(CONSUME_EXC_INVALID_FIELD);
 					const std::string &content_length
 						= getHeaderValue("Content-Length", 0);
-					_logger << "header has Content-Length" << async::debug;
+					_logger << "header has Content-Length" << async::verbose;
 					_logger << "content-length : " << content_length
-							<< async::debug;
+							<< async::verbose;
 					try
 					{
 						_content_length = toNum<size_t>(content_length);
@@ -144,7 +144,7 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 						_error_offset = 0;
 						_logger << __func__
 								<< ": exceeds the client_max_body_size"
-								<< async::debug;
+								<< async::warning;
 						throwException(CONSUME_EXC_INVALID_SIZE);
 					}
 					if (_content_length >= 0)
@@ -175,15 +175,17 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 		case PARSE_STATE_CHUNK:
 			rc = consumeChunk(buffer);
 			_logger << "Got return code " << code_names[rc] << async::debug;
-			_logger << "total content length " << _content_length << async::debug;
-			_logger << "client max body size " << client_max_body_size << async::debug;
+			_logger << "total content length " << _content_length
+					<< async::debug;
+			_logger << "client max body size " << client_max_body_size
+					<< async::debug;
 			if (_content_length > client_max_body_size)
 				throwException(CONSUME_EXC_INVALID_SIZE);
 			if (rc == RETURN_TYPE_OK)
 			{
 				if (_header.hasValue("Trailer"))
 				{
-					_logger << "header has Trailer" << async::debug;
+					_logger << "header has Trailer" << async::verbose;
 					_current_state = PARSE_STATE_TRAILER;
 				}
 				else

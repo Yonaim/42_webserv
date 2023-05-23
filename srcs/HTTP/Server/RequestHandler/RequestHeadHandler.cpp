@@ -5,12 +5,25 @@ using namespace HTTP;
 Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 											   const Request &request,
 											   const Server::Location &location)
-	: RequestHandler(server, request, location), _reader(1000, _resource_path)
+	: RequestHandler(server, request, location), _reader(NULL),
+	  _cgi_handler(NULL)
 {
+	if (location.cgiEnabled() && location.isCGIextension(_resource_path))
+	{
+		// TODO: CGI 핸들러 완성시 주석 해제
+		// _cgi_handler = new CGIHandler(args);
+		return;
+	}
+	_reader = new async::FileReader(1000, _resource_path);
 }
 
 Server::RequestHeadHandler::~RequestHeadHandler()
 {
+	// TODO: CGI 핸들러 완성시 주석 해제
+	// if (_cgi_handler)
+	// 	delete _cgi_handler;
+	if (_reader)
+		delete _reader;
 }
 
 int Server::RequestHeadHandler::task(void)
@@ -18,38 +31,48 @@ int Server::RequestHeadHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
-	try
+	if (_cgi_handler)
 	{
-		int rc = _reader.task();
-		if (rc == async::status::OK)
+		// _status = _cgi_handler->task();
+	}
+
+	if (_reader)
+	{
+		try
 		{
-			const std::string &content = _reader.retrieve();
-			_response.setStatus(200);
-			_response.setContentLength(content.length());
-			_response.setContentType(_resource_path);
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+			int rc = _reader->task();
+			if (rc == async::status::OK)
+			{
+				const std::string &content = _reader->retrieve();
+				_response.setStatus(200);
+				_response.setContentLength(content.length());
+				_response.setContentType(_resource_path);
+				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+			}
+			else if (rc == async::status::AGAIN)
+			{
+				_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+			}
+			else
+			{
+				// TODO: 세분화된 예외 처리
+				_response = _server->generateErrorResponse(500);
+				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+			}
 		}
-		else if (rc == async::status::AGAIN)
+		catch (const async::IOProcessor::FileIsDirectory &e)
 		{
-			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+			registerErrorResponse(404, e); // Not Found
 		}
-		else
+		catch (const async::FileIOProcessor::FileOpeningError &e)
 		{
-			// TODO: 예외 처리
+			registerErrorResponse(404, e); // Not Found
+		}
+		catch (const std::exception &e)
+		{
+			registerErrorResponse(500, e); // Internal Server Error
 		}
 	}
-	catch (const async::FileIOProcessor::FileOpeningError &e)
-	{
-		_response = _server->generateErrorResponse(404); // Not Found;
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		_server->_logger << e.what() << async::warning;
-	}
-	catch (const std::exception &e)
-	{
-		// Internal Server Error
-		_response = _server->generateErrorResponse(500);
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		_server->_logger << e.what() << async::warning;
-	}
+
 	return (_status);
 }

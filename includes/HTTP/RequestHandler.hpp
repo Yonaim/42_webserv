@@ -1,5 +1,5 @@
-#ifndef REQUESTHANDLER_HPP
-#define REQUESTHANDLER_HPP
+#ifndef HTTP_REQUESTHANDLER_HPP
+#define HTTP_REQUESTHANDLER_HPP
 
 #include "HTTP/Request.hpp"
 #include "HTTP/Response.hpp"
@@ -18,6 +18,8 @@ class Server::RequestHandler
 	Response _response;
 	int _status;
 	std::string _resource_path;
+
+	void registerErrorResponse(const int code, const std::exception &e);
 
   public:
 	enum response_status_e
@@ -53,7 +55,8 @@ class Server::RequestGetHandler : public Server::RequestHandler
 class Server::RequestHeadHandler : public Server::RequestHandler
 {
   private:
-	async::FileReader _reader;
+	async::FileReader *_reader;
+	void *_cgi_handler;
 
   public:
 	RequestHeadHandler(Server *server, const Request &request,

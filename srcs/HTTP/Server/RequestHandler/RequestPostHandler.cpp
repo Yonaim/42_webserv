@@ -62,25 +62,18 @@ int Server::RequestPostHandler::task(void)
 			}
 			else
 			{
-				// TODO: 예외 처리
-				_response.setStatus(404);
-				// _response.setBody(_error_pages.find(404)->second);
+				// TODO: 세분화된 예외 처리
+				_response = _server->generateErrorResponse(500);
 				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 			}
 		}
 		catch (const async::FileIOProcessor::FileOpeningError &e)
 		{
-			// Service Unavailable
-			_response = _server->generateErrorResponse(503);
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			_server->_logger << e.what() << async::warning;
+			registerErrorResponse(503, e); // Service Unavailable
 		}
 		catch (const std::exception &e)
 		{
-			// Internal Server Error
-			_response = _server->generateErrorResponse(500);
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			_server->_logger << e.what() << async::warning;
+			registerErrorResponse(500, e); // Internal Server Error
 		}
 	}
 

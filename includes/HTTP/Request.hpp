@@ -1,5 +1,5 @@
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#ifndef HTTP_REQUEST_HPP
+#define HTTP_REQUEST_HPP
 
 #include "HTTP/Header.hpp"
 #include "async/Logger.hpp"
