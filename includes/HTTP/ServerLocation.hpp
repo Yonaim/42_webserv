@@ -16,6 +16,7 @@ class Server::Location
 	std::vector<std::string> _index;
 	std::pair<int, std::string> _redirection;
 	std::set<int> _allowed_methods;
+	std::vector<std::string> _cgi_extensions;
 	async::Logger &_logger;
 
   public:
@@ -30,9 +31,8 @@ class Server::Location
 	void parseDirectiveReturn(const ConfigContext &location_context);
 	void parseDirectiveAutoIndex(const ConfigContext &location_context);
 	void parseDirectiveIndex(const ConfigContext &location_context);
+	void parseDirectiveCgiExtension(const ConfigContext &location_context);
 	const std::string &getPath(void) const;
-
-	// 추가
 	const std::string &getRoot(void) const;
 	const std::string &getNthIndex(size_t nth) const;
 	bool isAllowedMethod(int method) const;

@@ -237,6 +237,7 @@ int Request::consumeTrailer(std::string &buffer)
 
 	const std::string header_line = getfrontstr(buffer, crlf_pos);
 	_logger << __func__ << ": header line: " << header_line << async::debug;
+	
 	/** name 파싱 **/
 	size_t key_end_idx = 0;
 	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
