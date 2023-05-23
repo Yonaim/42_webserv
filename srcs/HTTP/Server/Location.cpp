@@ -69,6 +69,11 @@ const std::string &Server::Location::getRoot(void) const
 	return (_root);
 }
 
+const bool 		   Server::Location::getAutoIndex(void) const
+{
+	return (_autoindex);
+}
+
 const std::string &Server::Location::getNthIndex(size_t nth) const
 {
 	if (nth > _index.size())
