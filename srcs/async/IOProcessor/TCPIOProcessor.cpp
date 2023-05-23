@@ -98,7 +98,7 @@ void TCPIOProcessor::initialize(void)
 	int option = 1;
 	setsockopt(_listening_socket, SOL_SOCKET, SO_REUSEADDR, &option,
 			   sizeof(option));
-	_logger << "Created socket " << _listening_socket << async::verbose;
+	_logger << "Created socket " << _listening_socket << async::info;
 
 	struct sockaddr_in addr;
 	std::memset(&addr, 0, sizeof(struct sockaddr_in));
@@ -110,19 +110,19 @@ void TCPIOProcessor::initialize(void)
 	if (result < 0)
 		finalize(strerror(errno));
 	_logger << "Bind socket " << _listening_socket << " at port " << _port
-			<< async::verbose;
+			<< async::info;
 
 	result = listen(_listening_socket, _backlog);
 	if (result < 0)
 		finalize(strerror(errno));
-	_logger << "Listen with backlog size " << _backlog << async::debug;
+	_logger << "Listen with backlog size " << _backlog << async::info;
 
 	result = fcntl(_listening_socket, F_SETFL, O_NONBLOCK);
 	if (result < 0)
 		finalize(strerror(errno));
 	_watchlist.push_back(constructKevent(_listening_socket, IOEVENT_READ));
 	flushKQueue();
-	_logger << "TCPIOProcessor initialization complete" << async::debug;
+	_logger << "TCPIOProcessor initialization complete" << async::verbose;
 }
 
 void TCPIOProcessor::finalize(const char *with_error)

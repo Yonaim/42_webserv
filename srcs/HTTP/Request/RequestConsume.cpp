@@ -20,14 +20,14 @@ int Request::consumeStartLine(std::string &buffer)
 	if (crlf_pos == 0)
 	{
 		_logger << __func__ << ": buffer's first line is empty"
-				<< async::verbose;
+				<< async::warning;
 		_error_offset = 0;
 		throwException(CONSUME_EXC_EMPTY_LINE);
 	}
 	if (buffer[0] == ' ')
 	{
 		_logger << __func__ << ": buffer's first character is space"
-				<< async::verbose;
+				<< async::warning;
 		_error_offset = 0;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
@@ -40,7 +40,7 @@ int Request::consumeStartLine(std::string &buffer)
 	std::vector<std::string> tokens = split(start_line, ' ');
 	if (tokens.size() != 3)
 	{
-		_logger << __func__ << ": token count mismatch" << async::verbose;
+		_logger << __func__ << ": token count mismatch" << async::warning;
 		_error_offset = start_line.size();
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
@@ -64,7 +64,7 @@ int Request::consumeStartLine(std::string &buffer)
 	_logger << __func__ << ": method index is " << _method << async::debug;
 	if (_method == METHOD_NONE)
 	{
-		_logger << __func__ << ": invalid method" << async::verbose;
+		_logger << __func__ << ": invalid method" << async::warning;
 		_error_offset = tokens[0].size();
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
@@ -72,9 +72,9 @@ int Request::consumeStartLine(std::string &buffer)
 	/* uri, version 파싱 */
 	_uri = tokens[1];
 	_version_string = tokens[2];
-	_logger << __func__ << ": URI: \"" << _uri << "\"" << async::debug;
+	_logger << __func__ << ": URI: \"" << _uri << "\"" << async::verbose;
 	_logger << __func__ << ": version: \"" << _version_string << "\""
-			<< async::debug;
+			<< async::verbose;
 
 	trimfrontstr(buffer, start_line.size() + CRLF_LEN);
 
@@ -110,10 +110,10 @@ int Request::consumeHeader(std::string &buffer)
 	std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
-		_logger << __func__ << ": header has invalid name" << async::verbose;
+		_logger << __func__ << ": header has invalid name" << async::warning;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	_logger << __func__ << ": header name is " << name << async::debug;
+	_logger << __func__ << ": header name is " << name << async::verbose;
 
 	/* value 파싱 */
 	while (std::isspace(header_line[key_end_idx]))
@@ -184,11 +184,11 @@ int Request::consumeChunk(std::string &buffer)
 
 	const int content_length = strtol(buffer.c_str(), NULL, 16);
 	_logger << __func__ << ": content length " << content_length
-			<< async::debug;
+			<< async::verbose;
 	if (content_length < 0)
 	{
 		_logger << __func__ << ": negative content length of chunk"
-				<< async::verbose;
+				<< async::warning;
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
 	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN * 2이면 ok
@@ -203,7 +203,7 @@ int Request::consumeChunk(std::string &buffer)
 			<< async::debug;
 	if (buffer.substr(crlf_pos + CRLF_LEN + content_length, CRLF_LEN) != CRLF)
 	{
-		_logger << __func__ << ": chunk must end with CRLF" << async::verbose;
+		_logger << __func__ << ": chunk must end with CRLF" << async::warning;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 	trimfrontstr(buffer, crlf_pos + CRLF_LEN * 2 + content_length);
@@ -237,17 +237,17 @@ int Request::consumeTrailer(std::string &buffer)
 
 	const std::string header_line = getfrontstr(buffer, crlf_pos);
 	_logger << __func__ << ": header line: " << header_line << async::debug;
-	
+
 	/** name 파싱 **/
 	size_t key_end_idx = 0;
 	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
 	if (name == "" || hasSpace(name))
 	{
-		_logger << __func__ << ": header has invalid name" << async::verbose;
+		_logger << __func__ << ": header has invalid name" << async::warning;
 		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
-	_logger << __func__ << ": header name is " << name << async::debug;
+	_logger << __func__ << ": header name is " << name << async::verbose;
 
 	std::vector<std::string>::iterator iter = _trailer_values.begin();
 	bool found_name = false;
@@ -263,7 +263,7 @@ int Request::consumeTrailer(std::string &buffer)
 	if (found_name == false)
 	{
 		_logger << __func__ << ": Trailer header doesn't have " << name
-				<< async::verbose;
+				<< async::warning;
 		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
@@ -291,12 +291,12 @@ int Request::consumeTrailer(std::string &buffer)
 	/** key가 있다면, 붙여넣기 **/
 	if (!_header.hasValue(name))
 	{
-		_logger << __func__ << ": assign to new header" << async::debug;
+		_logger << __func__ << ": assign to new header" << async::verbose;
 		_header.assign(name, vec_values);
 	}
 	else
 	{
-		_logger << __func__ << ": insert to existing header" << async::debug;
+		_logger << __func__ << ": insert to existing header" << async::verbose;
 		_header.insert(name, vec_values);
 	}
 
