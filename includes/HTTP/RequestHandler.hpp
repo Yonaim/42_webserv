@@ -19,6 +19,8 @@ class Server::RequestHandler
 	int _status;
 	std::string _resource_path;
 
+	void registerErrorResponse(const int code, const std::exception &e);
+
   public:
 	enum response_status_e
 	{
