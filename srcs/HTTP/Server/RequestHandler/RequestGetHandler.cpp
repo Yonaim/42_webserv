@@ -78,25 +78,25 @@ int Server::RequestGetHandler::task(void)
 		}
 		catch (const async::IOProcessor::FileIsDirectory &e)
 		{
-			registerErrorResponse(404, e); // Not Found
-		}
-		catch (const async::FileIOProcessor::FileOpeningError &e)
-		{
-			registerErrorResponse(404, e); // Not Found
-		}
-		catch (const std::exception &e)
-		{
 			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			if (isDirectory() && _location.hasAutoIndex() == true)
+			if (_location.hasAutoIndex() == true)
 			{
 				_response.makeDirectoryListing(_resource_path,
 											   _request.getURIPath());
 				_server->_logger << "directory listing" << async::verbose;
 			}
 			else
-			{
-				registerErrorResponse(500, e); // Internal Server Error
-			}
+				registerErrorResponse(404, e); // Not Found
+		}
+		catch (const async::FileIOProcessor::FileOpeningError &e)
+		{
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+			registerErrorResponse(404, e); // Not Found
+		}
+		catch (const std::exception &e)
+		{
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+			registerErrorResponse(500, e); // Internal Server Error
 		}
 	}
 
