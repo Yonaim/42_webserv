@@ -1,5 +1,5 @@
-#ifndef SERVERLOCATION_HPP
-#define SERVERLOCATION_HPP
+#ifndef HTTP_SERVERLOCATION_HPP
+#define HTTP_SERVERLOCATION_HPP
 
 #include "Server.hpp"
 

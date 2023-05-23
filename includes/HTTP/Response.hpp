@@ -1,5 +1,5 @@
-#ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+#ifndef HTTP_RESPONSE_HPP
+#define HTTP_RESPONSE_HPP
 
 #include "HTTP/Header.hpp"
 

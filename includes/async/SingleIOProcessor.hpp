@@ -1,5 +1,5 @@
-#ifndef SINGLEIOPROCESSOR_HPP
-#define SINGLEIOPROCESSOR_HPP
+#ifndef ASYNC_SINGLEIOPROCESSOR_HPP
+#define ASYNC_SINGLEIOPROCESSOR_HPP
 
 #include "async/IOProcessor.hpp"
 #include <sstream>

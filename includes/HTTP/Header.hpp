@@ -1,5 +1,5 @@
-#ifndef HEADER_HPP
-#define HEADER_HPP
+#ifndef HTTP_HEADER_HPP
+#define HTTP_HEADER_HPP
 
 #include <map>
 #include <string>

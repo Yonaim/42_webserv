@@ -1,5 +1,5 @@
-#ifndef REQUESTHANDLER_HPP
-#define REQUESTHANDLER_HPP
+#ifndef HTTP_REQUESTHANDLER_HPP
+#define HTTP_REQUESTHANDLER_HPP
 
 #include "HTTP/Request.hpp"
 #include "HTTP/Response.hpp"

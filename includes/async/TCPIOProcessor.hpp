@@ -1,5 +1,5 @@
-#ifndef TCPIOPROCESSOR_HPP
-#define TCPIOPROCESSOR_HPP
+#ifndef ASYNC_TCPIOPROCESSOR_HPP
+#define ASYNC_TCPIOPROCESSOR_HPP
 
 #include "async/IOProcessor.hpp"
 #include "async/Logger.hpp"

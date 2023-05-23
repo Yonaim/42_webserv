@@ -1,5 +1,5 @@
-#ifndef ASYNCLOGGER_HPP
-#define ASYNCLOGGER_HPP
+#ifndef ASYNC_LOGGER_HPP
+#define ASYNC_LOGGER_HPP
 
 #include "async/SingleIOProcessor.hpp"
 #include <map>

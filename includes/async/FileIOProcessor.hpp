@@ -1,5 +1,5 @@
-#ifndef FILEIOPROCESSOR_HPP
-#define FILEIOPROCESSOR_HPP
+#ifndef ASYNC_FILEIOPROCESSOR_HPP
+#define ASYNC_FILEIOPROCESSOR_HPP
 
 #include "async/SingleIOProcessor.hpp"
 #include <ctime>
