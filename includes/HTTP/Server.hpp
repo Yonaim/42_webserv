@@ -45,6 +45,8 @@ class Server
 	std::string getErrorPage(const int code);
 	Response generateErrorResponse(const int code);
 	void registerErrorResponse(const int fd, const int code);
+	void registerRedirectResponse(const int fd,
+								  const Server::Location &location);
 
   public:
 	class LocationNotFound;

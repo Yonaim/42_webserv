@@ -42,6 +42,12 @@ void Server::registerErrorResponse(const int fd, const int code)
 	_output_queue[fd].push(generateErrorResponse(code));
 }
 
+void Server::registerRedirectResponse(const int fd,
+									  const Server::Location &location)
+{
+	_output_queue[fd].push(location.generateRedirectResponse());
+}
+
 void Server::ensureClientConnected(int client_fd)
 {
 	if (_output_queue.find(client_fd) == _output_queue.end())
