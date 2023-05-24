@@ -134,8 +134,19 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			== _request_buffer[port].end())
 			_request_buffer[port][client_fd] = HTTP::Request();
 
-		int rc = _request_buffer[port][client_fd].parse(
-			tcp_proc.rdbuf(client_fd), _max_body_size);
+		int rc;
+		try
+		{
+			rc = _request_buffer[port][client_fd].parse(
+				tcp_proc.rdbuf(client_fd), _max_body_size);
+		}
+		catch (const HTTP::Request::ParsingFail &e)
+		{
+			// TODO: Bad Request를 서버에 등록
+			_logger << e.what() << '\n';
+			_request_buffer[port][client_fd] = HTTP::Request();
+			continue;
+		}
 
 		switch (rc)
 		{

@@ -11,7 +11,14 @@ SingleIOProcessor::SingleIOProcessor()
 {
 }
 
-SingleIOProcessor::SingleIOProcessor(const int fd) : _fd(fd)
+SingleIOProcessor::SingleIOProcessor(const int fd)
+	: _fd(fd), _event_option(IO_RW)
+{
+	initialize();
+}
+
+SingleIOProcessor::SingleIOProcessor(const int fd, const int event_option)
+	: _fd(fd), _event_option(event_option)
 {
 	initialize();
 }
@@ -21,7 +28,7 @@ SingleIOProcessor::~SingleIOProcessor()
 }
 
 SingleIOProcessor::SingleIOProcessor(const SingleIOProcessor &orig)
-	: _fd(orig._fd)
+	: _fd(orig._fd), _event_option(orig._event_option)
 {
 	initialize();
 }
@@ -29,6 +36,7 @@ SingleIOProcessor::SingleIOProcessor(const SingleIOProcessor &orig)
 SingleIOProcessor &SingleIOProcessor::operator=(const SingleIOProcessor &orig)
 {
 	_fd = orig._fd;
+	_event_option = orig._event_option;
 	initialize();
 	return (*this);
 }
@@ -70,8 +78,15 @@ void SingleIOProcessor::initialize()
 	if (result < 0)
 		throw(std::runtime_error(std::string("Error while running fcntl at fd ")
 								 + toStr(_fd) + ": " + strerror(errno)));
-	_watchlist.push_back(constructKevent(_fd, IOEVENT_READ));
-	_watchlist.push_back(constructKevent(_fd, IOEVENT_WRITE));
+	if (_event_option == IO_R)
+		_watchlist.push_back(constructKevent(_fd, IOEVENT_READ));
+	else if (_event_option == IO_W)
+		_watchlist.push_back(constructKevent(_fd, IOEVENT_WRITE));
+	else
+	{
+		_watchlist.push_back(constructKevent(_fd, IOEVENT_READ));
+		_watchlist.push_back(constructKevent(_fd, IOEVENT_WRITE));
+	}
 	flushKQueue();
 }
 

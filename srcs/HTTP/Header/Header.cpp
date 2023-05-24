@@ -1,6 +1,4 @@
-#include "HTTP/Header.hpp"
-
-using namespace HTTP;
+#include "Header.hpp"
 
 Header::Header()
 {
@@ -28,8 +26,7 @@ bool Header::hasValue(std::string const &name) const
 	return (false);
 }
 
-bool Header::hasValue(const std::string &name,
-							const std::string &value) const
+bool Header::hasValue(const std::string &name, const std::string &value) const
 {
 	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
@@ -45,7 +42,7 @@ bool Header::hasValue(const std::string &name,
 }
 
 bool Header::hasValue(const Header::const_iterator &iter,
-							const std::string &value) const
+					  const std::string &value) const
 {
 	for (_list::const_iterator value_iter = iter->second.begin();
 		 value_iter != iter->second.end(); ++value_iter)
@@ -56,8 +53,7 @@ bool Header::hasValue(const Header::const_iterator &iter,
 	return (false);
 }
 
-const std::string &Header::getValue(const std::string &name,
-										  int idx) const
+const std::string &Header::getValue(const std::string &name, int idx) const
 {
 	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
@@ -66,8 +62,7 @@ const std::string &Header::getValue(const std::string &name,
 	return (name_iter->second.at(idx));
 }
 
-const std::vector<std::string> Header::getValues(
-	const std::string &name) const
+const std::vector<std::string> Header::getValues(const std::string &name) const
 {
 	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())
@@ -76,23 +71,21 @@ const std::vector<std::string> Header::getValues(
 }
 
 void Header::assign(const std::string &name,
-						  const std::vector<std::string> values)
+					const std::vector<std::string> values)
 {
 	_values[name] = values;
 }
 
 void Header::insert(const std::string &name,
-						  const std::vector<std::string> values)
+					const std::vector<std::string> values)
 {
 	_values[name].insert(_values[name].end(), values.begin(), values.end());
 }
 
-void Header::insert(const std::string &name,
-						  const std::string value)
+void Header::insert(const std::string &name, const std::string value)
 {
 	_values[name].insert(_values[name].end(), value);
 }
-
 
 Header::iterator Header::begin(void)
 {

@@ -6,6 +6,7 @@
 #include "HTTP/Server.hpp"
 #include "async/FileIOProcessor.hpp"
 #include "async/status.hpp"
+#include "CGI/RequestHandler.hpp"
 
 namespace HTTP
 {
@@ -34,6 +35,7 @@ class Server::RequestHandler
 
 	virtual int task(void) = 0;
 	Response retrieve(void);
+	void setCGIRequestValues(CGI::Request &cgi_request);
 	bool isDirectory(void) const;
 	bool isInvalidDirectoryFormat(void) const;
 };

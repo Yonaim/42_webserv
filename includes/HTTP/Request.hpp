@@ -1,7 +1,7 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
 
-#include "HTTP/Header.hpp"
+#include "Header.hpp"
 #include "async/Logger.hpp"
 #include <map>
 #include <string>
@@ -32,13 +32,14 @@ class Request
 	};
 
 	int _method;
+	std::string _method_string;
 	std::string _uri;
+	std::string _query_string;
 	std::string _version_string; // 1.1 2.0 1.0
 	int _version;                // 1001 2000 1000
 	Header _header;
 	std::string _body;
-	int _current_state;   // enum parse_state_e
-	size_t _error_offset; // 에러가 발생한 위치
+	int _current_state; // enum parse_state_e
 	std::vector<std::string> _trailer_values;
 	size_t _content_length;
 	async::Logger &_logger;
@@ -58,6 +59,12 @@ class Request
 		RETURN_TYPE_AGAIN,
 		RETURN_TYPE_IN_PROCESS
 	};
+	class ParsingFail : public std::runtime_error
+	{
+	  public:
+		ParsingFail(const std::string &why);
+	};
+
 	Request(void);
 	~Request();
 	Request(const Request &orig);
@@ -74,7 +81,9 @@ class Request
 	// getter
 	const std::string &getHeaderValue(const std::string &name, int idx) const;
 	int getMethod(void) const;
+	const std::string &getMethodString(void) const;
 	const std::string &getURIPath(void) const;
+	const std::string &getQueryString(void) const;
 	const std::string &getBody() const;
 };
 } // namespace HTTP

@@ -9,7 +9,7 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 	: RequestHandler(server, request, location), _writer(NULL),
 	  _cgi_handler(NULL)
 {
-	if (location.cgiEnabled() && location.isCGIextension(_resource_path))
+	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
 	{
 		// TODO: CGI 핸들러 완성시 주석 해제
 		// _cgi_handler = new CGIHandler(args);
@@ -43,6 +43,8 @@ int Server::RequestPostHandler::task(void)
 
 	if (_cgi_handler)
 	{
+		CGI::Request cgi_request;
+		setCGIRequestValues(cgi_request);
 		// _status = _cgi_handler->task();
 	}
 
@@ -53,7 +55,16 @@ int Server::RequestPostHandler::task(void)
 			int rc = _writer->task();
 			if (rc == async::status::OK)
 			{
+				std::string body = "made the file\n"
+								   "click <A href=\""
+								   + _request.getURIPath()
+								   + "\">here</A> to view it.";
+
 				_response.setStatus(201); // Created
+				_response.setLocation(_request.getURIPath());
+				_response.setBody(body);
+				_response.setContentType("text/html");
+				_response.setContentLength(body.length());
 				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 			}
 			else if (rc == async::status::AGAIN)

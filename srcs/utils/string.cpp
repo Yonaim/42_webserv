@@ -106,16 +106,16 @@ std::string strBeforeSep(const std::string &be_parsed, const std::string &sep,
 	return (result);
 }
 
-std::string strtrim(std::string str, std::string charset)
+std::string strtrim(const std::string str, const std::string charset)
 {
 	size_t start;
 	size_t offest;
 
 	start = 0;
-	while (str[start] && strchr(charset.c_str(), str[start]))
+	while (start < str.length() && strchr(charset.c_str(), str[start]))
 		++start;
 	offest = start;
-	while (str[offest] && !strchr(charset.c_str(), str[offest]))
+	while (offest < str.length() && !strchr(charset.c_str(), str[offest]))
 		++offest;
 	return (str.substr(start, offest - start));
 }
@@ -165,6 +165,13 @@ std::string getbackstr(const std::string &str, size_t from)
 void trimfrontstr(std::string &str, size_t from)
 {
 	str = str.substr(from, str.size() - from);
+}
+
+std::string consumestr(std::string &str, size_t from)
+{
+	std::string buf = getfrontstr(str, from);
+	trimfrontstr(str, from);
+	return (buf);
 }
 
 std::string getExtension(const std::string &filename)

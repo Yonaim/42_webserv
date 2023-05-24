@@ -4,8 +4,10 @@
 // special token
 const std::string HTTP::CRLF = "\r\n";
 const std::string HTTP::SP = " ";
-const int HTTP::CRLF_LEN = 2;
-const int HTTP::SP_LEN = 1;
+const std::string HTTP::LWS = " \t";
+const size_t HTTP::CRLF_LEN = HTTP::CRLF.length();
+const size_t HTTP::SP_LEN = HTTP::SP.length();
+const size_t HTTP::LWS_LEN = HTTP::LWS.length();
 
 // method
 const std::pair<std::string, int> _METHOD[]
@@ -13,10 +15,11 @@ const std::pair<std::string, int> _METHOD[]
 	   std::pair<std::string, int>("GET", METHOD_GET),
 	   std::pair<std::string, int>("HEAD", METHOD_HEAD),
 	   std::pair<std::string, int>("POST", METHOD_POST),
-	   std::pair<std::string, int>("DELETE", METHOD_DELETE)};
+	   std::pair<std::string, int>("DELETE", METHOD_DELETE),
+	   std::pair<std::string, int>("PUT", METHOD_POST)};
 
-const BidiMap<std::string, int> HTTP::METHOD(
-	_METHOD, sizeof(_METHOD) / sizeof(_METHOD[0]));
+const BidiMap<std::string, int> HTTP::METHOD(_METHOD, sizeof(_METHOD)
+														  / sizeof(_METHOD[0]));
 
 // status code
 static const std::pair<int, std::string> _STATUS_CODE[] = {

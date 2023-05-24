@@ -8,13 +8,13 @@
 using namespace HTTP;
 
 Server::Server(const ConfigContext &server_context)
-	: _root(""), _logger(async::Logger::getLogger("Server"))
+	: _cgi_enabled(false), _logger(async::Logger::getLogger("Server"))
 {
 	parseDirectiveListen(server_context);
-	parseDirectiveRoot(server_context);
 	parseDirectiveErrorPage(server_context);
 	parseDirectiveServerName(server_context);
 	parseDirectiveLocation(server_context);
+	parseDirectiveCGI(server_context);
 }
 
 Server::~Server()
@@ -22,24 +22,23 @@ Server::~Server()
 }
 
 Server::Server(const Server &orig)
-	: _port(orig._port), _server_name(orig._server_name), _root(""),
-	  _error_pages(orig._error_pages), _locations(orig._locations),
-	  _logger(async::Logger::getLogger("Server"))
+	: _port(orig._port), _cgi_enabled(orig._cgi_enabled),
+	  _server_name(orig._server_name), _error_pages(orig._error_pages),
+	  _locations(orig._locations), _logger(async::Logger::getLogger("Server"))
 {
 }
 
 Server &Server::operator=(const Server &orig)
 {
-	_root = orig._root;
 	_port = orig._port;
+	_cgi_enabled = orig._cgi_enabled;
 	_server_name = orig._server_name;
 	_error_pages = orig._error_pages;
 	_locations = orig._locations;
 	return (*this);
 }
 
-const Server::Location &Server::getLocation(
-	const std::string &path) const
+const Server::Location &Server::getLocation(const std::string &path) const
 {
 	size_t cmp_diff;
 	size_t cur_diff = ULLONG_MAX;
@@ -71,11 +70,21 @@ const Server::Location &Server::getLocation(
 
 std::string Server::getResourcePath(const Request &req) const
 {
-	const std::string &uri_path = req.getURIPath();
+	std::string uri_path = req.getURIPath();
 	const Location &location = getLocation(uri_path);
+	const std::string &alias = location.getAlias();
 
-	if (uri_path.back() == '/' && location.hasIndex())
-		return (location.getRoot() + uri_path + location.getNthIndex(0));
+	uri_path.replace(0, location.getPath().length(), alias);
+	if (req.getURIPath().back() == '/' && location.hasIndex())
+		uri_path += location.getNthIndex(0);
 
-	return (location.getRoot() + uri_path);
+	return (uri_path);
+}
+
+bool Server::isCGIextension(const std::string &path) const
+{
+	std::string ext = getExtension(path);
+	if (ext == "")
+		return (false);
+	return (_cgi_extensions.find(ext) != _cgi_extensions.end());
 }

@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-namespace HTTP
-{
 class Header
 {
   private:
@@ -38,6 +36,5 @@ class Header
 	const_iterator begin(void) const;
 	const_iterator end(void) const;
 };
-} // namespace HTTP
 
 #endif

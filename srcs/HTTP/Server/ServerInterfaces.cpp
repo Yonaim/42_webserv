@@ -71,7 +71,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	}
 	if (location.doRedirect())
 	{
-		_logger << "Location " << location.getRoot() << " redirect the request"
+		_logger << "Location " << location.getAlias() << " redirect the request"
 				<< async::verbose;
 		registerRedirectResponse(client_fd, location);
 		return;

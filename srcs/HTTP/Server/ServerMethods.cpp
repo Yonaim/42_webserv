@@ -12,6 +12,11 @@ int Server::getPort(void) const
 	return (_port);
 }
 
+bool Server::cgiEnabled() const
+{
+	return (_cgi_enabled);
+}
+
 std::string Server::getErrorPage(const int code)
 {
 	if (_error_pages.find(code) == _error_pages.end())

@@ -45,31 +45,6 @@ void Server::parseDirectiveListen(const ConfigContext &server_context)
 	_logger << "parsed port " << _port << async::verbose;
 }
 
-void Server::parseDirectiveRoot(const ConfigContext &server_context)
-{
-	const char *dir_name = "root";
-	if (server_context.countDirectivesByName(dir_name) != 1)
-	{
-		_logger << server_context.name() << " should have 1 " << dir_name
-				<< async::error;
-		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
-	}
-	const ConfigDirective &root_directive
-		= server_context.getNthDirectiveByName(dir_name, 0);
-	if (root_directive.is_context())
-	{
-		_logger << dir_name << " should not be context" << async::error;
-		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
-	}
-	if (root_directive.nParameters() != 1)
-	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
-		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
-	}
-	_root = root_directive.parameter(0);
-	_logger << "parsed root " << _root << async::verbose;
-}
-
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 {
 	const char *dir_name = "error_page";
@@ -105,9 +80,9 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			}
 			// TODO: 타임아웃 정해야함
-			_error_pages[code] = new async::FileReader(1000, _root + file_path);
-			_logger << "parsed error page " << _root + file_path << " for code "
-					<< code << async::verbose;
+			_error_pages[code] = new async::FileReader(1000, file_path);
+			_logger << "parsed error page " << file_path << " for code " << code
+					<< async::verbose;
 		}
 	}
 }
@@ -166,6 +141,52 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 		_logger << "parsed location " << new_location.getPath()
 				<< async::verbose;
 	}
+}
+
+void Server::parseDirectiveCGI(const ConfigContext &server_context)
+{
+	const char *dir_name = "cgi_extension";
+	const size_t n_indexs = server_context.countDirectivesByName(dir_name);
+	if (n_indexs == 0)
+		return;
+	if (n_indexs > 1)
+	{
+		_logger << server_context.name() << " should have 0 or 1 " << dir_name
+				<< async::error;
+		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+	_cgi_enabled = true;
+	const ConfigDirective &cgi_directive
+		= server_context.getNthDirectiveByName(dir_name, 0);
+	if (cgi_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		cgi_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	// 맨대토리 버젼, 1개의 아규먼트만 허용
+	if (cgi_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	_cgi_extensions.insert(cgi_directive.parameter(0));
+	_logger << "CGI call in " << cgi_directive.parameter(0) << " enabled"
+			<< async::verbose;
+	/*
+	보너스 대비한 버젼
+	if (cgi_directive.nParameters() < 1)
+	{
+		_logger << dir_name << " should have more than 0 parameter(s)"
+				<< async::error;
+		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	for (size_t i = 0; i < cgi_directive.nParameters(); i++)
+	{
+		_cgi_extensions.insert(cgi_directive.parameter(i));
+		_logger << "CGI call to in " << cgi_directive.parameter(i) << " enabled"
+				<< async::verbose;
+	}
+	*/
 }
 
 bool Server::isValidStatusCode(const int &status_code)

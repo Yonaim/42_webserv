@@ -8,7 +8,7 @@ Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 	: RequestHandler(server, request, location), _reader(NULL),
 	  _cgi_handler(NULL)
 {
-	if (location.cgiEnabled() && location.isCGIextension(_resource_path))
+	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
 	{
 		// TODO: CGI 핸들러 완성시 주석 해제
 		// _cgi_handler = new CGIHandler(args);
@@ -33,6 +33,8 @@ int Server::RequestHeadHandler::task(void)
 
 	if (_cgi_handler)
 	{
+		CGI::Request cgi_request;
+		setCGIRequestValues(cgi_request);
 		// _status = _cgi_handler->task();
 	}
 

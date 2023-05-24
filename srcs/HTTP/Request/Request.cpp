@@ -9,6 +9,11 @@ static const char *consume_exc_description[]
 static const char *parse_state_str[]
 	= {"start line", "header", "body", "chunk", "trailer"};
 
+HTTP::Request::ParsingFail::ParsingFail(const std::string &why)
+	: std::runtime_error(why)
+{
+}
+
 HTTP::Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE),
 	  _content_length(0), _logger(async::Logger::getLogger("Request"))
@@ -78,7 +83,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 				if (!_header.hasValue("Host")
 					&& !_header.hasValue("Trailer", "Host"))
 				{
-					_error_offset = 0;
 					_logger << __func__
 							<< "Header must include Host header field"
 							<< async::warning;
@@ -95,7 +99,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 						_trailer_values = _header.getValues("Trailer");
 						if (_trailer_values.empty())
 						{
-							_error_offset = 0;
 							throwException(CONSUME_EXC_EMPTY_LINE);
 						}
 						std::vector<std::string>::const_iterator iter
@@ -104,10 +107,7 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 						{
 							if (*iter == "Trailer" || *iter == "Content-Length"
 								|| *iter == "Transfer-Encoding")
-							{
-								_error_offset = 0;
 								throwException(CONSUME_EXC_INVALID_FIELD);
-							}
 						}
 						_logger << "header has Trailer" << async::verbose;
 					}
@@ -115,7 +115,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 				}
 				else if (_header.hasValue("Trailer"))
 				{
-					_error_offset = 0;
 					_logger << __func__ << ": Trailer with no Transfer-Encoding"
 							<< async::warning;
 					throwException(CONSUME_EXC_INVALID_VALUE);
@@ -141,7 +140,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 
 					if (_content_length > client_max_body_size)
 					{
-						_error_offset = 0;
 						_logger << __func__
 								<< ": exceeds the client_max_body_size"
 								<< async::warning;
@@ -214,7 +212,7 @@ void HTTP::Request::throwException(int code) const
 	else
 		what << consume_exc_description[code];
 	what << ": " << parse_state_str[_current_state];
-	throw(std::runtime_error(what.str()));
+	throw(ParsingFail(what.str()));
 }
 
 bool HTTP::Request::hasHeaderValue(std::string const &name,
@@ -245,9 +243,19 @@ int HTTP::Request::getMethod(void) const
 	return (_method);
 }
 
+const std::string &HTTP::Request::getMethodString(void) const
+{
+	return (_method_string);
+}
+
 const std::string &HTTP::Request::getURIPath(void) const
 {
 	return (_uri);
+}
+
+const std::string &HTTP::Request::getQueryString(void) const
+{
+	return (_query_string);
 }
 
 const std::string &HTTP::Request::getBody() const
