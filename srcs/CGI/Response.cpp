@@ -27,6 +27,18 @@ const CGI::Response &CGI::Response::operator=(const Response &orig)
 	return (*this);
 }
 
+void CGI::Response::makeResponse(const std::string &cgi_output)
+{
+	(void)cgi_output;
+	// TODO: string으로 받은 Response 메시지 기반으로 CGI/Response 초기화
+}
+
+void CGI::Response::setError(int status_code)
+{
+	// TODO: setError
+	(void)status_code;
+}
+
 int CGI::Response::getType() const
 {
 	return (_type);

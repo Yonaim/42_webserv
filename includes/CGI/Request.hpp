@@ -39,8 +39,9 @@ class Request
 	const Request &operator=(const Request &orig);
 
 	// 생성자에서 사용할 파싱 메서드 추가 예정
+	const std::string getPath(void) const;
 	const std::string &getMessageBody(void) const;
-	const char **getEnv(void) const;
+	char *const *getEnv(void) const;
 };
 } // namespace CGI
 

@@ -34,8 +34,15 @@ const std::string &Request::getMessageBody(void) const
 	return (_message_body);
 }
 
-const char **Request::getEnv(void) const
+char *const *Request::getEnv(void) const
 {
 	// TODO: getEnv 구현
 	return (NULL);
+}
+
+const std::string Request::getPath() const
+{
+	// TODO: getPath() 구현
+	std::string str;
+	return (str);
 }

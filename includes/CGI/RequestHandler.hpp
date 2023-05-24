@@ -5,6 +5,7 @@
 #include "CGI/Response.hpp"
 #include "HTTP/Request.hpp"
 #include "async/FileIOProcessor.hpp"
+#include "async/Logger.hpp"
 #include "async/status.hpp"
 
 namespace CGI
@@ -16,15 +17,33 @@ class RequestHandler
 	async::FileWriter *_writer;
 	Request _request;
 	Response _response;
-	std::string _cgi_path;
+	// std::string _cgi_path;
 	int _status;
+
 	int _pipe_fd[2];
+	pid_t _pid;
+	int _waitpid_status;
+
+	// debug
+	async::Logger &_logger;
+
+	enum cgi_response_inner_status_e
+	{
+		CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_READ_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_OK
+	};
+
+	int sendCGIRequest(void);
+	int waitExecution(void);
+	int makeCGIResponse(void);
 
   public:
-	enum response_status_e
+	enum cgi_response_status_e
 	{
-		CGI_RESPONSE_STATUS_OK = 0,
-		CGI_RESPONSE_STATUS_AGAIN
+		CGI_RESPONSE_STATUS_AGAIN,
+		CGI_RESPONSE_STATUS_OK,
 	};
 
 	RequestHandler(const HTTP::Request &http_request);

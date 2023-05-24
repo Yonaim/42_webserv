@@ -29,7 +29,10 @@ class Response
 	~Response();
 	Response(const std::string &cgi_output);
 	Response(const Response &orig);
-	const Response &operator=(const Response &orig);
+	const Response &operator=(const Response &cgi_output);
+
+	void makeResponse(const std::string &orig);
+	void setError(int status_code);
 
 	// getter
 	int getType() const;
