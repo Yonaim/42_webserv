@@ -155,6 +155,17 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 	}
 }
 
+WebServer::_Servers::iterator WebServer::findNoneNameServer(int port)
+{
+	for (_Servers::iterator it = _servers[port].begin();
+		 it != _servers[port].end(); it++)
+	{
+		if (it->hasServerName() == false)
+			return (it);
+	}
+	return (_servers[port].end());
+}
+
 void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 {
 	for (_Servers::iterator it = _servers[port].begin();
@@ -166,8 +177,12 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 			return;
 		}
 	}
-	// 일치하는 Host가 없을 시 해당 포트의 첫 서버(기본값)에 등록
-	_servers[port].front().registerRequest(client_fd, request);
+	// 일치하는 Host가 없을 시, 해당 포트의 server_name이 없는 서버를 찾아보고
+	// 그러한 서버가 없다면 해당 포트의 첫 서버에 등록
+	if (findNoneNameServer(port) != _servers[port].end())
+		findNoneNameServer(port)->registerRequest(client_fd, request);
+	else
+		_servers[port].front().registerRequest(client_fd, request);
 }
 
 void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)

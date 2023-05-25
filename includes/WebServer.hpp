@@ -34,6 +34,7 @@ class WebServer
 	void parseServer(const ConfigContext &server_context);
 
 	void parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc);
+	_Servers::iterator findNoneNameServer(int port);
 	void registerRequest(int port, int client_fd, HTTP::Request &request);
 	void retrieveResponseForEachFd(int port, _Servers &servers);
 

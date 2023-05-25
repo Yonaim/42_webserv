@@ -114,11 +114,13 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 
 void Server::parseDirectiveServerName(const ConfigContext &server_context)
 {
+	_has_server_name = false;
 	const char *dir_name = "server_name";
 	const size_t n_server_names
 		= server_context.countDirectivesByName(dir_name);
 	if (n_server_names == 0)
 		return;
+	_has_server_name = true;
 	for (size_t i = 0; i < n_server_names; i++)
 	{
 		const ConfigDirective &server_name_directive

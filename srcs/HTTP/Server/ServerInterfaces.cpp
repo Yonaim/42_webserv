@@ -144,6 +144,11 @@ bool Server::hasResponses(int client_fd)
 	return (!_output_queue[client_fd].empty());
 }
 
+bool Server::hasServerName(void) const
+{
+	return (_has_server_name);
+}
+
 void Server::disconnect(int client_fd)
 {
 	ensureClientConnected(client_fd);

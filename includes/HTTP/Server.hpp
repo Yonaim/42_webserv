@@ -27,6 +27,7 @@ class Server
 	class Location;
 
 	int _port;
+	bool _has_server_name;
 	std::set<std::string> _server_name;
 	std::string _root;
 	std::map<int, async::FileReader *> _error_pages;
@@ -62,6 +63,7 @@ class Server
 	Response retrieveResponse(int client_fd);
 	int hasResponses(void);
 	bool hasResponses(int client_fd);
+	bool hasServerName(void) const;
 	void disconnect(int client_fd);
 
 	int getPort(void) const;
