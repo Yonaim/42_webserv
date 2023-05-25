@@ -80,6 +80,7 @@ int Server::RequestGetHandler::task(void)
 			{
 				_response.makeDirectoryListing(_resource_path,
 											   _request.getURIPath());
+				_response.setStatus(200);
 				_server->_logger << "directory listing" << async::verbose;
 			}
 			else
