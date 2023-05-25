@@ -23,22 +23,7 @@ void Response::setDate(void)
 
 void Response::setStatus(int status_code)
 {
-	char buff[4];
-	int i = 3;
-	int temp = status_code;
-
-	if (status_code < 0)
-		throw(std::runtime_error("wrong status code"));
-	buff[i--] = '\0';
-	while (temp > 0 && i >= 0)
-	{
-		buff[i--] = temp % 10 + '0';
-		temp /= 10;
-	}
-	if (temp != 0 && i != -1)
-		throw(std::runtime_error("wrong status code"));
-	_status_code = buff;
-
+	_status_code = toStr<int>(status_code);
 	std::map<int, std::string>::const_iterator it
 		= STATUS_CODE.find(status_code);
 	if (it == STATUS_CODE.end())
