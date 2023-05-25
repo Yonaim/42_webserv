@@ -33,7 +33,6 @@ void Server::Location::parseDirectiveLimitExcept(
 	const ConfigContext &location_context)
 {
 	_allowed_methods.insert(METHOD_GET);
-	_allowed_methods.insert(METHOD_HEAD);
 
 	const char *dir_name = "limit_except";
 	const size_t n_limit_excepts
