@@ -72,15 +72,7 @@ void Server::Location::parseDirectiveLimitExcept(
 			}
 
 			const int method = it->second;
-			if (method == METHOD_GET)
-			{
-				_allowed_methods.insert(METHOD_GET);
-				_allowed_methods.insert(METHOD_HEAD);
-			}
-			else
-			{
-				_allowed_methods.insert(method);
-			}
+			_allowed_methods.insert(method);
 		}
 	}
 }
