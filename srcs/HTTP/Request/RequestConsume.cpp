@@ -17,22 +17,24 @@ int Request::consumeStartLine(std::string &buffer)
 		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
+
+	const std::string start_line = consumestr(buffer, crlf_pos);
+	consumestr(buffer, CRLF_LEN);
+	_logger << __func__ << ": start line is \"" << start_line << "\""
+			<< async::debug;
+
 	if (crlf_pos == 0)
 	{
 		_logger << __func__ << ": buffer's first line is empty"
 				<< async::warning;
 		throwException(CONSUME_EXC_EMPTY_LINE);
 	}
-	if (buffer[0] == ' ')
+	if (start_line[0] == ' ')
 	{
 		_logger << __func__ << ": buffer's first character is space"
 				<< async::warning;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
-
-	const std::string start_line = getfrontstr(buffer, crlf_pos);
-	_logger << __func__ << ": start line is \"" << start_line << "\""
-			<< async::debug;
 
 	/* 공백 기준 split */
 	std::vector<std::string> tokens = split(start_line, ' ');
@@ -42,10 +44,12 @@ int Request::consumeStartLine(std::string &buffer)
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
-	_logger << __func__ << ": split into ";
-	for (size_t i = 0; i < tokens.size(); i++)
-		_logger << "\"" << tokens[i] << "\" ";
-	_logger << async::debug;
+	{
+		_logger << __func__ << ": split into ";
+		for (size_t i = 0; i < tokens.size(); i++)
+			_logger << "\"" << tokens[i] << "\" ";
+		_logger << async::debug;
+	}
 
 	/* method index 구하기 */
 	for (BidiMap<std::string, int>::const_iterator it = METHOD.begin();
@@ -68,14 +72,14 @@ int Request::consumeStartLine(std::string &buffer)
 	/* uri, version 파싱 */
 	_uri = tokens[1];
 	_version_string = tokens[2];
-	_logger << __func__ << ": URI: \"" << _uri << "\"" << async::verbose;
-	_logger << __func__ << ": version: \"" << _version_string << "\""
-			<< async::verbose;
 
-	trimfrontstr(buffer, start_line.size() + CRLF_LEN);
-
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
+	{
+		_logger << __func__ << ": URI: \"" << _uri << "\"" << async::verbose;
+		_logger << __func__ << ": version: \"" << _version_string << "\""
+				<< async::verbose;
+		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+				<< async::debug;
+	}
 	return (RETURN_TYPE_OK);
 }
 
