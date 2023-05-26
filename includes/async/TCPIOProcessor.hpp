@@ -3,6 +3,7 @@
 
 #include "async/IOProcessor.hpp"
 #include "async/Logger.hpp"
+#include <queue>
 
 namespace async
 {
@@ -37,6 +38,8 @@ class TCPIOProcessor : public IOProcessor
 	};
 
   public:
+	static std::queue<int> disconnected_clients;
+
 	TCPIOProcessor(const int port = 80);
 	virtual ~TCPIOProcessor();
 	TCPIOProcessor(const TCPIOProcessor &orig);

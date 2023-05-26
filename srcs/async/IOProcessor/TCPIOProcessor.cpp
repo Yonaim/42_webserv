@@ -8,6 +8,7 @@
 using namespace async;
 
 const int TCPIOProcessor::_backlog = 8;
+std::queue<int> TCPIOProcessor::disconnected_clients;
 
 TCPIOProcessor::TCPIOProcessor(const int port)
 	: _port(port), _logger(Logger::getLogger("TCPIOProcessor"))
@@ -155,6 +156,7 @@ void TCPIOProcessor::disconnect(const int client_socket)
 	close(client_socket);
 	_rdbuf.erase(client_socket);
 	_wrbuf.erase(client_socket);
+	disconnected_clients.push(client_socket);
 	_logger << "Disconnected " << client_socket << async::info;
 }
 
