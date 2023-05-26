@@ -1,7 +1,7 @@
 #ifndef HTTP_REQUEST_HPP
 #define HTTP_REQUEST_HPP
 
-#include "HTTP/Header.hpp"
+#include "Header.hpp"
 #include "async/Logger.hpp"
 #include <map>
 #include <string>
