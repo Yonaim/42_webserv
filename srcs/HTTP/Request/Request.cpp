@@ -47,8 +47,8 @@ HTTP::Request &HTTP::Request::operator=(const HTTP::Request &orig)
 int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 {
 	// TODO: 디버그 완료 후 하단 변수 삭제
-	const char *state_names[] = {"STARTLINE", "HEADER",  "BODY",
-								 "CHUNK",     "TRAILER"};
+	const char *state_names[]
+		= {"STARTLINE", "HEADER", "BODY", "CHUNK", "TRAILER"};
 	const char *code_names[] = {"OK", "INVALID", "AGAIN", "IN PROCESS"};
 
 	while (true)
