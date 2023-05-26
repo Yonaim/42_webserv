@@ -167,6 +167,13 @@ void trimfrontstr(std::string &str, size_t from)
 	str = str.substr(from, str.size() - from);
 }
 
+std::string consumestr(std::string &str, size_t from)
+{
+	std::string buf = getfrontstr(str, from);
+	trimfrontstr(str, from);
+	return (buf);
+}
+
 std::string getExtension(const std::string &filename)
 {
 	size_t pos = filename.rfind('.');

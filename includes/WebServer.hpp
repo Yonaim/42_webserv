@@ -37,6 +37,7 @@ class WebServer
 	_Servers::iterator findNoneNameServer(int port);
 	void registerRequest(int port, int client_fd, HTTP::Request &request);
 	void retrieveResponseForEachFd(int port, _Servers &servers);
+	void disconnect(int port, int client_fd);
 
   public:
 	WebServer(const ConfigContext &root_context);

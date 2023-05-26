@@ -134,8 +134,19 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			== _request_buffer[port].end())
 			_request_buffer[port][client_fd] = HTTP::Request();
 
-		int rc
-			= _request_buffer[port][client_fd].parse(tcp_proc.rdbuf(client_fd), _max_body_size);
+		int rc;
+		try
+		{
+			rc = _request_buffer[port][client_fd].parse(
+				tcp_proc.rdbuf(client_fd), _max_body_size);
+		}
+		catch (const HTTP::Request::ParsingFail &e)
+		{
+			// TODO: Bad Request를 서버에 등록
+			_logger << e.what() << '\n';
+			_request_buffer[port][client_fd] = HTTP::Request();
+			continue;
+		}
 
 		switch (rc)
 		{
@@ -206,12 +217,42 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 	}
 }
 
+void WebServer::disconnect(int port, int client_fd)
+{
+	_request_buffer[port].erase(client_fd);
+	for (_Servers::iterator it = _servers[port].begin();
+		 it != _servers[port].end(); it++)
+	{
+		try
+		{
+			it->disconnect(client_fd);
+		}
+		catch (const HTTP::Server::ClientNotFound &e)
+		{
+			(void)e;
+		}
+	}
+	_logger << "Disconnected client fd " << client_fd << " from port " << port
+			<< async::info;
+}
+
 void WebServer::task(void)
 {
 	async::IOTaskHandler::task();
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
 		 it++)
-		parseRequestForEachFd(it->first, it->second);
+	{
+		int port = it->first;
+		async::TCPIOProcessor &tcp = it->second;
+
+		while (!tcp.disconnected_clients.empty())
+		{
+			int disconnected_fd = tcp.disconnected_clients.front();
+			tcp.disconnected_clients.pop();
+			disconnect(port, disconnected_fd);
+		}
+		parseRequestForEachFd(port, tcp);
+	}
 	for (_ServerMap::iterator it = _servers.begin(); it != _servers.end(); it++)
 		retrieveResponseForEachFd(it->first, it->second);
 }

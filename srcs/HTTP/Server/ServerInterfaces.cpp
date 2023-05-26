@@ -152,6 +152,15 @@ bool Server::hasServerName(void) const
 void Server::disconnect(int client_fd)
 {
 	ensureClientConnected(client_fd);
+	if (_request_handlers.find(client_fd) != _request_handlers.end())
+	{
+		while (!_request_handlers[client_fd].empty())
+		{
+			delete _request_handlers[client_fd].front();
+			_request_handlers[client_fd].pop();
+		}
+	}
 	_request_handlers.erase(client_fd);
 	_output_queue.erase(client_fd);
+	_logger << "Disconnected client fd " << client_fd << async::info;
 }

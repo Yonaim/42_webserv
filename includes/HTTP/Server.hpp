@@ -51,6 +51,7 @@ class Server
 
   public:
 	class LocationNotFound;
+	class ClientNotFound;
 
 	Server(const ConfigContext &server_context);
 	~Server();
