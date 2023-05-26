@@ -21,14 +21,12 @@ int Request::consumeStartLine(std::string &buffer)
 	{
 		_logger << __func__ << ": buffer's first line is empty"
 				<< async::warning;
-		_error_offset = 0;
 		throwException(CONSUME_EXC_EMPTY_LINE);
 	}
 	if (buffer[0] == ' ')
 	{
 		_logger << __func__ << ": buffer's first character is space"
 				<< async::warning;
-		_error_offset = 0;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
@@ -41,7 +39,6 @@ int Request::consumeStartLine(std::string &buffer)
 	if (tokens.size() != 3)
 	{
 		_logger << __func__ << ": token count mismatch" << async::warning;
-		_error_offset = start_line.size();
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
@@ -65,7 +62,6 @@ int Request::consumeStartLine(std::string &buffer)
 	if (_method == METHOD_NONE)
 	{
 		_logger << __func__ << ": invalid method" << async::warning;
-		_error_offset = tokens[0].size();
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
 
@@ -244,7 +240,6 @@ int Request::consumeTrailer(std::string &buffer)
 	if (name == "" || hasSpace(name))
 	{
 		_logger << __func__ << ": header has invalid name" << async::warning;
-		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 	_logger << __func__ << ": header name is " << name << async::verbose;
@@ -264,7 +259,6 @@ int Request::consumeTrailer(std::string &buffer)
 	{
 		_logger << __func__ << ": Trailer header doesn't have " << name
 				<< async::warning;
-		_error_offset = key_end_idx;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
 	passLWS(buffer);

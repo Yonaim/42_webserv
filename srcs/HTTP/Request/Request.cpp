@@ -83,7 +83,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 				if (!_header.hasValue("Host")
 					&& !_header.hasValue("Trailer", "Host"))
 				{
-					_error_offset = 0;
 					_logger << __func__
 							<< "Header must include Host header field"
 							<< async::warning;
@@ -100,7 +99,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 						_trailer_values = _header.getValues("Trailer");
 						if (_trailer_values.empty())
 						{
-							_error_offset = 0;
 							throwException(CONSUME_EXC_EMPTY_LINE);
 						}
 						std::vector<std::string>::const_iterator iter
@@ -109,10 +107,7 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 						{
 							if (*iter == "Trailer" || *iter == "Content-Length"
 								|| *iter == "Transfer-Encoding")
-							{
-								_error_offset = 0;
 								throwException(CONSUME_EXC_INVALID_FIELD);
-							}
 						}
 						_logger << "header has Trailer" << async::verbose;
 					}
@@ -120,7 +115,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 				}
 				else if (_header.hasValue("Trailer"))
 				{
-					_error_offset = 0;
 					_logger << __func__ << ": Trailer with no Transfer-Encoding"
 							<< async::warning;
 					throwException(CONSUME_EXC_INVALID_VALUE);
@@ -146,7 +140,6 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 
 					if (_content_length > client_max_body_size)
 					{
-						_error_offset = 0;
 						_logger << __func__
 								<< ": exceeds the client_max_body_size"
 								<< async::warning;
