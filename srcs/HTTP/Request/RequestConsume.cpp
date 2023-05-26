@@ -180,7 +180,8 @@ int Request::consumeChunk(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 
-	const int content_length = strtol(buffer.c_str(), NULL, 16);
+	const std::string length_line = consumestr(buffer, crlf_pos + CRLF_LEN);
+	const size_t content_length = strtol(length_line.c_str(), NULL, 16);
 	_logger << __func__ << ": content length " << content_length
 			<< async::verbose;
 	if (content_length < 0)
@@ -189,22 +190,21 @@ int Request::consumeChunk(std::string &buffer)
 				<< async::warning;
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
-	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN * 2이면 ok
-	if (buffer.size() < crlf_pos + content_length + CRLF_LEN * 2)
+	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN이면 ok
+	if (buffer.size() < content_length + CRLF_LEN)
 	{
 		_logger << __func__ << ": not enough buffer size" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
 	_content_length += content_length;
-	_body.append(buffer.substr(crlf_pos + CRLF_LEN, content_length));
+	_body.append(consumestr(buffer, content_length));
 	_logger << __func__ << ": body result in :\"" << _body << "\""
 			<< async::debug;
-	if (buffer.substr(crlf_pos + CRLF_LEN + content_length, CRLF_LEN) != CRLF)
+	if (consumestr(buffer, CRLF_LEN) != CRLF)
 	{
 		_logger << __func__ << ": chunk must end with CRLF" << async::warning;
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
-	trimfrontstr(buffer, crlf_pos + CRLF_LEN * 2 + content_length);
 	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
 			<< async::debug;
 
