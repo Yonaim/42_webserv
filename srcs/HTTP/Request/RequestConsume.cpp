@@ -163,10 +163,9 @@ int Request::consumeBody(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 
-	_body = getfrontstr(buffer, _content_length);
+	_body = consumestr(buffer, _content_length);
 	_logger << __func__ << ": body result in :\"" << _body << "\""
 			<< async::debug;
-	trimfrontstr(buffer, _content_length);
 	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
 			<< async::debug;
 	return (RETURN_TYPE_OK);
