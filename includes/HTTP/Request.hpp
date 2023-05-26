@@ -58,6 +58,12 @@ class Request
 		RETURN_TYPE_AGAIN,
 		RETURN_TYPE_IN_PROCESS
 	};
+	class ParsingFail : public std::runtime_error
+	{
+	  public:
+		ParsingFail(const std::string &why);
+	};
+
 	Request(void);
 	~Request();
 	Request(const Request &orig);

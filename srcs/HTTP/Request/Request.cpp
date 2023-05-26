@@ -9,6 +9,11 @@ static const char *consume_exc_description[]
 static const char *parse_state_str[]
 	= {"start line", "header", "body", "chunk", "trailer"};
 
+HTTP::Request::ParsingFail::ParsingFail(const std::string &why)
+	: std::runtime_error(why)
+{
+}
+
 HTTP::Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE),
 	  _content_length(0), _logger(async::Logger::getLogger("Request"))
@@ -214,7 +219,7 @@ void HTTP::Request::throwException(int code) const
 	else
 		what << consume_exc_description[code];
 	what << ": " << parse_state_str[_current_state];
-	throw(std::runtime_error(what.str()));
+	throw(ParsingFail(what.str()));
 }
 
 bool HTTP::Request::hasHeaderValue(std::string const &name,
