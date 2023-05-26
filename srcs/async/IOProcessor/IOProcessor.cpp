@@ -130,6 +130,29 @@ void IOProcessor::setDebug(bool debug)
 	_debug = debug;
 }
 
+/*
+TODO: stat 함수가 사용 불가능하여 임시로 만든 해결책으로 stat이 사용 가능해질 시
+해당 콜 사용하여 재작성해야 함
+*/
+bool IOProcessor::isFdClosed(const int fd)
+{
+	try
+	{
+		read(fd, 1);
+	}
+	catch (const IOProcessor::FileClosed &e)
+	{
+		(void)e;
+		return (true);
+	}
+	catch (const std::exception &e)
+	{
+		(void)e;
+		return (true);
+	}
+	return (false);
+}
+
 struct kevent constructKevent(const int fd, const int event)
 {
 	if (event == IOEVENT_ERROR)

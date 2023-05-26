@@ -40,6 +40,7 @@ class IOProcessor
 	virtual void task(void) = 0;
 	void blockingWrite(void);
 	static void setDebug(bool debug);
+	bool isFdClosed(const int fd);
 };
 
 enum IOEVENT_E
