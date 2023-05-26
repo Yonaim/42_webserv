@@ -245,6 +245,11 @@ int HTTP::Request::getMethod(void) const
 	return (_method);
 }
 
+const std::string &HTTP::Request::getMethodString(void) const
+{
+	return (_method_string);
+}
+
 const std::string &HTTP::Request::getURIPath(void) const
 {
 	return (_uri);
