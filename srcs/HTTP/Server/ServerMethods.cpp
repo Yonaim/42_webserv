@@ -51,8 +51,5 @@ void Server::registerRedirectResponse(const int fd,
 void Server::ensureClientConnected(int client_fd)
 {
 	if (_output_queue.find(client_fd) == _output_queue.end())
-	{
-		throw(std::runtime_error("Client fd " + toStr(client_fd)
-								 + " is not yet connected."));
-	}
+		throw(ClientNotFound(client_fd));
 }
