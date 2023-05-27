@@ -34,6 +34,7 @@ class Request
 	int _method;
 	std::string _method_string;
 	std::string _uri;
+	std::string _query_string;
 	std::string _version_string; // 1.1 2.0 1.0
 	int _version;                // 1001 2000 1000
 	Header _header;
@@ -82,6 +83,7 @@ class Request
 	int getMethod(void) const;
 	const std::string &getMethodString(void) const;
 	const std::string &getURIPath(void) const;
+	const std::string &getQueryString(void) const;
 	const std::string &getBody() const;
 };
 } // namespace HTTP

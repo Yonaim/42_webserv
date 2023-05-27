@@ -72,6 +72,7 @@ int Request::consumeStartLine(std::string &buffer)
 
 	/* uri, version 파싱 */
 	_uri = tokens[1];
+	// TODO: uri와 query_string 파싱
 	_version_string = tokens[2];
 
 	{
