@@ -33,6 +33,7 @@ void WebServer::parseMaxBodySize(const ConfigContext &root_context)
 	}
 
 	_max_body_size = toNum<size_t>(body_size_directive.parameter(0));
+	_logger << "global max body size is " << _max_body_size << async::info;
 }
 
 void WebServer::parseUploadStore(const ConfigContext &root_context)
@@ -61,6 +62,7 @@ void WebServer::parseUploadStore(const ConfigContext &root_context)
 	}
 
 	_upload_store = upload_directive.parameter(0);
+	_logger << "upload store path set to " << _upload_store << async::info;
 }
 
 void WebServer::parseServer(const ConfigContext &server_context)
@@ -188,6 +190,8 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 			return;
 		}
 	}
+	_logger << "No matching server for " << request.getHeaderValue("Host", 0)
+			<< async::warning;
 	// 일치하는 Host가 없을 시, 해당 포트의 server_name이 없는 서버를 찾아보고
 	// 그러한 서버가 없다면 해당 포트의 첫 서버에 등록
 	if (findNoneNameServer(port) != _servers[port].end())

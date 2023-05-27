@@ -68,6 +68,8 @@ const Server::Location &Server::getLocation(const std::string &path) const
 
 	if (cur_diff == ULLONG_MAX)
 		throw(LocationNotFound(path));
+	_logger << "path " << path << " is for location " << result->first
+			<< async::verbose;
 	return (result->second);
 }
 

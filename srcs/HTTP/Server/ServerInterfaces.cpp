@@ -32,6 +32,8 @@ void Server::task(void)
 		{
 			delete handlers.front();
 			handlers.pop();
+			_logger << "RequestHandler return code " << rc
+					<< ", causing code 500" << async::error;
 			registerErrorResponse(client_fd, 500); // Internal Server Error}
 		}
 	}
