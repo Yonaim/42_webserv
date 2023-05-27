@@ -12,6 +12,11 @@ int Server::getPort(void) const
 	return (_port);
 }
 
+unsigned int Server::getTimeout(void) const
+{
+	return (_timeout_ms);
+}
+
 bool Server::cgiEnabled() const
 {
 	return (_cgi_enabled);

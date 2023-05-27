@@ -7,9 +7,10 @@
 
 using namespace HTTP;
 
-Server::Server(const ConfigContext &server_context, const size_t max_body_size)
+Server::Server(const ConfigContext &server_context, const size_t max_body_size,
+			   const unsigned int timeout_ms)
 	: _cgi_enabled(false), _max_body_size(max_body_size),
-	  _logger(async::Logger::getLogger("Server"))
+	  _timeout_ms(timeout_ms), _logger(async::Logger::getLogger("Server"))
 {
 	parseDirectiveListen(server_context);
 	parseDirectiveErrorPage(server_context);
@@ -26,7 +27,7 @@ Server::Server(const Server &orig)
 	: _port(orig._port), _cgi_enabled(orig._cgi_enabled),
 	  _server_name(orig._server_name), _error_pages(orig._error_pages),
 	  _locations(orig._locations), _max_body_size(orig._max_body_size),
-	  _logger(async::Logger::getLogger("Server"))
+	  _timeout_ms(orig._timeout_ms), _logger(async::Logger::getLogger("Server"))
 {
 }
 

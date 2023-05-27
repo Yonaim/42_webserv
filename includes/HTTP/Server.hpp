@@ -36,6 +36,7 @@ class Server
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
 	size_t _max_body_size;
+	const unsigned int _timeout_ms;
 	async::Logger &_logger;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
@@ -55,7 +56,8 @@ class Server
 	class LocationNotFound;
 	class ClientNotFound;
 
-	Server(const ConfigContext &server_context, const size_t max_body_size);
+	Server(const ConfigContext &server_context, const size_t max_body_size,
+		   const unsigned int timeout_ms);
 	~Server();
 	Server(const Server &orig);
 	Server &operator=(const Server &orig);
@@ -70,6 +72,7 @@ class Server
 	void disconnect(int client_fd);
 
 	int getPort(void) const;
+	unsigned int getTimeout(void) const;
 	bool cgiEnabled(void) const;
 	const Location &getLocation(const std::string &location) const;
 	std::string getResourcePath(const Request &req) const;

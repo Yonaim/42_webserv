@@ -79,8 +79,7 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 						<< async::error;
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			}
-			// TODO: 타임아웃 정해야함
-			_error_pages[code] = new async::FileReader(1000, file_path);
+			_error_pages[code] = new async::FileReader(_timeout_ms, file_path);
 			_logger << "parsed error page " << file_path << " for code " << code
 					<< async::verbose;
 		}
