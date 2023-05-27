@@ -28,10 +28,12 @@ class Server
 
 	int _port;
 	bool _has_server_name;
+	bool _cgi_enabled;
 	std::set<std::string> _server_name;
 	std::string _alias;
 	std::map<int, async::FileReader *> _error_pages;
 	std::map<std::string, Location> _locations;
+	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
 	async::Logger &_logger;
@@ -41,6 +43,7 @@ class Server
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);
 	void parseDirectiveLocation(const ConfigContext &server_context);
+	void parseDirectiveCGI(const ConfigContext &server_context);
 	void ensureClientConnected(int client_fd);
 	static bool isValidStatusCode(const int &status_code);
 	std::string getErrorPage(const int code);
@@ -68,8 +71,10 @@ class Server
 	void disconnect(int client_fd);
 
 	int getPort(void) const;
+	bool cgiEnabled(void) const;
 	const Location &getLocation(const std::string &location) const;
 	std::string getResourcePath(const Request &req) const;
+	bool isCGIextension(const std::string &path) const;
 };
 } // namespace HTTP
 

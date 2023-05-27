@@ -9,7 +9,7 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 	: RequestHandler(server, request, location), _writer(NULL),
 	  _cgi_handler(NULL)
 {
-	if (location.cgiEnabled() && location.isCGIextension(_resource_path))
+	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
 	{
 		// TODO: CGI 핸들러 완성시 주석 해제
 		// _cgi_handler = new CGIHandler(args);
