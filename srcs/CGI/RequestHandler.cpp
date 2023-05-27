@@ -3,7 +3,7 @@
 
 using namespace CGI;
 
-RequestHandler::RequestHandler(const HTTP::Request &http_request)
+RequestHandler::RequestHandler(const Request &http_request)
 	: _request(http_request)
 {
 }
