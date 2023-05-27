@@ -17,8 +17,8 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 	}
 	if (location.uploadAllowed())
 	{
-		_writer
-			= new async::FileWriter(1000, _resource_path, request.getBody());
+		_writer = new async::FileWriter(_server->_timeout_ms, _resource_path,
+										request.getBody());
 		return;
 	}
 	_response = _server->generateErrorResponse(500);

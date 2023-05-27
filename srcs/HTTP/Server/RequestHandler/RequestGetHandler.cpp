@@ -15,7 +15,7 @@ Server::RequestGetHandler::RequestGetHandler(Server *server,
 		// _cgi_handler = new CGIHandler(args);
 		return;
 	}
-	_reader = new async::FileReader(1000, _resource_path);
+	_reader = new async::FileReader(_server->_timeout_ms, _resource_path);
 }
 
 Server::RequestGetHandler::~RequestGetHandler()
