@@ -131,7 +131,7 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 			_logger << dir_name << " should be context" << async::error;
 			location_context.throwException(PARSINGEXC_UNDEF_DIR);
 		}
-		Location new_location(location_context);
+		Location new_location(location_context, _max_body_size);
 		if (_locations.find(new_location.getPath()) != _locations.end())
 		{
 			_logger << dir_name << " has duplicate paths" << async::error;

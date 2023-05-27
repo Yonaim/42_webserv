@@ -9,9 +9,11 @@ Server::Location::Location() : _logger(async::Logger::getLogger("Location"))
 {
 }
 
-Server::Location::Location(const ConfigContext &location_context)
+Server::Location::Location(const ConfigContext &location_context,
+						   const size_t max_body_size)
 	: _has_index(false), _do_redirection(false), _autoindex(false),
-	  _upload_allowed(false), _logger(async::Logger::getLogger("Location"))
+	  _upload_allowed(false), _max_body_size(max_body_size),
+	  _logger(async::Logger::getLogger("Location"))
 {
 	if (location_context.nParameters() != 1)
 		location_context.throwException(PARSINGEXC_INVALID_N_ARG);
@@ -34,7 +36,8 @@ Server::Location::Location(const Location &orig)
 	  _autoindex(orig._autoindex), _upload_allowed(orig._upload_allowed),
 	  _path(orig._path), _alias(orig._alias), _index(orig._index),
 	  _redirection(orig._redirection), _allowed_methods(orig._allowed_methods),
-	  _upload_store_path(orig._upload_store_path), _logger(orig._logger)
+	  _upload_store_path(orig._upload_store_path),
+	  _max_body_size(orig._max_body_size), _logger(orig._logger)
 {
 }
 
@@ -50,6 +53,7 @@ Server::Location &Server::Location::operator=(const Location &orig)
 	_redirection = orig._redirection;
 	_allowed_methods = orig._allowed_methods;
 	_upload_store_path = orig._upload_store_path;
+	_max_body_size = orig._max_body_size;
 	return (*this);
 }
 

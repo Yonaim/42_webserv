@@ -18,6 +18,7 @@ class Server::Location
 	std::pair<int, std::string> _redirection;
 	std::set<int> _allowed_methods;
 	std::string _upload_store_path;
+	size_t _max_body_size;
 	async::Logger &_logger;
 
 	void parseDirectiveAlias(const ConfigContext &location_context);
@@ -29,7 +30,7 @@ class Server::Location
 
   public:
 	Location();
-	Location(const ConfigContext &location_context);
+	Location(const ConfigContext &location_context, const size_t max_body_size);
 	~Location();
 	Location(const Location &orig);
 	Location &operator=(const Location &orig);
