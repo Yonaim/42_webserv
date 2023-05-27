@@ -10,7 +10,7 @@ using namespace HTTP;
 
 const std::string Response::_http_version = "HTTP/1.1";
 
-Response::Response(void)
+Response::Response(void) : _logger(async::Logger::getLogger("Response"))
 {
 	initGeneralHeaderFields();
 	initResponseHeaderFields();
@@ -20,7 +20,7 @@ Response::Response(void)
 Response::Response(Response const &other)
 	: _response(other._response), _status_code(other._status_code),
 	  _reason_phrase(other._reason_phrase), _header(other._header),
-	  _body(other._body)
+	  _body(other._body), _logger(other._logger)
 {
 }
 

@@ -29,6 +29,8 @@ void Response::setStatus(int status_code)
 	if (it == STATUS_CODE.end())
 		throw(std::runtime_error("wrong status code"));
 	_reason_phrase = it->second;
+	_logger << "Status code set to " << _status_code << " " << _reason_phrase
+			<< async::verbose;
 }
 
 void Response::setContent(const std::string &content,

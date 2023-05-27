@@ -2,6 +2,7 @@
 #define HTTP_RESPONSE_HPP
 
 #include "Header.hpp"
+#include "async/Logger.hpp"
 
 // 시작줄 : [HTTP 버전] [상태 코드] [사유 구절] # 공백으로 띄워진다.
 // 헤더, 빈 줄, 엔티티 본문이 온다.
@@ -47,6 +48,7 @@ class Response
 	std::string _reason_phrase;
 	Header _header;
 	std::string _body;
+	async::Logger &_logger;
 
 	enum e_autoindex
 	{
