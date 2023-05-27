@@ -45,29 +45,29 @@ void Server::parseDirectiveListen(const ConfigContext &server_context)
 	_logger << "parsed port " << _port << async::verbose;
 }
 
-void Server::parseDirectiveRoot(const ConfigContext &server_context)
+void Server::parseDirectiveAlias(const ConfigContext &server_context)
 {
-	const char *dir_name = "root";
+	const char *dir_name = "alias";
 	if (server_context.countDirectivesByName(dir_name) != 1)
 	{
 		_logger << server_context.name() << " should have 1 " << dir_name
 				<< async::error;
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
-	const ConfigDirective &root_directive
+	const ConfigDirective &alias_directive
 		= server_context.getNthDirectiveByName(dir_name, 0);
-	if (root_directive.is_context())
+	if (alias_directive.is_context())
 	{
 		_logger << dir_name << " should not be context" << async::error;
-		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		alias_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	}
-	if (root_directive.nParameters() != 1)
+	if (alias_directive.nParameters() != 1)
 	{
 		_logger << dir_name << " should have 1 parameter(s)" << async::error;
-		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		alias_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
-	_root = root_directive.parameter(0);
-	_logger << "parsed root " << _root << async::verbose;
+	_alias = alias_directive.parameter(0);
+	_logger << "parsed alias " << _alias << async::verbose;
 }
 
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
@@ -105,8 +105,8 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			}
 			// TODO: 타임아웃 정해야함
-			_error_pages[code] = new async::FileReader(1000, _root + file_path);
-			_logger << "parsed error page " << _root + file_path << " for code "
+			_error_pages[code] = new async::FileReader(1000, _alias + file_path);
+			_logger << "parsed error page " << _alias + file_path << " for code "
 					<< code << async::verbose;
 		}
 	}

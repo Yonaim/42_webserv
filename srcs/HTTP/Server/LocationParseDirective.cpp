@@ -5,28 +5,29 @@
 
 using namespace HTTP;
 
-void Server::Location::parseDirectiveRoot(const ConfigContext &location_context)
+void Server::Location::parseDirectiveAlias(
+	const ConfigContext &location_context)
 {
-	const char *dir_name = "root";
+	const char *dir_name = "alias";
 	if (location_context.countDirectivesByName(dir_name) != 1)
 	{
 		_logger << location_context.name() << " should have 1 " << dir_name
 				<< async::error;
 		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
-	const ConfigDirective &root_directive
+	const ConfigDirective &alias_directive
 		= location_context.getNthDirectiveByName(dir_name, 0);
-	if (root_directive.is_context())
+	if (alias_directive.is_context())
 	{
 		_logger << dir_name << " should not be context" << async::error;
-		root_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		alias_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	}
-	if (root_directive.nParameters() != 1)
+	if (alias_directive.nParameters() != 1)
 	{
 		_logger << dir_name << " should have 1 parameter(s)" << async::error;
-		root_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		alias_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
-	_root = root_directive.parameter(0);
+	_alias = alias_directive.parameter(0);
 }
 
 void Server::Location::parseDirectiveLimitExcept(
@@ -193,7 +194,7 @@ void Server::Location::parseDirectiveUpload(
 		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 	_upload_allowed = true;
-	_logger << "Uploading to " << _root << " enabled" << async::verbose;
+	_logger << "Uploading to " << _alias << " enabled" << async::verbose;
 	const ConfigDirective &upload_directive
 		= location_context.getNthDirectiveByName(dir_name, 0);
 	if (upload_directive.is_context())
@@ -236,7 +237,7 @@ void Server::Location::parseDirectiveCGI(const ConfigContext &location_context)
 		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	_cgi_extensions.insert(cgi_directive.parameter(0));
-	_logger << "CGI call to " << _root << " in " << cgi_directive.parameter(0)
+	_logger << "CGI call to " << _alias << " in " << cgi_directive.parameter(0)
 			<< " enabled" << async::verbose;
 	/*
 	보너스 대비한 버젼
@@ -249,7 +250,7 @@ void Server::Location::parseDirectiveCGI(const ConfigContext &location_context)
 	for (size_t i = 0; i < cgi_directive.nParameters(); i++)
 	{
 		_cgi_extensions.insert(cgi_directive.parameter(i));
-		_logger << "CGI call to " << _root << " in "
+		_logger << "CGI call to " << _alias << " in "
 				<< cgi_directive.parameter(i) << " enabled" << async::verbose;
 	}
 	*/

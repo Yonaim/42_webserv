@@ -14,7 +14,7 @@ class Server::Location
 	bool _upload_allowed;
 	bool _cgi_enabled;
 	std::string _path;
-	std::string _root;
+	std::string _alias;
 	std::vector<std::string> _index;
 	std::pair<int, std::string> _redirection;
 	std::set<int> _allowed_methods;
@@ -22,7 +22,7 @@ class Server::Location
 	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
 	async::Logger &_logger;
 
-	void parseDirectiveRoot(const ConfigContext &location_context);
+	void parseDirectiveAlias(const ConfigContext &location_context);
 	void parseDirectiveLimitExcept(const ConfigContext &location_context);
 	void parseDirectiveReturn(const ConfigContext &location_context);
 	void parseDirectiveAutoIndex(const ConfigContext &location_context);
@@ -38,7 +38,7 @@ class Server::Location
 	Location &operator=(const Location &orig);
 
 	const std::string &getPath(void) const;
-	const std::string &getRoot(void) const;
+	const std::string &getAlias(void) const;
 	const std::string &getNthIndex(size_t nth) const;
 	bool isAllowedMethod(int method) const;
 	bool hasIndex() const;

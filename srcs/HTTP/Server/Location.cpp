@@ -18,7 +18,7 @@ Server::Location::Location(const ConfigContext &location_context)
 		location_context.throwException(PARSINGEXC_INVALID_N_ARG);
 	_path = location_context.parameter(0);
 
-	parseDirectiveRoot(location_context);
+	parseDirectiveAlias(location_context);
 	parseDirectiveLimitExcept(location_context);
 	parseDirectiveReturn(location_context);
 	parseDirectiveAutoIndex(location_context);
@@ -34,7 +34,7 @@ Server::Location::~Location()
 Server::Location::Location(const Location &orig)
 	: _has_index(orig._has_index), _do_redirection(orig._do_redirection),
 	  _autoindex(orig._autoindex), _upload_allowed(orig._upload_allowed),
-	  _cgi_enabled(orig._cgi_enabled), _path(orig._path), _root(orig._root),
+	  _cgi_enabled(orig._cgi_enabled), _path(orig._path), _alias(orig._alias),
 	  _index(orig._index), _redirection(orig._redirection),
 	  _allowed_methods(orig._allowed_methods),
 	  _upload_store_path(orig._upload_store_path),
@@ -50,7 +50,7 @@ Server::Location &Server::Location::operator=(const Location &orig)
 	_upload_allowed = orig._upload_allowed;
 	_cgi_enabled = orig._cgi_enabled;
 	_path = orig._path;
-	_root = orig._root;
+	_alias = orig._alias;
 	_index = orig._index;
 	_redirection = orig._redirection;
 	_allowed_methods = orig._allowed_methods;
@@ -64,9 +64,9 @@ const std::string &Server::Location::getPath(void) const
 	return (_path);
 }
 
-const std::string &Server::Location::getRoot(void) const
+const std::string &Server::Location::getAlias(void) const
 {
-	return (_root);
+	return (_alias);
 }
 
 const std::string &Server::Location::getNthIndex(size_t nth) const

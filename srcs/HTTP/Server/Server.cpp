@@ -8,10 +8,10 @@
 using namespace HTTP;
 
 Server::Server(const ConfigContext &server_context)
-	: _root(""), _logger(async::Logger::getLogger("Server"))
+	: _alias(""), _logger(async::Logger::getLogger("Server"))
 {
 	parseDirectiveListen(server_context);
-	parseDirectiveRoot(server_context);
+	parseDirectiveAlias(server_context);
 	parseDirectiveErrorPage(server_context);
 	parseDirectiveServerName(server_context);
 	parseDirectiveLocation(server_context);
@@ -22,7 +22,7 @@ Server::~Server()
 }
 
 Server::Server(const Server &orig)
-	: _port(orig._port), _server_name(orig._server_name), _root(""),
+	: _port(orig._port), _server_name(orig._server_name), _alias(""),
 	  _error_pages(orig._error_pages), _locations(orig._locations),
 	  _logger(async::Logger::getLogger("Server"))
 {
@@ -30,7 +30,7 @@ Server::Server(const Server &orig)
 
 Server &Server::operator=(const Server &orig)
 {
-	_root = orig._root;
+	_alias = orig._alias;
 	_port = orig._port;
 	_server_name = orig._server_name;
 	_error_pages = orig._error_pages;
