@@ -172,8 +172,7 @@ int Request::consumeChunk(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 
-	const std::string length_line = consumestr(buffer, crlf_pos + CRLF_LEN);
-	const size_t content_length = strtol(length_line.c_str(), NULL, 16);
+	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
 	_logger << __func__ << ": content length " << content_length
 			<< async::verbose;
 	if (content_length < 0)
@@ -182,12 +181,15 @@ int Request::consumeChunk(std::string &buffer)
 				<< async::warning;
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
-	// buffer.size() >= 숫자 길이 + content_length + CRLF_LEN이면 ok
-	if (buffer.size() < content_length + CRLF_LEN)
+
+	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
+	if (buffer.size() < crlf_pos + CRLF_LEN + content_length + CRLF_LEN)
 	{
 		_logger << __func__ << ": not enough buffer size" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
+
+	consumestr(buffer, crlf_pos + CRLF_LEN);
 	_content_length += content_length;
 	_body.append(consumestr(buffer, content_length));
 	_logger << __func__ << ": body result in :\"" << _body << "\""
