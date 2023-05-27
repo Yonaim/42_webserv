@@ -39,7 +39,7 @@ int FileReader::task(void)
 	if (_status == status::BEGIN)
 	{
 		openFdByPath(O_RDONLY);
-		_processor = new SingleIOProcessor(_fd);
+		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_R);
 		// TODO: stat 함수가 사용 가능해지면 isFdClosed는 삭제하든지 하고 파일의
 		// 크기를 구하는 함수 작성하여 사용
 		if (_processor->isFdClosed(_fd))

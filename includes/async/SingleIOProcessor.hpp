@@ -10,12 +10,21 @@ class SingleIOProcessor : public IOProcessor
 {
   private:
 	int _fd;
+	int _event_option;
 
 	SingleIOProcessor();
 	void initialize(void);
 
   public:
+	enum IO_event_option
+	{
+		IO_R,
+		IO_W,
+		IO_RW
+	};
+
 	SingleIOProcessor(const int fd);
+	SingleIOProcessor(const int fd, const int event_option);
 	virtual ~SingleIOProcessor();
 	SingleIOProcessor(const SingleIOProcessor &orig);
 	SingleIOProcessor &operator=(const SingleIOProcessor &orig);

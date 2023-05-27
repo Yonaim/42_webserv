@@ -41,7 +41,7 @@ int FileWriter::task(void)
 	if (_status == status::BEGIN)
 	{
 		openFdByPath(O_WRONLY | O_CREAT);
-		_processor = new SingleIOProcessor(_fd);
+		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_W);
 		_processor->setWriteBuf(_content);
 		_status = status::AGAIN;
 	}
