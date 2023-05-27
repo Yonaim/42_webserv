@@ -30,7 +30,6 @@ class Server
 	bool _has_server_name;
 	bool _cgi_enabled;
 	std::set<std::string> _server_name;
-	std::string _alias;
 	std::map<int, async::FileReader *> _error_pages;
 	std::map<std::string, Location> _locations;
 	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
@@ -39,7 +38,6 @@ class Server
 	async::Logger &_logger;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
-	void parseDirectiveAlias(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);
 	void parseDirectiveLocation(const ConfigContext &server_context);

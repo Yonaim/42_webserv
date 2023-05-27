@@ -45,31 +45,6 @@ void Server::parseDirectiveListen(const ConfigContext &server_context)
 	_logger << "parsed port " << _port << async::verbose;
 }
 
-void Server::parseDirectiveAlias(const ConfigContext &server_context)
-{
-	const char *dir_name = "alias";
-	if (server_context.countDirectivesByName(dir_name) != 1)
-	{
-		_logger << server_context.name() << " should have 1 " << dir_name
-				<< async::error;
-		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
-	}
-	const ConfigDirective &alias_directive
-		= server_context.getNthDirectiveByName(dir_name, 0);
-	if (alias_directive.is_context())
-	{
-		_logger << dir_name << " should not be context" << async::error;
-		alias_directive.throwException(PARSINGEXC_UNDEF_DIR);
-	}
-	if (alias_directive.nParameters() != 1)
-	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
-		alias_directive.throwException(PARSINGEXC_INVALID_N_ARG);
-	}
-	_alias = alias_directive.parameter(0);
-	_logger << "parsed alias " << _alias << async::verbose;
-}
-
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 {
 	const char *dir_name = "error_page";
@@ -105,9 +80,9 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			}
 			// TODO: 타임아웃 정해야함
-			_error_pages[code] = new async::FileReader(1000, _alias + file_path);
-			_logger << "parsed error page " << _alias + file_path << " for code "
-					<< code << async::verbose;
+			_error_pages[code] = new async::FileReader(1000, file_path);
+			_logger << "parsed error page " << file_path << " for code " << code
+					<< async::verbose;
 		}
 	}
 }
@@ -195,8 +170,8 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	_cgi_extensions.insert(cgi_directive.parameter(0));
-	_logger << "CGI call to " << _alias << " in " << cgi_directive.parameter(0)
-			<< " enabled" << async::verbose;
+	_logger << "CGI call in " << cgi_directive.parameter(0) << " enabled"
+			<< async::verbose;
 	/*
 	보너스 대비한 버젼
 	if (cgi_directive.nParameters() < 1)
@@ -208,8 +183,8 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 	for (size_t i = 0; i < cgi_directive.nParameters(); i++)
 	{
 		_cgi_extensions.insert(cgi_directive.parameter(i));
-		_logger << "CGI call to " << _alias << " in "
-				<< cgi_directive.parameter(i) << " enabled" << async::verbose;
+		_logger << "CGI call to in " << cgi_directive.parameter(i) << " enabled"
+				<< async::verbose;
 	}
 	*/
 }
