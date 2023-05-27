@@ -92,20 +92,6 @@ std::vector<std::string> split(std::string const &s, std::string const &sep)
 	return (words);
 }
 
-std::string strBeforeSep(const std::string &be_parsed, const std::string &sep,
-						 size_t &start)
-{
-	std::string result;
-	size_t end;
-
-	end = be_parsed.find(sep, start);
-	if (end == std::string::npos)
-		return ("");
-	result = be_parsed.substr(start, end - start);
-	start = end + sep.size();
-	return (result);
-}
-
 std::string strtrim(const std::string str, const std::string charset)
 {
 	size_t start;
