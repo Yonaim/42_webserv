@@ -9,8 +9,8 @@ using namespace CGI;
 // 추후에 status_code 수정 필요함
 #define ERROR_CODE 11
 
-RequestHandler::RequestHandler(const HTTP::Request &http_request)
-	: _reader(NULL), _writer(NULL), _request(http_request),
+RequestHandler::RequestHandler(const Request &request)
+	: _reader(NULL), _writer(NULL), _request(request),
 	  _status(CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN), _pid(-1),
 	  _waitpid_status(-1),
 	  _logger(async::Logger::getLogger("CGIRequestHandler"))

@@ -46,7 +46,7 @@ class RequestHandler
 		CGI_RESPONSE_STATUS_OK,
 	};
 
-	RequestHandler(const Request &http_request);
+	RequestHandler(const Request &request);
 	~RequestHandler();
 
 	int task(void);
