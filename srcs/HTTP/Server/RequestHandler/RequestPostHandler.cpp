@@ -23,8 +23,7 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 	}
 	_response = _server->generateErrorResponse(500);
 	_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-	_server->_logger << "This location doesn't allow uploads or CGI"
-					 << async::warning;
+	_logger << "This location doesn't allow uploads or CGI" << async::warning;
 }
 
 Server::RequestPostHandler::~RequestPostHandler()

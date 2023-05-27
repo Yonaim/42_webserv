@@ -19,6 +19,7 @@ class Server::RequestHandler
 	Response _response;
 	int _status;
 	std::string _resource_path;
+	async::Logger &_logger;
 
 	void registerErrorResponse(const int code, const std::exception &e);
 

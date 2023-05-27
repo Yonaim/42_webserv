@@ -40,7 +40,8 @@ int Server::RequestGetHandler::task(void)
 		_response = _server->generateErrorResponse(301); // Not Found;
 		_response.setValue("Location", _request.getURIPath() + "/");
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		_server->_logger << "invalid directory format" << async::warning;
+		_logger << "invalid directory format, redirect to \""
+				<< _request.getURIPath() + "\"" << async::warning;
 		return (_status);
 	}
 	if (_cgi_handler)
@@ -83,7 +84,7 @@ int Server::RequestGetHandler::task(void)
 				_response.makeDirectoryListing(_resource_path,
 											   _request.getURIPath());
 				_response.setStatus(200);
-				_server->_logger << "directory listing" << async::verbose;
+				_logger << "directory listing" << async::verbose;
 			}
 			else
 				registerErrorResponse(404, e); // Not Found
