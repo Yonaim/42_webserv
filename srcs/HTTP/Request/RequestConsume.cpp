@@ -97,6 +97,8 @@ int Request::consumeHeader(std::string &buffer)
 	const std::string header_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
 	_logger << __func__ << ": header line: " << header_line << async::debug;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
 
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
@@ -107,52 +109,40 @@ int Request::consumeHeader(std::string &buffer)
 		return (RETURN_TYPE_OK);
 	}
 
-	/* name 파싱 */
-	size_t key_end_idx = 0;
-	std::string name = strBeforeSep(header_line, ":", key_end_idx);
-	if (name == "" || hasSpace(name))
+	const size_t colon_pos = header_line.find(":");
+	if (colon_pos == std::string::npos)
 	{
-		_logger << __func__ << ": header has invalid name" << async::warning;
+		_logger << __func__ << ": header line has no colon" << async::warning;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	_logger << __func__ << ": header name is " << name << async::verbose;
 
-	/* value 파싱 */
-	while (std::isspace(header_line[key_end_idx]))
-		++key_end_idx;
-
-	std::vector<std::string> vec_values;
-	while (true)
+	const std::string name = getfrontstr(header_line, colon_pos);
+	if (hasSpace(name))
 	{
-		std::string value = strBeforeSep(header_line, ",", key_end_idx);
-		if (value == "")
-			break;
-		vec_values.push_back(strtrim(value, " "));
-		_logger << __func__ << ": push value " << vec_values.back()
-				<< async::debug;
+		_logger << __func__ << ": header name has space" << async::warning;
+		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	std::string value = strtrim(std::string(&header_line[key_end_idx]), " ");
-	if (value != "")
+
+	const std::string value_part = getbackstr(header_line, colon_pos + 1);
+	std::vector<std::string> values = split(value_part, ",");
+	for (std::vector<std::string>::iterator it = values.begin();
+		 it != values.end(); it++)
 	{
-		vec_values.push_back(value);
-		_logger << __func__ << ": push value " << vec_values.back()
-				<< async::debug;
+		*it = strtrim(*it, LWS);
+		_logger << __func__ << ": new value \"" << *it << "\"" << async::debug;
 	}
 
 	/* key가 있다면, 붙여넣기 */
 	if (!_header.hasValue(name))
 	{
 		_logger << __func__ << ": assign to new header" << async::debug;
-		_header.assign(name, vec_values);
+		_header.assign(name, values);
 	}
 	else
 	{
 		_logger << __func__ << ": insert to existing header" << async::debug;
-		_header.insert(name, vec_values);
+		_header.insert(name, values);
 	}
-
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
 
 	return (RETURN_TYPE_IN_PROCESS);
 }
@@ -239,24 +229,28 @@ int Request::consumeTrailer(std::string &buffer)
 		return (RETURN_TYPE_OK);
 	}
 
-	/** name 파싱 **/
-	size_t key_end_idx = 0;
-	const std::string name = strBeforeSep(header_line, ":", key_end_idx);
-	if (name == "" || hasSpace(name))
+	const size_t colon_pos = header_line.find(":");
+	if (colon_pos == std::string::npos)
 	{
-		_logger << __func__ << ": header has invalid name" << async::warning;
-		throwException(CONSUME_EXC_INVALID_FORMAT);
+		_logger << __func__ << ": header line has no colon" << async::warning;
+		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	_logger << __func__ << ": header name is " << name << async::verbose;
 
-	std::vector<std::string>::iterator iter = _trailer_values.begin();
-	bool found_name = false;
-	for (; iter != _trailer_values.end(); ++iter)
+	const std::string name = getfrontstr(header_line, colon_pos);
+	if (hasSpace(name))
 	{
-		if (*iter == name)
+		_logger << __func__ << ": header name has space" << async::warning;
+		throwException(CONSUME_EXC_INVALID_FIELD);
+	}
+
+	bool found_name = false;
+	for (std::vector<std::string>::iterator it = _trailer_values.begin();
+		 it != _trailer_values.end(); it++)
+	{
+		if (*it == name)
 		{
 			found_name = true;
-			_trailer_values.erase(iter);
+			_trailer_values.erase(it);
 			break;
 		}
 	}
@@ -266,37 +260,26 @@ int Request::consumeTrailer(std::string &buffer)
 				<< async::warning;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	// passLWS(buffer);
 
-	/** value 파싱 **/
-	std::vector<std::string> vec_values;
-	while (true)
+	const std::string value_part = getbackstr(header_line, colon_pos + 1);
+	std::vector<std::string> values = split(value_part, ",");
+	for (std::vector<std::string>::iterator it = values.begin();
+		 it != values.end(); it++)
 	{
-		std::string value = strBeforeSep(header_line, ",", key_end_idx);
-		if (value == "")
-			break;
-		vec_values.push_back(strtrim(value, " "));
-		_logger << __func__ << ": push value " << vec_values.back()
-				<< async::debug;
-	}
-	std::string value = strtrim(std::string(&header_line[key_end_idx]), " ");
-	if (value != "")
-	{
-		vec_values.push_back(value);
-		_logger << __func__ << ": push value " << vec_values.back()
-				<< async::debug;
+		*it = strtrim(*it, LWS);
+		_logger << __func__ << ": new value \"" << *it << "\"" << async::debug;
 	}
 
 	/** key가 있다면, 붙여넣기 **/
 	if (!_header.hasValue(name))
 	{
 		_logger << __func__ << ": assign to new header" << async::verbose;
-		_header.assign(name, vec_values);
+		_header.assign(name, values);
 	}
 	else
 	{
 		_logger << __func__ << ": insert to existing header" << async::verbose;
-		_header.insert(name, vec_values);
+		_header.insert(name, values);
 	}
 
 	if (_trailer_values.size() == 0)
