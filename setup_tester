@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Create the main directory
+mkdir YoupiBanane
+cd YoupiBanane
+
+# Create files in the main directory
+echo "Path: YoupiBanane/youpi.bad_extension" > youpi.bad_extension
+echo "Path: YoupiBanane/youpi.bla" > youpi.bla
+
+# Create subdirectories
+mkdir nop
+mkdir Yeah
+
+# Create files in the "nop" subdirectory
+echo "Path: YoupiBanane/nop/youpi.bad_extension" > nop/youpi.bad_extension
+echo "Path: YoupiBanane/nop/other.pouic" > nop/other.pouic
+
+# Create a file in the "Yeah" subdirectory
+echo "Path: YoupiBanane/Yeah/not_happy.bad_extension" > Yeah/not_happy.bad_extension
