@@ -1,5 +1,6 @@
 #include "HTTP/RequestHandler.hpp"
 #include "utils/file.hpp"
+#include "utils/string.hpp"
 
 using namespace HTTP;
 
@@ -32,6 +33,33 @@ Response Server::RequestHandler::retrieve(void)
 	if (_status != RESPONSE_STATUS_OK)
 		throw(std::runtime_error("Response has not been made yet."));
 	return (_response);
+}
+
+void Server::RequestHandler::setCGIRequestValues(CGI::Request &cgi_request)
+{
+	// TODO: setCGIRequestValues 완성하기
+	// cgi_request.setMetaVariable("CONTENT_LENGTH",
+	// 							toStr<size_t>(_request.getBody().length()));
+	// if (_request.hasHeaderValue("Content-Type"))
+	// 	cgi_request.setMetaVariable("CONTENT_TYPE",
+	// 								_request.getHeaderValue("Content-Type", 0));
+	// cgi_request.setMetaVariable("PATH_INFO", _request.getURIPath());
+	// cgi_request.setMetaVariable("QUERY_STRING", _request.getQueryString());
+	// cgi_request.setMetaVariable("REQUEST_METHOD", _request.getMethodString());
+	// std::string host_header = _request.getHeaderValue("Host", 0);
+	// size_t colon_pos = host_header.find(':');
+	// if (colon_pos == std::string::npos)
+	// {
+	// 	cgi_request.setMetaVariable("SERVER_NAME", host_header);
+	// 	cgi_request.setMetaVariable("SERVER_PORT", "80");
+	// }
+	// else
+	// {
+	// 	cgi_request.setMetaVariable("SERVER_NAME",
+	// 								host_header.substr(0, colon_pos));
+	// 	cgi_request.setMetaVariable("SERVER_PORT",
+	// 								host_header.substr(colon_pos));
+	// }
 }
 
 bool Server::RequestHandler::isDirectory(void) const

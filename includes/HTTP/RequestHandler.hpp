@@ -35,7 +35,7 @@ class Server::RequestHandler
 
 	virtual int task(void) = 0;
 	Response retrieve(void);
-	void makeMetaVariables(CGI::Request &cgi_request);
+	void setCGIRequestValues(CGI::Request &cgi_request);
 	bool isDirectory(void) const;
 	bool isInvalidDirectoryFormat(void) const;
 };

@@ -43,6 +43,8 @@ int Server::RequestPostHandler::task(void)
 
 	if (_cgi_handler)
 	{
+		CGI::Request cgi_request;
+		setCGIRequestValues(cgi_request);
 		// _status = _cgi_handler->task();
 	}
 
