@@ -2,6 +2,8 @@
 #include "../const_values.hpp"
 #include "utils/string.hpp"
 
+using namespace HTTP;
+
 static const char *consume_exc_description[]
 	= {"Empty line found", "Invalid format", "Invalid header field",
 	   "Invalid header value", "Invalid body size"};
@@ -9,22 +11,22 @@ static const char *consume_exc_description[]
 static const char *parse_state_str[]
 	= {"start line", "header", "body", "chunk", "trailer"};
 
-HTTP::Request::ParsingFail::ParsingFail(const std::string &why)
+Request::ParsingFail::ParsingFail(const std::string &why)
 	: std::runtime_error(why)
 {
 }
 
-HTTP::Request::Request(void)
+Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE),
 	  _content_length(0), _logger(async::Logger::getLogger("Request"))
 {
 }
 
-HTTP::Request::~Request()
+Request::~Request()
 {
 }
 
-HTTP::Request::Request(const Request &orig)
+Request::Request(const Request &orig)
 	: _method(orig._method), _uri(orig._uri),
 	  _version_string(orig._version_string), _version(orig._version),
 	  _header(orig._header), _body(orig._body),
@@ -33,7 +35,7 @@ HTTP::Request::Request(const Request &orig)
 {
 }
 
-HTTP::Request &HTTP::Request::operator=(const HTTP::Request &orig)
+Request &Request::operator=(const Request &orig)
 {
 	if (this != &orig)
 	{
@@ -49,7 +51,7 @@ HTTP::Request &HTTP::Request::operator=(const HTTP::Request &orig)
 	return (*this);
 }
 
-int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
+int Request::parse(std::string &buffer, size_t client_max_body_size)
 {
 	// TODO: 디버그 완료 후 하단 변수 삭제
 	const char *state_names[]
@@ -203,7 +205,7 @@ int HTTP::Request::parse(std::string &buffer, size_t client_max_body_size)
 	}
 }
 
-void HTTP::Request::throwException(int code) const
+void Request::throwException(int code) const
 {
 	std::stringstream what;
 
@@ -215,50 +217,50 @@ void HTTP::Request::throwException(int code) const
 	throw(ParsingFail(what.str()));
 }
 
-bool HTTP::Request::hasHeaderValue(std::string const &name,
-								   std::string const &value) const
+bool Request::hasHeaderValue(std::string const &name,
+							 std::string const &value) const
 {
 	return (_header.hasValue(name, value));
 }
 
-bool HTTP::Request::hasHeaderValue(const Header::const_iterator &name_iter,
-								   const std::string &value) const
+bool Request::hasHeaderValue(const Header::const_iterator &name_iter,
+							 const std::string &value) const
 {
 	return (_header.hasValue(name_iter, value));
 }
 
-bool HTTP::Request::hasHeaderValue(std::string const &name) const
+bool Request::hasHeaderValue(std::string const &name) const
 {
 	return (_header.hasValue(name));
 }
 
-const std::string &HTTP::Request::getHeaderValue(std::string const &name,
-												 int idx) const
+const std::string &Request::getHeaderValue(std::string const &name,
+										   int idx) const
 {
 	return (_header.getValue(name, idx));
 }
 
-int HTTP::Request::getMethod(void) const
+int Request::getMethod(void) const
 {
 	return (_method);
 }
 
-const std::string &HTTP::Request::getMethodString(void) const
+const std::string &Request::getMethodString(void) const
 {
 	return (_method_string);
 }
 
-const std::string &HTTP::Request::getURIPath(void) const
+const std::string &Request::getURIPath(void) const
 {
 	return (_uri);
 }
 
-const std::string &HTTP::Request::getQueryString(void) const
+const std::string &Request::getQueryString(void) const
 {
 	return (_query_string);
 }
 
-const std::string &HTTP::Request::getBody() const
+const std::string &Request::getBody() const
 {
 	return (_body);
 }
