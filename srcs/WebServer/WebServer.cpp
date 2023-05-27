@@ -65,7 +65,7 @@ void WebServer::parseUploadStore(const ConfigContext &root_context)
 
 void WebServer::parseServer(const ConfigContext &server_context)
 {
-	HTTP::Server server(server_context);
+	HTTP::Server server(server_context, _max_body_size);
 	int port = server.getPort();
 	_logger << "Created Server at port " << port << async::info;
 	if (_tcp_procs.find(port) == _tcp_procs.end())

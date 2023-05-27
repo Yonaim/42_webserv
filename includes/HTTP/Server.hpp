@@ -35,6 +35,7 @@ class Server
 	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
+	size_t _max_body_size;
 	async::Logger &_logger;
 
 	void parseDirectiveListen(const ConfigContext &server_context);
@@ -54,7 +55,7 @@ class Server
 	class LocationNotFound;
 	class ClientNotFound;
 
-	Server(const ConfigContext &server_context);
+	Server(const ConfigContext &server_context, const size_t max_body_size);
 	~Server();
 	Server(const Server &orig);
 	Server &operator=(const Server &orig);
