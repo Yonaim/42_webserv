@@ -45,6 +45,7 @@ TESTDRIVERDEPS		= $(addprefix $(DIR_TESTOBJS), $(addsuffix .d, $(TESTDRIVERNAMES
 FILENAMES			= \
 					utils/string \
 					utils/file \
+					Header/Header \
 					$(DIR_ASYNC_IO)IOProcessor \
 					$(DIR_ASYNC_IO)IOException \
 					$(DIR_ASYNC_IO)SingleIOProcessor \
@@ -62,7 +63,6 @@ FILENAMES			= \
 					$(DIR_HTTP)const_values \
 					$(DIR_HTTP)mime_type \
 					$(DIR_HTTP)error_pages \
-					$(DIR_HTTP)Header/Header \
 					$(DIR_HTTP)Request/Request \
 					$(DIR_HTTP)Request/RequestConsume \
 					$(DIR_HTTP)Response/Response \
