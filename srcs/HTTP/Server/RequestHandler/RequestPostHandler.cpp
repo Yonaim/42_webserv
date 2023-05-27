@@ -55,7 +55,16 @@ int Server::RequestPostHandler::task(void)
 			int rc = _writer->task();
 			if (rc == async::status::OK)
 			{
+				std::string body = "made the file\n"
+								   "click <A href=\""
+								   + _request.getURIPath()
+								   + "\">here</A> to view it.";
+
 				_response.setStatus(201); // Created
+				_response.setLocation(_request.getURIPath());
+				_response.setBody(body);
+				_response.setContentType("text/html");
+				_response.setContentLength(body.length());
 				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 			}
 			else if (rc == async::status::AGAIN)
