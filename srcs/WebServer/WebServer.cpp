@@ -65,6 +65,35 @@ void WebServer::parseUploadStore(const ConfigContext &root_context)
 	_logger << "upload store path set to " << _upload_store << async::info;
 }
 
+void WebServer::parseTimeout(const ConfigContext &root_context)
+{
+	const char *dir_name = "timeout";
+
+	if (root_context.countDirectivesByName(dir_name) != 1)
+	{
+		_logger << root_context.name() << " should have 1 " << dir_name
+				<< async::error;
+		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+
+	const ConfigDirective &timeout_directive
+		= root_context.getNthDirectiveByName(dir_name, 0);
+
+	if (timeout_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		root_context.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	if (timeout_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		timeout_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+
+	_timeout_ms = toNum<unsigned int>(timeout_directive.parameter(0));
+	_logger << "global timeout is " << _timeout_ms << async::info;
+}
+
 void WebServer::parseServer(const ConfigContext &server_context)
 {
 	HTTP::Server server(server_context, _max_body_size);
@@ -87,6 +116,7 @@ WebServer::WebServer(const ConfigContext &root_context)
 {
 	parseMaxBodySize(root_context);
 	parseUploadStore(root_context);
+	parseTimeout(root_context);
 
 	const char *dir_name = "server";
 	size_t n_servers = root_context.countDirectivesByName(dir_name);
@@ -112,7 +142,7 @@ WebServer::~WebServer()
 
 WebServer::WebServer(const WebServer &orig)
 	: _tcp_procs(orig._tcp_procs), _servers(orig._servers),
-	  _logger(orig._logger)
+	  _timeout_ms(orig._timeout_ms), _logger(orig._logger)
 {
 }
 
@@ -120,6 +150,7 @@ WebServer &WebServer::operator=(const WebServer &orig)
 {
 	_tcp_procs = orig._tcp_procs;
 	_servers = orig._servers;
+	_timeout_ms = orig._timeout_ms;
 	return (*this);
 }
 
