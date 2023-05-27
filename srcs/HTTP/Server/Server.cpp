@@ -38,8 +38,7 @@ Server &Server::operator=(const Server &orig)
 	return (*this);
 }
 
-const Server::Location &Server::getLocation(
-	const std::string &path) const
+const Server::Location &Server::getLocation(const std::string &path) const
 {
 	size_t cmp_diff;
 	size_t cur_diff = ULLONG_MAX;

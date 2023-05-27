@@ -69,8 +69,7 @@ bool Server::RequestHandler::isDirectory(void) const
 
 bool Server::RequestHandler::isInvalidDirectoryFormat(void) const
 {
-	if (isDirectory())
-		if (_resource_path.back() != '/')
+	if (isDirectory() && _resource_path.back() != '/')
 			return (true);
 	return (false);
 }
