@@ -15,11 +15,13 @@ class Request
   public:
 	Request();
 	~Request();
-	Request(const HTTP::Request &http_request);
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
 
-	// 생성자에서 사용할 파싱 메서드 추가 예정
+	// setter
+	void setMetaVariable(std::string name, std::string value);
+
+	// getter
 	const std::string &getMessageBody(void) const;
 	const char **getEnv(void) const;
 };

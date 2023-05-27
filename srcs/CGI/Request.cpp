@@ -20,12 +20,6 @@ Request::~Request()
 {
 }
 
-Request::Request(const HTTP::Request &http_request)
-{
-	(void)http_request;
-	// TODO: http request를 인자로 받는 생성자 구현
-}
-
 Request::Request(const Request &orig)
 {
 	(void)orig;
@@ -39,13 +33,25 @@ const Request &Request::operator=(const Request &orig)
 	return (*this);
 }
 
+const char **Request::getEnv(void) const
+{
+	char **env = new char *[_n_meta_variables + 1];
+	for (size_t i = 0; i < _n_meta_variables; i++)
+	{
+		const std::string &name = meta_variable_names[i];
+		const std::string &value = _meta_variables.find(name)->second;
+		env[i] = strdup((name + '=' + value).c_str());
+	}
+	env[_n_meta_variables] = NULL;
+	return ((const char **)env);
+}
+
 const std::string &Request::getMessageBody(void) const
 {
 	return (_message_body);
 }
 
-const char **Request::getEnv(void) const
+void Request::setMetaVariable(std::string name, std::string value)
 {
-	// TODO: getEnv 구현
-	return (NULL);
+	_meta_variables[name] = value;
 }
