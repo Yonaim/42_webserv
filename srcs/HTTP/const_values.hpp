@@ -19,8 +19,10 @@ namespace HTTP
 // special token
 extern const std::string CRLF;
 extern const std::string SP;
-extern const int CRLF_LEN;
-extern const int SP_LEN;
+extern const std::string LWS;
+extern const size_t CRLF_LEN;
+extern const size_t SP_LEN;
+extern const size_t LWS_LEN;
 
 // method
 extern const BidiMap<std::string, int> METHOD;

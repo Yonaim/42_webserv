@@ -4,8 +4,10 @@
 // special token
 const std::string HTTP::CRLF = "\r\n";
 const std::string HTTP::SP = " ";
-const int HTTP::CRLF_LEN = 2;
-const int HTTP::SP_LEN = 1;
+const std::string HTTP::LWS = " \t";
+const size_t HTTP::CRLF_LEN = HTTP::CRLF.length();
+const size_t HTTP::SP_LEN = HTTP::SP.length();
+const size_t HTTP::LWS_LEN = HTTP::LWS.length();
 
 // method
 const std::pair<std::string, int> _METHOD[]
