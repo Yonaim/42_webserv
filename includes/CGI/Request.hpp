@@ -8,27 +8,8 @@ namespace CGI
 class Request
 {
   private:
-	// meta-variables
-	// TODO: map으로 전환 여부 고려하기
-	std::string _auth_type;
-	std::string _content_length;
-	std::string _content_type;
-	std::string _gateway_interface;
-	std::string _path_info;
-	std::string _path_translated;
-	std::string _query_string;
-	std::string _remote_addr;
-	std::string _remote_host;
-	std::string _remote_ident;
-	std::string _remote_user;
-	std::string _request_method;
-	std::string _script_name;
-	std::string _server_name;
-	std::string _server_port;
-	std::string _server_protocol;
-	std::string _server_software;
-	std::vector<std::string> _extra_variables;
-	// message-body
+	static const size_t _n_meta_variables = 17;
+	std::map<std::string, std::string> _meta_variables;
 	std::string _message_body;
 
   public:
