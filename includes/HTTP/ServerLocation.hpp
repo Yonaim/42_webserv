@@ -27,6 +27,7 @@ class Server::Location
 	void parseDirectiveAutoIndex(const ConfigContext &location_context);
 	void parseDirectiveIndex(const ConfigContext &location_context);
 	void parseDirectiveUpload(const ConfigContext &location_context);
+	void parseDirectiveMaxBodySize(const ConfigContext &location_context);
 
   public:
 	Location();

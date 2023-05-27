@@ -25,6 +25,7 @@ Server::Location::Location(const ConfigContext &location_context,
 	parseDirectiveAutoIndex(location_context);
 	parseDirectiveIndex(location_context);
 	parseDirectiveUpload(location_context);
+	parseDirectiveMaxBodySize(location_context);
 }
 
 Server::Location::~Location()

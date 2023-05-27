@@ -209,3 +209,36 @@ void Server::Location::parseDirectiveUpload(
 	}
 	_upload_store_path = upload_directive.parameter(0);
 }
+
+void Server::Location::parseDirectiveMaxBodySize(
+	const ConfigContext &location_context)
+{
+	const char *dir_name = "client_max_body_size";
+
+	if (location_context.countDirectivesByName(dir_name) == 0)
+		return;
+	if (location_context.countDirectivesByName(dir_name) > 1)
+	{
+		_logger << location_context.name() << " should have 0 or 1 " << dir_name
+				<< async::error;
+		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+
+	const ConfigDirective &body_size_directive
+		= location_context.getNthDirectiveByName(dir_name, 0);
+
+	if (body_size_directive.is_context())
+	{
+		_logger << dir_name << " should not be context" << async::error;
+		location_context.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	if (body_size_directive.nParameters() != 1)
+	{
+		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		body_size_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+
+	_max_body_size = toNum<size_t>(body_size_directive.parameter(0));
+	_logger << "max body size for " << _path << " is " << _max_body_size
+			<< async::verbose;
+}
