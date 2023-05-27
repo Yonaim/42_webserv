@@ -225,18 +225,19 @@ int Request::consumeTrailer(std::string &buffer)
 		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
 		return (RETURN_TYPE_AGAIN);
 	}
+
+	const std::string header_line = consumestr(buffer, crlf_pos);
+	consumestr(buffer, CRLF_LEN);
+	_logger << __func__ << ": header line: " << header_line << async::debug;
+	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
+			<< async::debug;
+
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
 		_logger << __func__ << ": header line only has CRLF (end of header)"
 				<< async::debug;
-		trimfrontstr(buffer, CRLF_LEN);
-		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-				<< async::debug;
 		return (RETURN_TYPE_OK);
 	}
-
-	const std::string header_line = getfrontstr(buffer, crlf_pos);
-	_logger << __func__ << ": header line: " << header_line << async::debug;
 
 	/** name 파싱 **/
 	size_t key_end_idx = 0;
@@ -265,7 +266,7 @@ int Request::consumeTrailer(std::string &buffer)
 				<< async::warning;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
-	passLWS(buffer);
+	// passLWS(buffer);
 
 	/** value 파싱 **/
 	std::vector<std::string> vec_values;
@@ -297,10 +298,6 @@ int Request::consumeTrailer(std::string &buffer)
 		_logger << __func__ << ": insert to existing header" << async::verbose;
 		_header.insert(name, vec_values);
 	}
-
-	trimfrontstr(buffer, header_line.size() + CRLF_LEN);
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
 
 	if (_trailer_values.size() == 0)
 		return (RETURN_TYPE_OK);
