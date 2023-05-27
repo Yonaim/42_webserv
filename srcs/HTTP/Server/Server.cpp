@@ -74,9 +74,15 @@ std::string Server::getResourcePath(const Request &req) const
 	const Location &location = getLocation(uri_path);
 	const std::string &alias = location.getAlias();
 
+	_logger << __func__ << ": URI path before replace \"" << uri_path;
 	uri_path.replace(0, location.getPath().length(), alias);
+	_logger << "\" after \"" << uri_path << "\"" << async::verbose;
 	if (req.getURIPath().back() == '/' && location.hasIndex())
+	{
 		uri_path += location.getNthIndex(0);
+		_logger << __func__ << ": add index to URI path, result: \"" << uri_path
+				<< "\"" << async::verbose;
+	}
 
 	return (uri_path);
 }

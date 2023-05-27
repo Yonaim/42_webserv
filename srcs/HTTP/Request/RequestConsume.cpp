@@ -48,7 +48,7 @@ int Request::consumeStartLine(std::string &buffer)
 		_logger << __func__ << ": split into ";
 		for (size_t i = 0; i < tokens.size(); i++)
 			_logger << "\"" << tokens[i] << "\" ";
-		_logger << async::debug;
+		_logger << async::verbose;
 	}
 
 	/* method index 구하기 */
