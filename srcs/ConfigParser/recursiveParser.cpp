@@ -21,12 +21,13 @@ ConfigDirective parseConfigDirective(std::vector<std::string>::iterator &cursor,
 	while (true)
 	{
 		cursor_end++;
-		if (isSpecialToken(*cursor_end) || cursor_end == tokens.end())
+		if (cursor_end == tokens.end())
+			throw(ParsingFailException(
+				"Reached end of tokens without semicolon."));
+		if (isSpecialToken(*cursor_end))
 			break;
 		parameters.push_back(*cursor_end);
 	}
-	if (cursor_end == tokens.end())
-		throw(ParsingFailException("Reached end of tokens without semicolon."));
 	if (*cursor_end != token_semicolon)
 		throw(
 			ParsingFailException("Unexpected token \"" + *cursor_end + "\"."));
@@ -47,12 +48,13 @@ ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
 	while (true)
 	{
 		cursor_end++;
-		if (isSpecialToken(*cursor_end) || cursor_end == tokens.end())
+		if (cursor_end == tokens.end())
+			throw(
+				ParsingFailException("Reached end of tokens without braces."));
+		if (isSpecialToken(*cursor_end))
 			break;
 		parameters.push_back(*cursor_end);
 	}
-	if (cursor_end == tokens.end())
-		throw(ParsingFailException("Reached end of tokens without braces."));
 	if (*cursor_end != token_brace_open)
 		throw(
 			ParsingFailException("Unexpected token \"" + *cursor_end + "\"."));
