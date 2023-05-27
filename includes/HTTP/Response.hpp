@@ -18,13 +18,6 @@
 	Accept-Ranges: bytes
 */
 
-/**
- * TODO:
- * 	1. chunked-encoding 처리
- *  2. 특정 헤더 필드 처리(RFC 문서 참고하면서)
- *  3. 테스트 및 컴파일 잘되는지 확인하기
- */
-
 namespace HTTP
 {
 
