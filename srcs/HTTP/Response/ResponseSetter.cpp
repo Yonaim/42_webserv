@@ -63,8 +63,7 @@ void Response::setContentLength(void)
 
 void Response::setContentLength(size_t length)
 {
-	if (length > 0)
-		setValue("Content-Length", uintToStr(length));
+	setValue("Content-Length", toStr<size_t>(length));
 }
 
 void Response::setConnection(bool is_persistent)
