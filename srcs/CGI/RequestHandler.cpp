@@ -9,7 +9,8 @@ using namespace CGI;
 // 추후에 status_code 수정 필요함
 #define ERROR_CODE 11
 
-RequestHandler::RequestHandler(const Request &request)
+RequestHandler::RequestHandler(const Request &request,
+							   const unsigned int timeout_ms)
 	: _reader(NULL), _writer(NULL), _request(request),
 	  _status(CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN), _pid(-1),
 	  _waitpid_status(-1),
@@ -22,9 +23,9 @@ RequestHandler::RequestHandler(const Request &request)
 			// TODO: 예외 처리
 			throw(std::runtime_error("Failed to create pipe."));
 		}
-		_writer = new async::FileWriter(1000, _pipe_fd[1],
+		_writer = new async::FileWriter(timeout_ms, _pipe_fd[1],
 										_request.getMessageBody());
-		_reader = new async::FileReader(1000, _pipe_fd[0]);
+		_reader = new async::FileReader(timeout_ms, _pipe_fd[0]);
 	}
 	catch (const std::exception &e)
 	{

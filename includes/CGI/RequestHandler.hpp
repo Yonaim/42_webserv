@@ -46,7 +46,7 @@ class RequestHandler
 		CGI_RESPONSE_STATUS_OK,
 	};
 
-	RequestHandler(const Request &request);
+	RequestHandler(const Request &request, const unsigned int timeout_ms);
 	~RequestHandler();
 
 	int task(void);
