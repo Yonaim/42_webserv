@@ -70,11 +70,13 @@ const Server::Location &Server::getLocation(const std::string &path) const
 
 std::string Server::getResourcePath(const Request &req) const
 {
-	const std::string &uri_path = req.getURIPath();
+	std::string uri_path = req.getURIPath();
 	const Location &location = getLocation(uri_path);
+	const std::string &alias = location.getAlias();
 
-	if (uri_path.back() == '/' && location.hasIndex())
-		return (location.getRoot() + uri_path + location.getNthIndex(0));
+	uri_path.replace(0, location.getPath().length(), alias);
+	if (req.getURIPath().back() == '/' && location.hasIndex())
+		uri_path += location.getNthIndex(0);
 
-	return (location.getRoot() + uri_path);
+	return (uri_path);
 }
