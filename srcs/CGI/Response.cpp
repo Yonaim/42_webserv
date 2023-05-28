@@ -8,12 +8,6 @@ CGI::Response::~Response()
 {
 }
 
-CGI::Response::Response(const std::string &cgi_output)
-{
-	(void)cgi_output;
-	// TODO: cgi output을 인자로 받는 생성자 구현
-}
-
 CGI::Response::Response(const Response &orig)
 {
 	(void)orig;
