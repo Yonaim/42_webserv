@@ -12,37 +12,37 @@ void Server::parseDirectiveListen(const ConfigContext &server_context)
 	const char *dir_name = "listen";
 	if (server_context.countDirectivesByName("listen") != 1)
 	{
-		_logger << server_context.name() << " should have 1 " << dir_name
-				<< async::error;
+		_logger << async::error << server_context.name() << " should have 1 "
+				<< dir_name;
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 	const ConfigDirective &listen_directive
 		= server_context.getNthDirectiveByName(dir_name, 0);
 	if (listen_directive.is_context())
 	{
-		_logger << dir_name << " should not be context" << async::error;
+		_logger << async::error << dir_name << " should not be context";
 		listen_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	}
 	if (listen_directive.nParameters() != 1)
 	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
 		listen_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	const std::string &port_str = listen_directive.parameter(0);
 	if (!isUnsignedIntStr(port_str))
 	{
-		_logger << dir_name << " should have integer form parameter"
-				<< async::error;
+		_logger << async::error << dir_name
+				<< " should have integer form parameter";
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 	}
 	std::stringstream ss(port_str);
 	ss >> _port;
 	if (!(0 <= _port && _port <= 65536))
 	{
-		_logger << dir_name << " has invalid port number" << async::error;
+		_logger << async::error << dir_name << " has invalid port number";
 		listen_directive.throwException(PARSINGEXC_UNDEF_ARG);
 	}
-	_logger << "parsed port " << _port << async::verbose;
+	_logger << async::verbose << "parsed port " << _port;
 }
 
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
@@ -57,7 +57,7 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName(dir_name, i);
 		if (error_page_directive.is_context())
 		{
-			_logger << dir_name << " should not be context" << async::error;
+			_logger << async::error << dir_name << " should not be context";
 			error_page_directive.throwException(PARSINGEXC_UNDEF_DIR);
 		}
 		const size_t n_arguments = error_page_directive.nParameters();
@@ -68,20 +68,20 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			const std::string &code_str = error_page_directive.parameter(i);
 			if (!isUnsignedIntStr(code_str))
 			{
-				_logger << dir_name << " should have integer form parameter"
-						<< async::error;
+				_logger << async::error << dir_name
+						<< " should have integer form parameter";
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			}
 			int code = toNum<int>(code_str);
 			if (!isValidStatusCode(code))
 			{
-				_logger << dir_name << " has invalid status code"
-						<< async::error;
+				_logger << async::error << dir_name
+						<< " has invalid status code";
 				error_page_directive.throwException(PARSINGEXC_UNDEF_ARG);
 			}
 			_error_pages[code] = new async::FileReader(_timeout_ms, file_path);
-			_logger << "parsed error page " << file_path << " for code " << code
-					<< async::verbose;
+			_logger << async::verbose << "parsed error page " << file_path
+					<< " for code " << code;
 		}
 	}
 }
@@ -101,15 +101,15 @@ void Server::parseDirectiveServerName(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName(dir_name, i);
 		if (server_name_directive.is_context())
 		{
-			_logger << dir_name << " should not be context" << async::error;
+			_logger << async::error << dir_name << " should not be context";
 			server_name_directive.throwException(PARSINGEXC_UNDEF_DIR);
 		}
 		const size_t n_arguments = server_name_directive.nParameters();
 		for (size_t i = 0; i < n_arguments; i++)
 		{
 			_server_name.insert(server_name_directive.parameter(i));
-			_logger << "parsed server name "
-					<< server_name_directive.parameter(i) << async::verbose;
+			_logger << async::verbose << "parsed server name "
+					<< server_name_directive.parameter(i);
 		}
 	}
 }
@@ -127,18 +127,18 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 				"location", i));
 		if (!location_context.is_context())
 		{
-			_logger << dir_name << " should be context" << async::error;
+			_logger << async::error << dir_name << " should be context";
 			location_context.throwException(PARSINGEXC_UNDEF_DIR);
 		}
 		Location new_location(location_context, _max_body_size);
 		if (_locations.find(new_location.getPath()) != _locations.end())
 		{
-			_logger << dir_name << " has duplicate paths" << async::error;
+			_logger << async::error << dir_name << " has duplicate paths";
 			location_context.throwException(PARSINGEXC_DUP_DIR);
 		}
 		_locations[new_location.getPath()] = new_location;
-		_logger << "parsed location " << new_location.getPath()
-				<< async::verbose;
+		_logger << async::verbose << "parsed location "
+				<< new_location.getPath();
 	}
 }
 
@@ -150,8 +150,8 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 		return;
 	if (n_indexs > 1)
 	{
-		_logger << server_context.name() << " should have 0 or 1 " << dir_name
-				<< async::error;
+		_logger << async::error << server_context.name()
+				<< " should have 0 or 1 " << dir_name;
 		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 	_cgi_enabled = true;
@@ -159,31 +159,32 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 		= server_context.getNthDirectiveByName(dir_name, 0);
 	if (cgi_directive.is_context())
 	{
-		_logger << dir_name << " should not be context" << async::error;
+		_logger << async::error << dir_name << " should not be context";
 		cgi_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	}
 	// 맨대토리 버젼, 1개의 아규먼트만 허용
 	if (cgi_directive.nParameters() != 1)
 	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
 		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	_cgi_extensions.insert(cgi_directive.parameter(0));
-	_logger << "CGI call in " << cgi_directive.parameter(0) << " enabled"
-			<< async::verbose;
+	_logger << async::verbose << "CGI call in " << cgi_directive.parameter(0)
+			<< " enabled";
+
 	/*
 	보너스 대비한 버젼
 	if (cgi_directive.nParameters() < 1)
 	{
-		_logger << dir_name << " should have more than 0 parameter(s)"
-				<< async::error;
+		_logger << async::error << dir_name
+				<< " should have more than 0 parameter(s)";
 		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 	for (size_t i = 0; i < cgi_directive.nParameters(); i++)
 	{
 		_cgi_extensions.insert(cgi_directive.parameter(i));
-		_logger << "CGI call to in " << cgi_directive.parameter(i) << " enabled"
-				<< async::verbose;
+		_logger << async::verbose << "CGI call to in "
+				<< cgi_directive.parameter(i) << " enabled";
 	}
 	*/
 }
