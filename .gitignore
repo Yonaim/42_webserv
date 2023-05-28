@@ -55,3 +55,11 @@
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,visualstudiocode
+
+webserv
+
+# Youpi tester
+tester
+cgi_tester
+YoupiBanane/*
+file_should_exist_after
