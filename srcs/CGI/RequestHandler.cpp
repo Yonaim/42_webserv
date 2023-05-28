@@ -73,12 +73,15 @@ int RequestHandler::fork()
 			std::exit(CGI_RESPONSE_INNER_STATUS_OK);
 		}
 		::close(_write_pipe_fd[0]);
+		::close(_write_pipe_fd[1]);
+		::close(_read_pipe_fd[0]);
 		::close(_read_pipe_fd[1]);
 		// TODO:
 		// CGIRequest에서 getPath, getEnv 내부 메소드 필요할듯
 		// TODO:
 		// CGI 인자로 넘길 것 결정하기(NULL 말고)
 		execve(_request.getPath().c_str(), NULL, _request.getEnv());
+		_logger << "failed to execve cgi program" << async::debug;
 		std::exit(CGI_RESPONSE_INNER_STATUS_OK);
 	}
 	else
@@ -98,6 +101,9 @@ int RequestHandler::sendCGIRequest()
 	switch (rc)
 	{
 	case async::status::OK:
+		close(_write_pipe_fd[1]);
+		delete _writer;
+		_writer = NULL;
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	case async::status::AGAIN:
