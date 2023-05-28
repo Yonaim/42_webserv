@@ -24,10 +24,10 @@ RequestHandler::RequestHandler(const Request &request,
 			// TODO: 예외 처리
 			throw(std::runtime_error("Failed to create pipe."));
 		}
-		_logger << "read_pipe[0]: " << _read_pipe_fd[0] << async::debug;
-		_logger << "read_pipe[1]: " << _read_pipe_fd[1] << async::debug;
-		_logger << "write_pipe[0]: " << _write_pipe_fd[0] << async::debug;
-		_logger << "write_pipe[1]: " << _write_pipe_fd[1] << async::debug;
+		_logger << async::debug << "read_pipe[0]: " << _read_pipe_fd[0];
+		_logger << async::debug << "read_pipe[1]: " << _read_pipe_fd[1];
+		_logger << async::debug << "write_pipe[0]: " << _write_pipe_fd[0];
+		_logger << async::debug << "write_pipe[1]: " << _write_pipe_fd[1];
 
 		_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
 										_request.getMessageBody());
@@ -35,7 +35,7 @@ RequestHandler::RequestHandler(const Request &request,
 	}
 	catch (const std::exception &e)
 	{
-		_logger << e.what() << async::debug;
+		_logger << async::debug << e.what();
 		delete _writer;
 		_writer = NULL;
 		delete _reader;
@@ -57,7 +57,7 @@ int RequestHandler::fork()
 	_pid = ::fork();
 	if (_pid < 0)
 	{
-		_logger << "failed to fork" << async::debug;
+		_logger << async::debug << "failed to fork";
 		_response.setError(ERROR_CODE);
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
@@ -67,7 +67,7 @@ int RequestHandler::fork()
 		if (::dup2(_write_pipe_fd[0], STDIN_FILENO) < 0
 			|| ::dup2(_read_pipe_fd[1], STDOUT_FILENO) < 0)
 		{
-			_logger << "failed to dup2" << async::debug;
+			_logger << async::debug << "failed to dup2";
 			// TODO:
 			// exit status 뭐로 할지 결정할것
 			std::exit(CGI_RESPONSE_INNER_STATUS_OK);
@@ -81,7 +81,7 @@ int RequestHandler::fork()
 		// TODO:
 		// CGI 인자로 넘길 것 결정하기(NULL 말고)
 		execve(_request.getPath().c_str(), NULL, _request.getEnv());
-		_logger << "failed to execve cgi program" << async::debug;
+		_logger << async::debug << "failed to execve cgi program";
 		std::exit(CGI_RESPONSE_INNER_STATUS_OK);
 	}
 	else
@@ -127,13 +127,13 @@ int RequestHandler::waitExecution()
 	}
 	else if (rc == 0)
 	{
-		_logger << "waiting child" << async::debug;
+		_logger << async::debug << "waiting child";
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 	}
 	else
 	{
 		// TODO: _waitpid_status 값 체크하기
-		_logger << "waitpid done" << async::debug;
+		_logger << async::debug << "waitpid done";
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 	}
 
@@ -151,17 +151,17 @@ int RequestHandler::makeCGIResponse()
 	case async::status::OK:
 		// TODO:
 		//  CGI/Response makeResponse 멤버 함수 구현
-		_logger << "read_status is ok: " << read_status << async::debug;
-		_logger << _reader->retrieve() << async::debug;
+		_logger << async::debug << "read_status is ok: " << read_status;
+		_logger << async::debug << _reader->retrieve();
 		_response.makeResponse(_reader->retrieve());
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
 	case async::status::AGAIN:
-		_logger << "read_status is again: " << read_status << async::debug;
+		_logger << async::debug << "read_status is again: " << read_status;
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	default:
-		_logger << "read_status is error: " << read_status << async::debug;
+		_logger << async::debug << "read_status is error: " << read_status;
 		_response.setError(ERROR_CODE);
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
@@ -170,7 +170,7 @@ int RequestHandler::makeCGIResponse()
 
 int RequestHandler::task(void)
 {
-	_logger << "status : " << _status << async::debug;
+	_logger << async::debug << "status : " << _status;
 	switch (_status)
 	{
 	case CGI_RESPONSE_INNER_STATUS_BEGIN:
