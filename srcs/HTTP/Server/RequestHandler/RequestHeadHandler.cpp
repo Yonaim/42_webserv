@@ -5,8 +5,7 @@ using namespace HTTP;
 Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 											   const Request &request,
 											   const Server::Location &location)
-	: RequestHandler(server, request, location), _reader(NULL),
-	  _cgi_handler(NULL)
+	: RequestHandler(server, request, location), _reader(NULL)
 {
 	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
 	{

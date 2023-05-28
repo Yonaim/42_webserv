@@ -9,7 +9,7 @@ Server::RequestHandler::RequestHandler(Server *server, const Request &request,
 	: _request(request), _location(location), _server(server),
 	  _status(RESPONSE_STATUS_AGAIN),
 	  _resource_path(server->getResourcePath(request)),
-	  _logger(async::Logger::getLogger("RequestHandler"))
+	  _logger(async::Logger::getLogger("RequestHandler")), _cgi_handler(NULL)
 {
 	if (_request.hasHeaderValue("Connection", "close"))
 		_response.setConnection(false);
