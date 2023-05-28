@@ -72,11 +72,18 @@ int Request::consumeStartLine(std::string &buffer)
 
 	/* uri, version 파싱 */
 	_uri = tokens[1];
-	// TODO: uri와 query_string 파싱
+	size_t question_mark_pos = _uri.find('?');
+	if (question_mark_pos != std::string::npos)
+	{
+		_query_string = getbackstr(_uri, question_mark_pos + 1);
+		trimbackstr(_uri, question_mark_pos);
+	}
+
 	_version_string = tokens[2];
 
 	{
 		_logger << __func__ << ": URI: \"" << _uri << "\"" << async::verbose;
+		_logger << __func__ << ": QUERY: \"" << _query_string << "\"" << async::verbose;
 		_logger << __func__ << ": version: \"" << _version_string << "\""
 				<< async::verbose;
 		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
