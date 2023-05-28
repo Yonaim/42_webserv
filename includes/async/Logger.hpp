@@ -19,16 +19,14 @@ class Logger
 	static const std::string _name_default;
 	static int _log_level;
 	static const char *_level_names[];
+	static bool _active;
 
 	const std::string _name;
-	std::string _buf;
 
 	Logger(void);
 	Logger(const std::string &name);
 	Logger(const Logger &orig);
 	Logger &operator=(const Logger &orig);
-
-	std::string getPrefix(int level);
 
   public:
 	enum debug_level_e
@@ -50,11 +48,15 @@ class Logger
 	};
 
 	~Logger();
-	void registerLog(const std::string &content);
-	void log(int level);
+	std::string getPrefix(int level);
+	void log(const std::string &content);
+	static bool isActive(void);
+	static void activate(void);
+	static void deactivate(void);
 	static void registerFd(int fd);
 	static void setLogLevel(int log_level);
 	static void setLogLevel(const std::string &log_level);
+	static int getLogLevel(void);
 	static Logger &getLogger(const std::string &name);
 	static void task(void);
 	static void blockingWrite(void);
@@ -73,9 +75,11 @@ async::Logger &operator<<(async::Logger &io,
 template <typename T>
 inline async::Logger &operator<<(async::Logger &io, T content)
 {
+	if (!io.isActive())
+		return (io);
 	std::stringstream buf;
 	buf << content;
-	io.registerLog(buf.str());
+	io.log(buf.str());
 	return (io);
 }
 
