@@ -23,8 +23,8 @@ void Server::task(void)
 			_output_queue[client_fd].push(handlers.front()->retrieve());
 			delete handlers.front();
 			handlers.pop();
-			_logger << "Response for client " << client_fd
-					<< " has been retrieved" << async::verbose;
+			_logger << async::verbose << "Response for client " << client_fd
+					<< " has been retrieved";
 		}
 		else if (rc == RequestHandler::RESPONSE_STATUS_AGAIN)
 			continue;
@@ -32,8 +32,8 @@ void Server::task(void)
 		{
 			delete handlers.front();
 			handlers.pop();
-			_logger << "RequestHandler return code " << rc
-					<< ", causing code 500" << async::error;
+			_logger << async::error << "RequestHandler return code " << rc
+					<< ", causing code 500";
 			registerErrorResponse(client_fd, 500); // Internal Server Error}
 		}
 	}
@@ -46,14 +46,14 @@ bool Server::isForMe(const Request &request)
 			"HTTP Request has no header field with name \"Host\""));
 	// TODO: Host 헤더 필드가 여러개일 때 예외 처리
 	const std::string &host = request.getHeaderValue("Host", 0);
-	_logger << "Request is for host \"" << host << "\"" << async::verbose;
+	_logger << async::verbose << "Request is for host \"" << host << "\"";
 	for (std::set<std::string>::iterator it = _server_name.begin();
 		 it != _server_name.end(); it++)
 	{
 		if (*it == host)
 		{
-			_logger << "Request host match with \"" << host << "\""
-					<< async::verbose;
+			_logger << async::verbose << "Request host match with \"" << host
+					<< "\"";
 			return (true);
 		}
 	}
@@ -66,15 +66,15 @@ void Server::registerRequest(int client_fd, const Request &request)
 	const int method = request.getMethod();
 	if (!location.isAllowedMethod(method))
 	{
-		_logger << "Method " << METHOD[method] << " is not allowed"
-				<< async::info;
+		_logger << async::info << "Method " << METHOD[method]
+				<< " is not allowed";
 		registerErrorResponse(client_fd, 405); // Method Not Allowed
 		return;
 	}
 	if (location.doRedirect())
 	{
-		_logger << "Location " << location.getAlias() << " redirect the request"
-				<< async::verbose;
+		_logger << async::verbose << "Location " << location.getAlias()
+				<< " redirect the request";
 		registerRedirectResponse(client_fd, location);
 		return;
 	}
@@ -103,7 +103,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	}
 	catch (const LocationNotFound &e)
 	{
-		_logger << e.what() << async::warning;
+		_logger << async::warning << e.what();
 		registerErrorResponse(client_fd, 404); // Not Found
 	}
 
@@ -113,8 +113,8 @@ void Server::registerRequest(int client_fd, const Request &request)
 		_output_queue[client_fd] = std::queue<Response>();
 	}
 	_request_handlers[client_fd].push(handler);
-	_logger << "Registered RequestHandler for " << METHOD[request.getMethod()]
-			<< async::verbose;
+	_logger << async::verbose << "Registered RequestHandler for "
+			<< METHOD[request.getMethod()];
 }
 
 Response Server::retrieveResponse(int client_fd)
@@ -164,5 +164,5 @@ void Server::disconnect(int client_fd)
 	}
 	_request_handlers.erase(client_fd);
 	_output_queue.erase(client_fd);
-	_logger << "Disconnected client fd " << client_fd << async::info;
+	_logger << async::info << "Disconnected client fd " << client_fd;
 }
