@@ -59,6 +59,9 @@ test_http_server_constructor: $(OBJS) $(DIR_TESTOBJS)test_http_server_constructo
 test_bidimap: $(OBJS) $(DIR_TESTOBJS)test_bidimap.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_bidimap.o -o $@ $(LDFLAGS)
 
+test_cgirequesthandler: $(OBJS) $(DIR_TESTOBJS)test_cgirequesthandler.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_cgirequesthandler.o -o $@ $(LDFLAGS)
+
 -include $(DEPS) $(TESTDRIVERDEPS)
 
 clean:
