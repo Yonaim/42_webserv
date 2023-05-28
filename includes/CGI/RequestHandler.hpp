@@ -30,12 +30,14 @@ class RequestHandler
 
 	enum cgi_response_inner_status_e
 	{
+		CGI_RESPONSE_INNER_STATUS_BEGIN,
 		CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_READ_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_OK
 	};
 
+	int fork(void);
 	int sendCGIRequest(void);
 	int waitExecution(void);
 	int makeCGIResponse(void);

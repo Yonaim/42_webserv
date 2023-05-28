@@ -13,7 +13,7 @@ using namespace CGI;
 RequestHandler::RequestHandler(const Request &request,
 							   const unsigned int timeout_ms)
 	: _reader(NULL), _writer(NULL), _request(request),
-	  _status(CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN), _pid(-1),
+	  _status(CGI_RESPONSE_INNER_STATUS_BEGIN), _pid(-1),
 	  _waitpid_status(-1),
 	  _logger(async::Logger::getLogger("CGIRequestHandler"))
 {
@@ -24,8 +24,6 @@ RequestHandler::RequestHandler(const Request &request,
 			// TODO: 예외 처리
 			throw(std::runtime_error("Failed to create pipe."));
 		}
-		// std::cout << "pipe[0]: " << _read_pipe_fd[0] << std::endl;
-		// std::cout << "pipe[1]: " << _read_pipe_fd[1] << std::endl;
 		_logger << "read_pipe[0]: " << _read_pipe_fd[0] << async::debug;
 		_logger << "read_pipe[1]: " << _read_pipe_fd[1] << async::debug;
 		_logger << "write_pipe[0]: " << _write_pipe_fd[0] << async::debug;
@@ -54,6 +52,45 @@ RequestHandler::~RequestHandler()
 	delete _reader;
 }
 
+int RequestHandler::fork()
+{
+	_pid = ::fork();
+	if (_pid < 0)
+	{
+		_logger << "failed to fork" << async::debug;
+		_response.setError(ERROR_CODE);
+		_status = CGI_RESPONSE_INNER_STATUS_OK;
+		return (CGI_RESPONSE_STATUS_OK);
+	}
+	else if (_pid == 0)
+	{
+		if (::dup2(_write_pipe_fd[0], STDIN_FILENO) < 0
+			|| ::dup2(_read_pipe_fd[1], STDOUT_FILENO) < 0)
+		{
+			_logger << "failed to dup2" << async::debug;
+			// TODO:
+			// exit status 뭐로 할지 결정할것
+			std::exit(CGI_RESPONSE_INNER_STATUS_OK);
+		}
+		::close(_write_pipe_fd[0]);
+		::close(_read_pipe_fd[1]);
+		// TODO:
+		// CGIRequest에서 getPath, getEnv 내부 메소드 필요할듯
+		// TODO:
+		// CGI 인자로 넘길 것 결정하기(NULL 말고)
+		execve(_request.getPath().c_str(), NULL, _request.getEnv());
+		std::exit(CGI_RESPONSE_INNER_STATUS_OK);
+	}
+	else
+	{
+		::close(_write_pipe_fd[0]);
+		::close(_read_pipe_fd[1]);
+		_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
+		return (CGI_RESPONSE_STATUS_AGAIN);
+	}
+	return (CGI_RESPONSE_STATUS_OK);
+}
+
 int RequestHandler::sendCGIRequest()
 {
 	int rc = _writer->task();
@@ -61,56 +98,21 @@ int RequestHandler::sendCGIRequest()
 	switch (rc)
 	{
 	case async::status::OK:
-		_pid = fork();
-		if (_pid < 0)
-		{
-			_logger << "failed to fork" << async::debug;
-			_response.setError(ERROR_CODE);
-			_status = CGI_RESPONSE_INNER_STATUS_OK;
-		}
-		else if (_pid == 0)
-		{
-			if (::dup2(_write_pipe_fd[0], STDIN_FILENO) < 0
-				|| ::dup2(_read_pipe_fd[1], STDOUT_FILENO) < 0)
-			{
-				_logger << "failed to dup2" << async::debug;
-				// TODO:
-				// exit status 뭐로 할지 결정할것
-				std::exit(CGI_RESPONSE_INNER_STATUS_OK);
-			}
-			close(_write_pipe_fd[0]);
-			close(_read_pipe_fd[1]);
-			// TODO:
-			// CGIRequest에서 getPath, getEnv 내부 메소드 필요할듯
-			// TODO:
-			// CGI 인자로 넘길 것 결정하기(NULL 말고)
-			execve(_request.getPath().c_str(), NULL, _request.getEnv());
-			std::exit(CGI_RESPONSE_INNER_STATUS_OK);
-		}
-		else
-		{
-			close(_write_pipe_fd[0]);
-			close(_read_pipe_fd[1]);
-			_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
-		}
-		break;
+		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+		return (CGI_RESPONSE_STATUS_AGAIN);
 	case async::status::AGAIN:
 		_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
-		break;
+		return (CGI_RESPONSE_STATUS_AGAIN);
 	default:
 		_response.setError(ERROR_CODE);
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
-		break;
+		return (CGI_RESPONSE_STATUS_OK);
 	}
-
-	return ((_status == CGI_RESPONSE_INNER_STATUS_OK)
-				? CGI_RESPONSE_STATUS_OK
-				: CGI_RESPONSE_STATUS_AGAIN);
-};
+}
 
 int RequestHandler::waitExecution()
 {
-	int rc = waitpid(_pid, &_waitpid_status, WNOHANG);
+	int rc = ::waitpid(_pid, &_waitpid_status, WNOHANG);
 
 	if (rc < 0)
 	{
@@ -145,7 +147,7 @@ int RequestHandler::makeCGIResponse()
 		//  CGI/Response makeResponse 멤버 함수 구현
 		_logger << "read_status is ok: " << read_status << async::debug;
 		_logger << _reader->retrieve() << async::debug;
-		// _response.makeResponse(_reader->retrieve());
+		_response.makeResponse(_reader->retrieve());
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
 	case async::status::AGAIN:
@@ -162,8 +164,11 @@ int RequestHandler::makeCGIResponse()
 
 int RequestHandler::task(void)
 {
+	_logger << "status : " << _status << async::debug;
 	switch (_status)
 	{
+	case CGI_RESPONSE_INNER_STATUS_BEGIN:
+		return (fork());
 	case CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN:
 		return (sendCGIRequest());
 	case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
