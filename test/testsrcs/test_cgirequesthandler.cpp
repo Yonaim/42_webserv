@@ -15,7 +15,8 @@ int main()
 		{
 			int rc = cgi_request_handler.task();
 			async::Logger::blockingWrite();
-
+			sleep(1);
+			
 			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 				break;
 		    else

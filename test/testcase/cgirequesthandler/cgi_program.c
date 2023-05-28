@@ -1,29 +1,33 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <memory.h>
 
 int main(int argc, char **argv, char **envp)
 {
-dprintf(STDOUT_FILENO, "\nthis is CGI Program ...\n");
-dprintf(STDOUT_FILENO, "===== META VARIABLES =====\n");
-// dprintf(STDOUT_FILENO, "===== META VARIABLES =====\n");
+	char buff[300];
+	char *buff_ptr = buff;
+	int temp = 0;
 
-// write(1, "this is cgi program\n", 21);
+	memset(buff, 0, 300);
+	while ((temp = read(0, buff_ptr, 100)))
+	{
+		if (temp < 0)
+		{
+			perror("scanf");
+			return (1);
+		}
+		buff_ptr += temp;
+	}
+	dprintf(2, "scan done\n");
+	printf("message body: %s\n", buff);
 
-// char buffer[100];
-// fgets(buffer, 100, stdin);
-// dprintf(2, "stdin: %s\n", buffer);
+	printf("===== META VARIABLES =====\n");
+	printf("this is CGI Program ...\n");
+	int i = 0;
+	while (envp[i])
+		printf("%s\n", envp[i++]);
 
-int i = 0;
-while (envp[i])
-	dprintf(STDOUT_FILENO, "%s\n", envp[i++]);
-
-dprintf(2, "dprintf: ===== META VARIABLES =====\n");
-
-i = 0;
-while (envp[i])
-	dprintf(2, "dprintf: %s\n", envp[i++]);
-
-// message_body (stdin) 테스트 추가 예정
-close(STDOUT_FILENO);
-return (0);
+	fflush(stdout);
+	close(STDOUT_FILENO);
+	return (0);
 }
