@@ -14,25 +14,25 @@ int Request::consumeStartLine(std::string &buffer)
 
 	if (crlf_pos == std::string::npos)
 	{
-		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
+		_logger << async::debug << __func__ << ": buffer doesn't have CRLF";
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const std::string start_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
-	_logger << __func__ << ": start line is \"" << start_line << "\""
-			<< async::debug;
+	_logger << async::debug << __func__ << ": start line is \"" << start_line
+			<< "\"";
 
 	if (crlf_pos == 0)
 	{
-		_logger << __func__ << ": buffer's first line is empty"
-				<< async::warning;
+		_logger << async::warning << __func__
+				<< ": buffer's first line is empty";
 		throwException(CONSUME_EXC_EMPTY_LINE);
 	}
 	if (start_line[0] == ' ')
 	{
-		_logger << __func__ << ": buffer's first character is space"
-				<< async::warning;
+		_logger << async::warning << __func__
+				<< ": buffer's first character is space";
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
@@ -40,15 +40,14 @@ int Request::consumeStartLine(std::string &buffer)
 	std::vector<std::string> tokens = split(start_line, ' ');
 	if (tokens.size() != 3)
 	{
-		_logger << __func__ << ": token count mismatch" << async::warning;
+		_logger << async::warning << __func__ << ": token count mismatch";
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
 
 	{
-		_logger << __func__ << ": split into ";
+		_logger << async::verbose << __func__ << ": split into ";
 		for (size_t i = 0; i < tokens.size(); i++)
 			_logger << "\"" << tokens[i] << "\" ";
-		_logger << async::verbose;
 	}
 
 	/* method index 구하기 */
@@ -63,10 +62,10 @@ int Request::consumeStartLine(std::string &buffer)
 		}
 	}
 
-	_logger << __func__ << ": method index is " << _method << async::debug;
+	_logger << async::debug << __func__ << ": method index is " << _method;
 	if (_method == METHOD_NONE)
 	{
-		_logger << __func__ << ": invalid method" << async::warning;
+		_logger << async::warning << __func__ << ": invalid method";
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
 
@@ -82,12 +81,13 @@ int Request::consumeStartLine(std::string &buffer)
 	_version_string = tokens[2];
 
 	{
-		_logger << __func__ << ": URI: \"" << _uri << "\"" << async::verbose;
-		_logger << __func__ << ": QUERY: \"" << _query_string << "\"" << async::verbose;
-		_logger << __func__ << ": version: \"" << _version_string << "\""
-				<< async::verbose;
-		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-				<< async::debug;
+		_logger << async::verbose << __func__ << ": URI: \"" << _uri << "\"";
+		_logger << async::verbose << __func__ << ": QUERY: \"" << _query_string
+				<< "\"";
+		_logger << async::verbose << __func__ << ": version: \""
+				<< _version_string << "\"";
+		_logger << async::debug << __func__ << ": buffer result in :\""
+				<< buffer << "\"";
 	}
 	return (RETURN_TYPE_OK);
 }
@@ -97,36 +97,36 @@ int Request::consumeHeader(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
+		_logger << async::debug << __func__ << ": buffer doesn't have CRLF";
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const std::string header_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
-	_logger << __func__ << ": header line: " << header_line << async::debug;
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
+	_logger << async::debug << __func__ << ": header line: " << header_line;
+	_logger << async::debug << __func__ << ": buffer result in :\"" << buffer
+			<< "\"";
 
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
-		_logger << __func__ << ": header line only has CRLF (end of header)"
-				<< async::debug;
-		_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-				<< async::debug;
+		_logger << async::debug << __func__
+				<< ": header line only has CRLF (end of header)";
+		_logger << async::debug << __func__ << ": buffer result in :\""
+				<< buffer << "\"";
 		return (RETURN_TYPE_OK);
 	}
 
 	const size_t colon_pos = header_line.find(":");
 	if (colon_pos == std::string::npos)
 	{
-		_logger << __func__ << ": header line has no colon" << async::warning;
+		_logger << async::warning << __func__ << ": header line has no colon";
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
 
 	const std::string name = getfrontstr(header_line, colon_pos);
 	if (hasSpace(name))
 	{
-		_logger << __func__ << ": header name has space" << async::warning;
+		_logger << async::warning << __func__ << ": header name has space";
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
 
@@ -136,18 +136,18 @@ int Request::consumeHeader(std::string &buffer)
 		 it != values.end(); it++)
 	{
 		*it = strtrim(*it, LWS);
-		_logger << __func__ << ": new value \"" << *it << "\"" << async::debug;
+		_logger << async::debug << __func__ << ": new value \"" << *it << "\"";
 	}
 
 	/* key가 있다면, 붙여넣기 */
 	if (!_header.hasValue(name))
 	{
-		_logger << __func__ << ": assign to new header" << async::debug;
+		_logger << async::debug << __func__ << ": assign to new header";
 		_header.assign(name, values);
 	}
 	else
 	{
-		_logger << __func__ << ": insert to existing header" << async::debug;
+		_logger << async::debug << __func__ << ": insert to existing header";
 		_header.insert(name, values);
 	}
 
@@ -158,15 +158,15 @@ int Request::consumeBody(std::string &buffer)
 {
 	if (buffer.size() < static_cast<size_t>(_content_length))
 	{
-		_logger << __func__ << ": not enough buffer size" << async::debug;
+		_logger << async::debug << __func__ << ": not enough buffer size";
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	_body = consumestr(buffer, _content_length);
-	_logger << __func__ << ": body result in :\"" << _body << "\""
-			<< async::debug;
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
+	_logger << async::debug << __func__ << ": body result in :\"" << _body
+			<< "\"";
+	_logger << async::debug << __func__ << ": buffer result in :\"" << buffer
+			<< "\"";
 	return (RETURN_TYPE_OK);
 }
 
@@ -175,39 +175,39 @@ int Request::consumeChunk(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
+		_logger << async::debug << __func__ << ": buffer doesn't have CRLF";
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
-	_logger << __func__ << ": content length " << content_length
-			<< async::verbose;
+	_logger << async::verbose << __func__ << ": content length "
+			<< content_length;
 	if (content_length < 0)
 	{
-		_logger << __func__ << ": negative content length of chunk"
-				<< async::warning;
+		_logger << async::warning << __func__
+				<< ": negative content length of chunk";
 		throwException(CONSUME_EXC_INVALID_VALUE);
 	}
 
 	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
 	if (buffer.size() < crlf_pos + CRLF_LEN + content_length + CRLF_LEN)
 	{
-		_logger << __func__ << ": not enough buffer size" << async::debug;
+		_logger << async::debug << __func__ << ": not enough buffer size";
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	consumestr(buffer, crlf_pos + CRLF_LEN);
 	_content_length += content_length;
 	_body.append(consumestr(buffer, content_length));
-	_logger << __func__ << ": body result in :\"" << _body << "\""
-			<< async::debug;
+	_logger << async::debug << __func__ << ": body result in :\"" << _body
+			<< "\"";
 	if (consumestr(buffer, CRLF_LEN) != CRLF)
 	{
-		_logger << __func__ << ": chunk must end with CRLF" << async::warning;
+		_logger << async::warning << __func__ << ": chunk must end with CRLF";
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 	}
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
+	_logger << async::debug << __func__ << ": buffer result in :\"" << buffer
+			<< "\"";
 
 	if (content_length == 0)
 		return (RETURN_TYPE_OK);
@@ -221,34 +221,34 @@ int Request::consumeTrailer(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		_logger << __func__ << ": buffer doesn't have CRLF" << async::debug;
+		_logger << async::debug << __func__ << ": buffer doesn't have CRLF";
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const std::string header_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
-	_logger << __func__ << ": header line: " << header_line << async::debug;
-	_logger << __func__ << ": buffer result in :\"" << buffer << "\""
-			<< async::debug;
+	_logger << async::debug << __func__ << ": header line: " << header_line;
+	_logger << async::debug << __func__ << ": buffer result in :\"" << buffer
+			<< "\"";
 
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
-		_logger << __func__ << ": header line only has CRLF (end of header)"
-				<< async::debug;
+		_logger << async::debug << __func__
+				<< ": header line only has CRLF (end of header)";
 		return (RETURN_TYPE_OK);
 	}
 
 	const size_t colon_pos = header_line.find(":");
 	if (colon_pos == std::string::npos)
 	{
-		_logger << __func__ << ": header line has no colon" << async::warning;
+		_logger << async::warning << __func__ << ": header line has no colon";
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
 
 	const std::string name = getfrontstr(header_line, colon_pos);
 	if (hasSpace(name))
 	{
-		_logger << __func__ << ": header name has space" << async::warning;
+		_logger << async::warning << __func__ << ": header name has space";
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
 
@@ -265,8 +265,8 @@ int Request::consumeTrailer(std::string &buffer)
 	}
 	if (found_name == false)
 	{
-		_logger << __func__ << ": Trailer header doesn't have " << name
-				<< async::warning;
+		_logger << async::warning << __func__
+				<< ": Trailer header doesn't have " << name;
 		throwException(CONSUME_EXC_INVALID_FIELD);
 	}
 
@@ -276,18 +276,18 @@ int Request::consumeTrailer(std::string &buffer)
 		 it != values.end(); it++)
 	{
 		*it = strtrim(*it, LWS);
-		_logger << __func__ << ": new value \"" << *it << "\"" << async::debug;
+		_logger << async::debug << __func__ << ": new value \"" << *it << "\"";
 	}
 
 	/** key가 있다면, 붙여넣기 **/
 	if (!_header.hasValue(name))
 	{
-		_logger << __func__ << ": assign to new header" << async::verbose;
+		_logger << async::verbose << __func__ << ": assign to new header";
 		_header.assign(name, values);
 	}
 	else
 	{
-		_logger << __func__ << ": insert to existing header" << async::verbose;
+		_logger << async::verbose << __func__ << ": insert to existing header";
 		_header.insert(name, values);
 	}
 
