@@ -26,7 +26,7 @@ void Server::RequestHandler::registerErrorResponse(const int code,
 {
 	_response = _server->generateErrorResponse(code);
 	_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-	_server->_logger << e.what() << async::warning;
+	_server->_logger << async::warning << e.what();
 }
 
 Response Server::RequestHandler::retrieve(void)
