@@ -57,9 +57,9 @@ void Server::RequestHandler::setCGIRequestValues(CGI::Request &cgi_request)
 	else
 	{
 		cgi_request.setMetaVariable("SERVER_NAME",
-									host_header.substr(0, colon_pos));
+									getfrontstr(host_header, colon_pos));
 		cgi_request.setMetaVariable("SERVER_PORT",
-									host_header.substr(colon_pos));
+									getbackstr(host_header, colon_pos + 1));
 	}
 }
 
