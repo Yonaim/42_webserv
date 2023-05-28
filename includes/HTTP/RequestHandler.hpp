@@ -20,6 +20,7 @@ class Server::RequestHandler
 	int _status;
 	std::string _resource_path;
 	async::Logger &_logger;
+	void *_cgi_handler;
 
 	void registerErrorResponse(const int code, const std::exception &e);
 
@@ -45,7 +46,6 @@ class Server::RequestGetHandler : public Server::RequestHandler
 {
   private:
 	async::FileReader *_reader;
-	void *_cgi_handler;
 
   public:
 	RequestGetHandler(Server *server, const Request &request,
@@ -59,7 +59,6 @@ class Server::RequestHeadHandler : public Server::RequestHandler
 {
   private:
 	async::FileReader *_reader;
-	void *_cgi_handler;
 
   public:
 	RequestHeadHandler(Server *server, const Request &request,
@@ -73,7 +72,6 @@ class Server::RequestPostHandler : public Server::RequestHandler
 {
   private:
 	async::FileWriter *_writer;
-	void *_cgi_handler;
 
   public:
 	RequestPostHandler(Server *server, const Request &request,

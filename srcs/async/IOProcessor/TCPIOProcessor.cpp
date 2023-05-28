@@ -76,10 +76,9 @@ void TCPIOProcessor::task(void)
 			{
 				try
 				{
-					size_t len = std::min((size_t)data, _wrbuf[ident].length());
-					write(ident, len);
+					write(ident, _wrbuf[ident].length());
 				}
-				catch (const std::runtime_error &e)
+				catch (const IOProcessor::WriteError &e)
 				{
 					_logger << "Error while writing to client " << ident << ": "
 							<< e.what() << async::warning;
