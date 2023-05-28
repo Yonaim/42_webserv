@@ -70,6 +70,8 @@ int RequestHandler::sendCGIRequest()
 				// exit status 뭐로 할지 결정할것
 				std::exit(CGI_RESPONSE_INNER_STATUS_OK);
 			}
+			close(_pipe_fd[0]);
+			close(_pipe_fd[1]);
 			// TODO:
 			// CGIRequest에서 getPath, getEnv 내부 메소드 필요할듯
 			// TODO:
