@@ -62,12 +62,16 @@ void SingleIOProcessor::task(void)
 		}
 		else if (event == EVFILT_WRITE && _wrbuf[_fd].length() > 0)
 		{
-			size_t len = std::min((size_t)data, _wrbuf[_fd].length());
-			/* 표준 출력같은 FIFO fd에서 발생하는
-			Resource temporarily unavailable 오류 방지하는 임시 해결책 */
-			if (len > 1)
-				len /= 2;
-			write(_fd, len);
+			/* 표준 출력같은 FIFO fd에서 발생하는 Resource temporarily
+			 * unavailable 오류 무시 */
+			try
+			{
+				write(_fd, _wrbuf[_fd].length());
+			}
+			catch (const IOProcessor::WriteError &e)
+			{
+				(void)e;
+			}
 		}
 	}
 }
