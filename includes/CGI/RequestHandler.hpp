@@ -20,7 +20,8 @@ class RequestHandler
 	// std::string _cgi_path;
 	int _status;
 
-	int _pipe_fd[2];
+	int _read_pipe_fd[2];
+	int _write_pipe_fd[2];
 	pid_t _pid;
 	int _waitpid_status;
 

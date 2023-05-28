@@ -1,5 +1,6 @@
 #include "CGI/RequestHandler.hpp"
 #include <cstdlib>
+#include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -18,14 +19,21 @@ RequestHandler::RequestHandler(const Request &request,
 {
 	try
 	{
-		if (pipe(_pipe_fd) < 0)
+		if (::pipe(_read_pipe_fd) < 0 || ::pipe(_write_pipe_fd) < 0)
 		{
 			// TODO: 예외 처리
 			throw(std::runtime_error("Failed to create pipe."));
 		}
-		_writer = new async::FileWriter(timeout_ms, _pipe_fd[1],
+		// std::cout << "pipe[0]: " << _read_pipe_fd[0] << std::endl;
+		// std::cout << "pipe[1]: " << _read_pipe_fd[1] << std::endl;
+		_logger << "read_pipe[0]: " << _read_pipe_fd[0] << async::debug;
+		_logger << "read_pipe[1]: " << _read_pipe_fd[1] << async::debug;
+		_logger << "write_pipe[0]: " << _write_pipe_fd[0] << async::debug;
+		_logger << "write_pipe[1]: " << _write_pipe_fd[1] << async::debug;
+
+		_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
 										_request.getMessageBody());
-		_reader = new async::FileReader(timeout_ms, _pipe_fd[0]);
+		_reader = new async::FileReader(timeout_ms, _read_pipe_fd[0]);
 	}
 	catch (const std::exception &e)
 	{
@@ -40,8 +48,8 @@ RequestHandler::RequestHandler(const Request &request,
 
 RequestHandler::~RequestHandler()
 {
-	close(_pipe_fd[0]);
-	close(_pipe_fd[1]);
+	close(_read_pipe_fd[0]);
+	close(_read_pipe_fd[1]);
 	delete _writer;
 	delete _reader;
 }
@@ -62,16 +70,16 @@ int RequestHandler::sendCGIRequest()
 		}
 		else if (_pid == 0)
 		{
-			if (dup2(_pipe_fd[0], STDIN_FILENO) < 0
-				|| dup2(_pipe_fd[1], STDOUT_FILENO) < 0)
+			if (::dup2(_write_pipe_fd[0], STDIN_FILENO) < 0
+				|| ::dup2(_read_pipe_fd[1], STDOUT_FILENO) < 0)
 			{
 				_logger << "failed to dup2" << async::debug;
 				// TODO:
 				// exit status 뭐로 할지 결정할것
 				std::exit(CGI_RESPONSE_INNER_STATUS_OK);
 			}
-			close(_pipe_fd[0]);
-			close(_pipe_fd[1]);
+			close(_write_pipe_fd[0]);
+			close(_read_pipe_fd[1]);
 			// TODO:
 			// CGIRequest에서 getPath, getEnv 내부 메소드 필요할듯
 			// TODO:
@@ -80,7 +88,11 @@ int RequestHandler::sendCGIRequest()
 			std::exit(CGI_RESPONSE_INNER_STATUS_OK);
 		}
 		else
+		{
+			close(_write_pipe_fd[0]);
+			close(_read_pipe_fd[1]);
 			_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+		}
 		break;
 	case async::status::AGAIN:
 		_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
@@ -107,11 +119,13 @@ int RequestHandler::waitExecution()
 	}
 	else if (rc == 0)
 	{
+		_logger << "waiting child" << async::debug;
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 	}
 	else
 	{
 		// TODO: _waitpid_status 값 체크하기
+		_logger << "waitpid done" << async::debug;
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 	}
 
@@ -129,13 +143,17 @@ int RequestHandler::makeCGIResponse()
 	case async::status::OK:
 		// TODO:
 		//  CGI/Response makeResponse 멤버 함수 구현
-		_response.makeResponse(_reader->retrieve());
+		_logger << "read_status is ok: " << read_status << async::debug;
+		_logger << _reader->retrieve() << async::debug;
+		// _response.makeResponse(_reader->retrieve());
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
 	case async::status::AGAIN:
+		_logger << "read_status is again: " << read_status << async::debug;
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	default:
+		_logger << "read_status is error: " << read_status << async::debug;
 		_response.setError(ERROR_CODE);
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
