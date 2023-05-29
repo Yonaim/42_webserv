@@ -93,6 +93,9 @@ void Server::registerRequest(int client_fd, const Request &request)
 		case METHOD_POST:
 			handler = new RequestPostHandler(this, request, location);
 			break;
+		case METHOD_PUT:
+			handler = new RequestPutHandler(this, request, location);
+			break;
 		case METHOD_DELETE:
 			handler = new RequestDeleteHandler(this, request, location);
 			break;

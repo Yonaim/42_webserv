@@ -21,6 +21,7 @@ class Server
 	class RequestGetHandler;
 	class RequestHeadHandler;
 	class RequestPostHandler;
+	class RequestPutHandler;
 	class RequestDeleteHandler;
 
   private:

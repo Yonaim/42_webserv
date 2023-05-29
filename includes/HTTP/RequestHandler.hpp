@@ -85,6 +85,19 @@ class Server::RequestPostHandler : public Server::RequestHandler
 	virtual void handleRequest(void);
 };
 
+class Server::RequestPutHandler : public Server::RequestHandler
+{
+  private:
+	async::FileWriter *_writer;
+
+  public:
+	RequestPutHandler(Server *server, const Request &request,
+					  const Server::Location &location);
+	virtual ~RequestPutHandler();
+
+	virtual void handleRequest(void);
+};
+
 class Server::RequestDeleteHandler : public Server::RequestHandler
 {
   public:
