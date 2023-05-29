@@ -60,7 +60,7 @@ void Response::setContentType(const std::string &file_path)
 void Response::setContentLength(void)
 {
 	if (_body.length() > 0)
-		setValue("Content-Length", uintToStr(_body.length()));
+		setValue("Content-Length", toStr(_body.length()));
 }
 
 void Response::setContentLength(size_t length)

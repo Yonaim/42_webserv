@@ -19,9 +19,6 @@ void trimfrontstr(std::string &str, const size_t from);
 std::string consumestr(std::string &str, const size_t from);
 std::string getExtension(const std::string &filename);
 
-// conversion
-std::string uintToStr(size_t num);
-
 template <typename T> std::string toStr(T num, T num2)
 {
 	std::ostringstream ss;

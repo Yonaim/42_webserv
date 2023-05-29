@@ -107,29 +107,6 @@ void strtrim(std::string &str, const std::string &charset)
 	trimbackstr(str, offset);
 }
 
-std::string uintToStr(size_t num)
-{
-	size_t tem = num;
-	size_t length = 0;
-	std::string num_str;
-
-	if (num == 0)
-		return ("0");
-	while (tem > 0)
-	{
-		length++;
-		tem /= 10;
-	}
-	num_str.resize(length, '\0');
-	tem = num;
-	while (tem > 0)
-	{
-		num_str[--length] = tem % 10 + '0';
-		tem /= 10;
-	}
-	return (num_str);
-};
-
 // returns substring from start to (until).
 std::string getfrontstr(const std::string &str, const size_t until)
 {
