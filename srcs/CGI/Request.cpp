@@ -9,27 +9,44 @@ static const char *meta_variable_names[]
 	   "SCRIPT_NAME",    "SERVER_NAME",     "SERVER_PORT",  "SERVER_PROTOCOL",
 	   "SERVER_SOFTWARE"};
 
-Request::Request()
+Request::Request() : _message_body("this is the body got you")
 {
 	for (size_t i = 0; i < _n_meta_variables; i++)
-		_meta_variables.insert(
-			std::pair<std::string, std::string>(meta_variable_names[i], ""));
+	{
+		std::string name = meta_variable_names[i];
+		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
+	}
 }
 
 Request::~Request()
 {
 }
 
-Request::Request(const Request &orig)
+Request::Request(const Request &orig) : _message_body(orig._message_body)
 {
-	(void)orig;
-	// TODO: 복사 생성자 구현
+	for (size_t i = 0; i < _n_meta_variables; i++)
+	{
+		const std::string &name = meta_variable_names[i];
+		const std::string &value = orig._meta_variables.find(name)->second;
+		_meta_variables.insert(
+			std::pair<std::string, std::string>(name, value));
+	}
 }
 
 const Request &Request::operator=(const Request &orig)
 {
-	(void)orig;
-	// TODO: 복사 할당 연산자 구현
+	if (this != &orig)
+	{
+		_meta_variables.clear();
+		for (size_t i = 0; i < _n_meta_variables; i++)
+		{
+			const std::string &name = meta_variable_names[i];
+			const std::string &value = orig._meta_variables.find(name)->second;
+			_meta_variables.insert(
+				std::pair<std::string, std::string>(name, value));
+		}
+		_message_body = orig._message_body;
+	}
 	return (*this);
 }
 
@@ -53,10 +70,9 @@ const std::string &Request::getMessageBody(void) const
 
 const std::string Request::getPath() const
 {
-	// TODO: getPath() 구현
-	std::string str;
-	return (str);
+	return (_meta_variables.find("PATH_TRANSLATED")->second);
 }
+
 void Request::setMetaVariable(std::string name, std::string value)
 {
 	_meta_variables[name] = value;
