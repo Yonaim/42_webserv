@@ -76,8 +76,6 @@ class Server
 	unsigned int getTimeout(void) const;
 	bool cgiEnabled(void) const;
 	const Location &getLocation(const std::string &location) const;
-	std::string getResourcePath(const Request &req,
-								const Location &location) const;
 	bool isCGIextension(const std::string &path) const;
 };
 } // namespace HTTP

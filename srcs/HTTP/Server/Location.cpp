@@ -80,6 +80,34 @@ const std::string &Server::Location::getUploadPath(void) const
 	return (_upload_store_path);
 }
 
+std::string Server::Location::generateResourcePath(const Request &req) const
+{
+	std::string uri_path = req.getURIPath();
+
+	_logger << async::verbose << __func__ << ": URI path before replace \""
+			<< uri_path;
+	if ((req.getMethod() == METHOD_POST || req.getMethod() == METHOD_PUT)
+		&& _upload_allowed)
+	{
+		uri_path.replace(0, _path.length(), _upload_store_path);
+		_logger << "\" after \"" << uri_path << "\"";
+		_logger << async::verbose << __func__
+				<< ": above path is for uploading";
+		return (uri_path);
+	}
+
+	uri_path.replace(0, _path.length(), _alias);
+	_logger << "\" after \"" << uri_path << "\"";
+	if (req.getURIPath().back() == '/' && _has_index)
+	{
+		uri_path += _index[0];
+		_logger << async::verbose << __func__
+				<< ": add index to URI path, result: \"" << uri_path << "\"";
+	}
+
+	return (uri_path);
+}
+
 bool Server::Location::isAllowedMethod(int method) const
 {
 	const std::set<int>::const_iterator iter = _allowed_methods.find(method);
