@@ -43,11 +43,6 @@ std::string CGI::Response::getContentType() const
 	return (_content_type);
 }
 
-std::string CGI::Response::getLocation() const
-{
-	return (_location);
-}
-
 int CGI::Response::getStatus() const
 {
 	return (_status);
