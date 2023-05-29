@@ -1,6 +1,7 @@
 #include "../const_values.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTP/Server.hpp"
+#include "utils/hash.hpp"
 #include "utils/string.hpp"
 
 using namespace HTTP;
@@ -83,21 +84,33 @@ const std::string &Server::Location::getUploadPath(void) const
 std::string Server::Location::generateResourcePath(const Request &req) const
 {
 	std::string uri_path = req.getURIPath();
+	const int method = req.getMethod();
 
 	_logger << async::verbose << __func__ << ": URI path before replace \""
-			<< uri_path;
-	if ((req.getMethod() == METHOD_POST || req.getMethod() == METHOD_PUT)
-		&& _upload_allowed)
+			<< uri_path << "\"";
+	if (_upload_allowed && (method == METHOD_POST || method == METHOD_PUT))
 	{
-		uri_path.replace(0, _path.length(), _upload_store_path);
-		_logger << "\" after \"" << uri_path << "\"";
 		_logger << async::verbose << __func__
-				<< ": above path is for uploading";
+				<< ": generate resource path for upload";
+		switch (method)
+		{
+		case METHOD_POST: // upload_path/해시결과(URI에 현재 시각을 붙임)
+			uri_path = _upload_store_path;
+			if (uri_path.back() != '/')
+				uri_path += "/";
+			uri_path += generateHash(toStr(clock()) + req.getURIPath());
+			break;
+		case METHOD_PUT: // URI에서 path에 해당하는 부분 upload_path로 대체
+			uri_path.replace(0, _path.length(), _upload_store_path);
+			break;
+		}
+		_logger << async::verbose << __func__ << ": after \"" << uri_path
+				<< "\"";
 		return (uri_path);
 	}
 
 	uri_path.replace(0, _path.length(), _alias);
-	_logger << "\" after \"" << uri_path << "\"";
+	_logger << async::verbose << __func__ << ": after \"" << uri_path << "\"";
 	if (req.getURIPath().back() == '/' && _has_index)
 	{
 		uri_path += _index[0];
