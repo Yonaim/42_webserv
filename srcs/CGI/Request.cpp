@@ -2,6 +2,8 @@
 
 using namespace CGI;
 
+const std::string Request::_version = "1.1";
+
 static const char *meta_variable_names[]
 	= {"AUTH_TYPE",      "CONTENT_LENGTH",  "CONTENT_TYPE", "GATEWAY_INTERFACE",
 	   "PATH_INFO",      "PATH_TRANSLATED", "QUERY_STRING", "REMOTE_ADDR",
@@ -16,6 +18,7 @@ Request::Request()
 		std::string name = meta_variable_names[i];
 		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
 	}
+	_meta_variables.find("GATEWAY_INTERFACE")->second = "CGI/" + _version;
 }
 
 Request::~Request()
