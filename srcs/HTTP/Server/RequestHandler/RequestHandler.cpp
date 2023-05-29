@@ -45,6 +45,7 @@ void Server::RequestHandler::setCGIRequestValues(CGI::Request &cgi_request)
 		cgi_request.setMetaVariable("CONTENT_TYPE",
 									_request.getHeaderValue("Content-Type", 0));
 	cgi_request.setMetaVariable("PATH_INFO", _request.getURIPath());
+	cgi_request.setMetaVariable("PATH_TRANSLATED", _resource_path);
 	cgi_request.setMetaVariable("QUERY_STRING", _request.getQueryString());
 	cgi_request.setMetaVariable("REQUEST_METHOD", _request.getMethodString());
 	std::string host_header = _request.getHeaderValue("Host", 0);
