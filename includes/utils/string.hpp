@@ -9,14 +9,14 @@ bool hasSpace(const std::string &key);
 bool isHTTPSpace(const char c);
 bool isUnsignedIntStr(const std::string &str);
 void passLWS(std::string &str);
-std::string strtrim(const std::string str, const std::string charset);
-std::vector<std::string> split(std::string const &s, char const c);
-std::vector<std::string> split(std::string const &s, std::string const &sep);
-std::string getfrontstr(const std::string &str, size_t until);
-void trimbackstr(std::string &str, size_t until);
-std::string getbackstr(const std::string &str, size_t from);
-void trimfrontstr(std::string &str, size_t from);
-std::string consumestr(std::string &str, size_t from);
+void strtrim(std::string &str, const std::string &charset);
+std::vector<std::string> split(const std::string &s, const char c);
+std::vector<std::string> split(const std::string &s, const std::string &sep);
+std::string getfrontstr(const std::string &str, const size_t until);
+void trimbackstr(std::string &str, const size_t until);
+std::string getbackstr(const std::string &str, const size_t from);
+void trimfrontstr(std::string &str, const size_t from);
+std::string consumestr(std::string &str, const size_t from);
 std::string getExtension(const std::string &filename);
 
 // conversion

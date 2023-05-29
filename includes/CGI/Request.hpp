@@ -21,7 +21,7 @@ class Request
 	// 생성자에서 사용할 파싱 메서드 추가 예정
 	const std::string getPath(void) const;
 	// setter
-	void setMetaVariable(std::string name, std::string value);
+	void setMetaVariable(const std::string &name, const std::string &value);
 
 	// getter
 	const std::string &getMessageBody(void) const;

@@ -62,7 +62,7 @@ const std::string &Header::getValue(const std::string &name, int idx) const
 	return (name_iter->second.at(idx));
 }
 
-const std::vector<std::string> Header::getValues(const std::string &name) const
+const std::vector<std::string> &Header::getValues(const std::string &name) const
 {
 	Header::const_iterator name_iter = _values.find(name);
 	if (name_iter == _values.end())

@@ -88,7 +88,7 @@ void IOProcessor::read(const int fd, const size_t size)
 		*/
 		throw(IOProcessor::ReadError(fd, strerror(errno)));
 	}
-	_rdbuf[fd] += std::string(buff, buff + readsize);
+	_rdbuf[fd].append(buff, readsize);
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Read " << readsize << " bytes: \""
 				  << std::string(buff, buff + readsize) << "\"\n";

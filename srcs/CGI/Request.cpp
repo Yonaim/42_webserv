@@ -70,7 +70,7 @@ const std::string Request::getPath() const
 	return (_meta_variables.find("PATH_TRANSLATED")->second);
 }
 
-void Request::setMetaVariable(std::string name, std::string value)
+void Request::setMetaVariable(const std::string &name, const std::string &value)
 {
 	_meta_variables[name] = value;
 }

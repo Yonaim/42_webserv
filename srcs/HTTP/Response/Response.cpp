@@ -42,7 +42,7 @@ Response::~Response(void)
 }
 
 // convert to string
-std::string Response::toString(void)
+const std::string &Response::toString(void)
 {
 	setDate();
 	_response.clear();
@@ -71,7 +71,7 @@ void Response::makeHeader(void)
 
 		std::string to_append(it->first + ": ");
 
-		const std::vector<std::string> values = _header.getValues(it->first);
+		const std::vector<std::string> &values = _header.getValues(it->first);
 		for (std::vector<std::string>::const_iterator val_it = values.begin();
 			 val_it != values.end(); ++val_it)
 		{

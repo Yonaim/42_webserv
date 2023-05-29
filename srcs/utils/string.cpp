@@ -39,7 +39,7 @@ void passLWS(std::string &str)
 	trimfrontstr(str, after_lws);
 }
 
-std::vector<std::string> split(std::string const &s, char const c)
+std::vector<std::string> split(const std::string &s, const char c)
 {
 	std::vector<std::string> words;
 	size_t offset = 0;
@@ -60,7 +60,7 @@ std::vector<std::string> split(std::string const &s, char const c)
 	return (words);
 }
 
-static size_t _findFirstSep(std::string const &s, std::string const &sep,
+static size_t _findFirstSep(const std::string &s, const std::string &sep,
 							size_t offset)
 {
 	while (offset < s.length())
@@ -72,7 +72,7 @@ static size_t _findFirstSep(std::string const &s, std::string const &sep,
 	return (offset);
 }
 
-std::vector<std::string> split(std::string const &s, std::string const &sep)
+std::vector<std::string> split(const std::string &s, const std::string &sep)
 {
 	std::vector<std::string> words;
 	size_t offset = 0;
@@ -92,18 +92,19 @@ std::vector<std::string> split(std::string const &s, std::string const &sep)
 	return (words);
 }
 
-std::string strtrim(const std::string str, const std::string charset)
+void strtrim(std::string &str, const std::string &charset)
 {
 	size_t start;
-	size_t offest;
+	size_t offset;
 
 	start = 0;
 	while (start < str.length() && strchr(charset.c_str(), str[start]))
 		++start;
-	offest = start;
-	while (offest < str.length() && !strchr(charset.c_str(), str[offest]))
-		++offest;
-	return (str.substr(start, offest - start));
+	trimfrontstr(str, start);
+	offset = 0;
+	while (offset < str.length() && !strchr(charset.c_str(), str[offset]))
+		++offset;
+	trimbackstr(str, offset);
 }
 
 std::string uintToStr(size_t num)
@@ -130,32 +131,32 @@ std::string uintToStr(size_t num)
 };
 
 // returns substring from start to (until).
-std::string getfrontstr(const std::string &str, size_t until)
+std::string getfrontstr(const std::string &str, const size_t until)
 {
 	return (str.substr(0, until));
 }
 
 // trims the end of string except `until` characters.
-void trimbackstr(std::string &str, size_t until)
+void trimbackstr(std::string &str, const size_t until)
 {
-	str = str.substr(0, until);
+	str.erase(until, std::string::npos);
 }
 
 // returns substring from `from` to end.
-std::string getbackstr(const std::string &str, size_t from)
+std::string getbackstr(const std::string &str, const size_t from)
 {
 	return (str.substr(from, str.size() - from));
 }
 
 // trims `from` characters from the front of str.
-void trimfrontstr(std::string &str, size_t from)
+void trimfrontstr(std::string &str, const size_t from)
 {
-	str = str.substr(from, str.size() - from);
+	str.erase(0, from);
 }
 
-std::string consumestr(std::string &str, size_t from)
+std::string consumestr(std::string &str, const size_t from)
 {
-	std::string buf = getfrontstr(str, from);
+	std::string buf = str.substr(0, from);
 	trimfrontstr(str, from);
 	return (buf);
 }

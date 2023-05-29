@@ -134,7 +134,7 @@ int Request::consumeHeader(std::string &buffer)
 	for (std::vector<std::string>::iterator it = values.begin();
 		 it != values.end(); it++)
 	{
-		*it = strtrim(*it, LWS);
+		strtrim(*it, LWS);
 		_logger << async::debug << __func__ << ": new value \"" << *it << "\"";
 	}
 
@@ -274,7 +274,7 @@ int Request::consumeTrailer(std::string &buffer)
 	for (std::vector<std::string>::iterator it = values.begin();
 		 it != values.end(); it++)
 	{
-		*it = strtrim(*it, LWS);
+		strtrim(*it, LWS);
 		_logger << async::debug << __func__ << ": new value \"" << *it << "\"";
 	}
 

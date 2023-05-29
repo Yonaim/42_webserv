@@ -55,7 +55,7 @@ class Response
 	Response &operator=(Response const &other);
 	~Response();
 
-	std::string toString(void);
+	const std::string &toString(void);
 
 	// setter
 	void setValue(const std::string &key, const std::string &val);
