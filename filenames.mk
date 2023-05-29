@@ -45,6 +45,7 @@ TESTDRIVERDEPS		= $(addprefix $(DIR_TESTOBJS), $(addsuffix .d, $(TESTDRIVERNAMES
 FILENAMES			= \
 					utils/string \
 					utils/file \
+					utils/hash \
 					Header/Header \
 					$(DIR_ASYNC_IO)IOProcessor \
 					$(DIR_ASYNC_IO)IOException \
