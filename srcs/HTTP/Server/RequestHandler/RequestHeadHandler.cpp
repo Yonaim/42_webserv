@@ -7,70 +7,64 @@ Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 											   const Server::Location &location)
 	: RequestHandler(server, request, location), _reader(NULL)
 {
-	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
-	{
-		// TODO: CGI 핸들러 완성시 주석 해제
-		// _cgi_handler = new CGIHandler(args);
+	if (_cgi_handler)
 		return;
-	}
 	_reader = new async::FileReader(_server->_timeout_ms, _resource_path);
 }
 
 Server::RequestHeadHandler::~RequestHeadHandler()
 {
-	// TODO: CGI 핸들러 완성시 주석 해제
-	// if (_cgi_handler)
-	// 	delete _cgi_handler;
 	if (_reader)
 		delete _reader;
 }
 
-int Server::RequestHeadHandler::task(void)
+void Server::RequestHeadHandler::handleRequest(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return (_status);
+		return;
 
-	if (_cgi_handler)
+	if (isInvalidDirectoryFormat())
 	{
-		handleCGI();
-	}
-	else if (_reader)
-	{
-		try
-		{
-			int rc = _reader->task();
-			if (rc == async::status::OK)
-			{
-				const std::string &content = _reader->retrieve();
-				_response.setStatus(200);
-				_response.setContentLength(content.length());
-				_response.setContentType(_resource_path);
-				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			}
-			else if (rc == async::status::AGAIN)
-			{
-				_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
-			}
-			else
-			{
-				// TODO: 세분화된 예외 처리
-				_response = _server->generateErrorResponse(500);
-				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			}
-		}
-		catch (const async::IOProcessor::FileIsDirectory &e)
-		{
-			registerErrorResponse(404, e); // Not Found
-		}
-		catch (const async::FileIOProcessor::FileOpeningError &e)
-		{
-			registerErrorResponse(404, e); // Not Found
-		}
-		catch (const std::exception &e)
-		{
-			registerErrorResponse(500, e); // Internal Server Error
-		}
+		_response = _server->generateErrorResponse(301); // Not Found;
+		_response.setValue("Location", _request.getURIPath() + "/");
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_logger << async::warning << "invalid directory format, redirect to \""
+				<< _request.getURIPath() + "\"";
+		return;
 	}
 
-	return (_status);
+	try
+	{
+		int rc = _reader->task();
+		if (rc == async::status::OK)
+		{
+			const std::string &content = _reader->retrieve();
+			_response.setStatus(200);
+			_response.setContentLength(content.length());
+			_response.setContentType(_resource_path);
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+		else if (rc == async::status::AGAIN)
+		{
+			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+		}
+		else
+		{
+			// TODO: 세분화된 예외 처리
+			_response = _server->generateErrorResponse(500);
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+	}
+	catch (const async::IOProcessor::FileIsDirectory &e)
+	{
+		registerErrorResponse(404, e); // Not Found
+	}
+	catch (const async::FileIOProcessor::FileOpeningError &e)
+	{
+		registerErrorResponse(404, e); // Not Found
+	}
+	catch (const std::exception &e)
+	{
+		registerErrorResponse(500, e); // Internal Server Error
+	}
 }

@@ -15,10 +15,28 @@ Server::RequestHandler::RequestHandler(Server *server, const Request &request,
 		_response.setConnection(false);
 	else
 		_response.setConnection(true);
+	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
+	{
+		// TODO: CGI 핸들러 완성시 주석 해제
+		// _cgi_handler = new CGIHandler(args);
+		return;
+	}
 }
 
 Server::RequestHandler::~RequestHandler()
 {
+	// TODO: CGI 핸들러 완성시 주석 해제
+	// if (_cgi_handler)
+	// 	delete _cgi_handler;
+}
+
+int Server::RequestHandler::task(void)
+{
+	if (_cgi_handler)
+		handleCGI();
+	else
+		handleRequest();
+	return (_status);
 }
 
 void Server::RequestHandler::registerErrorResponse(const int code,

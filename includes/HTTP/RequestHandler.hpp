@@ -1,12 +1,12 @@
 #ifndef HTTP_REQUESTHANDLER_HPP
 #define HTTP_REQUESTHANDLER_HPP
 
+#include "CGI/RequestHandler.hpp"
 #include "HTTP/Request.hpp"
 #include "HTTP/Response.hpp"
 #include "HTTP/Server.hpp"
 #include "async/FileIOProcessor.hpp"
 #include "async/status.hpp"
-#include "CGI/RequestHandler.hpp"
 
 namespace HTTP
 {
@@ -35,10 +35,11 @@ class Server::RequestHandler
 				   const Server::Location &location);
 	virtual ~RequestHandler();
 
-	virtual int task(void) = 0;
+	int task(void);
 	Response retrieve(void);
 	void setCGIRequestValues(CGI::Request &cgi_request);
 	void handleCGI(void);
+	virtual void handleRequest(void) = 0;
 	void CGIResponseToHTTPResponse(const CGI::Response &cgi_response);
 
 	bool isDirectory(void) const;
@@ -55,7 +56,7 @@ class Server::RequestGetHandler : public Server::RequestHandler
 					  const Server::Location &location);
 	virtual ~RequestGetHandler();
 
-	virtual int task(void);
+	virtual void handleRequest(void);
 };
 
 class Server::RequestHeadHandler : public Server::RequestHandler
@@ -68,7 +69,7 @@ class Server::RequestHeadHandler : public Server::RequestHandler
 					   const Server::Location &location);
 	virtual ~RequestHeadHandler();
 
-	virtual int task(void);
+	virtual void handleRequest(void);
 };
 
 class Server::RequestPostHandler : public Server::RequestHandler
@@ -81,7 +82,7 @@ class Server::RequestPostHandler : public Server::RequestHandler
 					   const Server::Location &location);
 	virtual ~RequestPostHandler();
 
-	virtual int task(void);
+	virtual void handleRequest(void);
 };
 
 class Server::RequestDeleteHandler : public Server::RequestHandler
@@ -91,7 +92,7 @@ class Server::RequestDeleteHandler : public Server::RequestHandler
 						 const Server::Location &location);
 	virtual ~RequestDeleteHandler();
 
-	virtual int task(void);
+	virtual void handleRequest(void);
 };
 } // namespace HTTP
 

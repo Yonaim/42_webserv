@@ -8,12 +8,8 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 											   const Server::Location &location)
 	: RequestHandler(server, request, location), _writer(NULL)
 {
-	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
-	{
-		// TODO: CGI 핸들러 완성시 주석 해제
-		// _cgi_handler = new CGIHandler(args);
+	if (_cgi_handler)
 		return;
-	}
 	if (location.uploadAllowed())
 	{
 		_writer = new async::FileWriter(_server->_timeout_ms, _resource_path,
@@ -27,61 +23,49 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 
 Server::RequestPostHandler::~RequestPostHandler()
 {
-	// TODO: CGI 핸들러 완성시 주석 해제
-	// if (_cgi_handler)
-	// 	delete _cgi_handler;
 	if (_writer)
 		delete _writer;
 }
 
-int Server::RequestPostHandler::task(void)
+void Server::RequestPostHandler::handleRequest(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return (_status);
+		return;
 
-	if (_cgi_handler)
+	try
 	{
-		handleCGI();
-	}
-	else if (_writer)
-	{
-		try
+		int rc = _writer->task();
+		if (rc == async::status::OK)
 		{
-			int rc = _writer->task();
-			if (rc == async::status::OK)
-			{
-				std::string body = "made the file\n"
-								   "click <A href=\""
-								   + _request.getURIPath()
-								   + "\">here</A> to view it.";
+			std::string body = "made the file\n"
+							   "click <A href=\""
+							   + _request.getURIPath()
+							   + "\">here</A> to view it.";
 
-				_response.setStatus(201); // Created
-				_response.setLocation(_request.getURIPath());
-				_response.setBody(body);
-				_response.setContentType("text/html");
-				_response.setContentLength(body.length());
-				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			}
-			else if (rc == async::status::AGAIN)
-			{
-				_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
-			}
-			else
-			{
-				// TODO: 세분화된 예외 처리
-				_response = _server->generateErrorResponse(500);
-				_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-			}
+			_response.setStatus(201); // Created
+			_response.setLocation(_request.getURIPath());
+			_response.setBody(body);
+			_response.setContentType("text/html");
+			_response.setContentLength(body.length());
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		}
-		catch (const async::FileIOProcessor::FileOpeningError &e)
+		else if (rc == async::status::AGAIN)
 		{
-			registerErrorResponse(503, e); // Service Unavailable
+			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
 		}
-		catch (const std::exception &e)
+		else
 		{
-			registerErrorResponse(500, e); // Internal Server Error
+			// TODO: 세분화된 예외 처리
+			_response = _server->generateErrorResponse(500);
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		}
 	}
-
-	return (_status);
+	catch (const async::FileIOProcessor::FileOpeningError &e)
+	{
+		registerErrorResponse(503, e); // Service Unavailable
+	}
+	catch (const std::exception &e)
+	{
+		registerErrorResponse(500, e); // Internal Server Error
+	}
 }
