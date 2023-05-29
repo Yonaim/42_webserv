@@ -39,11 +39,10 @@ void Server::RequestPostHandler::handleRequest(void)
 		{
 			std::string body = "made the file\n"
 							   "click <A href=\""
-							   + _request.getURIPath()
-							   + "\">here</A> to view it.";
+							   + _resource_path + "\">here</A> to view it.";
 
 			_response.setStatus(201); // Created
-			_response.setLocation(_request.getURIPath());
+			_response.setLocation(_resource_path);
 			_response.setBody(body);
 			_response.setContentType("text/html");
 			_response.setContentLength(body.length());
