@@ -87,11 +87,12 @@ void Server::RequestHandler::handleCGI(void)
 		}
 		else
 		{
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
 		}
 	}
 	catch (const std::exception &e)
 	{
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		registerErrorResponse(500, e); // Internal Server Error
 	}
 }
