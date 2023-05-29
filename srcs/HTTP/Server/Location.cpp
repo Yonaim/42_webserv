@@ -75,6 +75,11 @@ const std::string &Server::Location::getNthIndex(size_t nth) const
 	return (_index[nth]);
 }
 
+const std::string &Server::Location::getUploadPath(void) const
+{
+	return (_upload_store_path);
+}
+
 bool Server::Location::isAllowedMethod(int method) const
 {
 	const std::set<int>::const_iterator iter = _allowed_methods.find(method);
