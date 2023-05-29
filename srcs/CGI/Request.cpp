@@ -1,21 +1,15 @@
 #include "CGI/Request.hpp"
+#include "CGI/const_values.hpp"
 
 using namespace CGI;
 
 const std::string Request::_version = "1.1";
 
-static const char *meta_variable_names[]
-	= {"AUTH_TYPE",      "CONTENT_LENGTH",  "CONTENT_TYPE", "GATEWAY_INTERFACE",
-	   "PATH_INFO",      "PATH_TRANSLATED", "QUERY_STRING", "REMOTE_ADDR",
-	   "REMOTE_HOST",    "REMOTE_IDENT",    "REMOTE_USER",  "REQUEST_METHOD",
-	   "SCRIPT_NAME",    "SERVER_NAME",     "SERVER_PORT",  "SERVER_PROTOCOL",
-	   "SERVER_SOFTWARE"};
-
 Request::Request()
 {
-	for (size_t i = 0; i < _n_meta_variables; i++)
+	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
-		std::string name = meta_variable_names[i];
+		std::string name = META_VARIABLES[i];
 		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
 	}
 	_meta_variables.find("GATEWAY_INTERFACE")->second = "CGI/" + _version;
@@ -27,9 +21,9 @@ Request::~Request()
 
 Request::Request(const Request &orig) : _message_body(orig._message_body)
 {
-	for (size_t i = 0; i < _n_meta_variables; i++)
+	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
-		const std::string &name = meta_variable_names[i];
+		const std::string &name = META_VARIABLES[i];
 		const std::string &value = orig._meta_variables.find(name)->second;
 		_meta_variables.insert(
 			std::pair<std::string, std::string>(name, value));
@@ -41,9 +35,9 @@ const Request &Request::operator=(const Request &orig)
 	if (this != &orig)
 	{
 		_meta_variables.clear();
-		for (size_t i = 0; i < _n_meta_variables; i++)
+		for (size_t i = 0; i < META_VARIABLES.size(); i++)
 		{
-			const std::string &name = meta_variable_names[i];
+			const std::string &name = META_VARIABLES[i];
 			const std::string &value = orig._meta_variables.find(name)->second;
 			_meta_variables.insert(
 				std::pair<std::string, std::string>(name, value));
@@ -55,14 +49,14 @@ const Request &Request::operator=(const Request &orig)
 
 char *const *Request::getEnv(void) const
 {
-	char **env = new char *[_n_meta_variables + 1];
-	for (size_t i = 0; i < _n_meta_variables; i++)
+	char **env = new char *[META_VARIABLES.size() + 1];
+	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
-		const std::string &name = meta_variable_names[i];
+		const std::string &name = META_VARIABLES[i];
 		const std::string &value = _meta_variables.find(name)->second;
 		env[i] = strdup((name + '=' + value).c_str());
 	}
-	env[_n_meta_variables] = NULL;
+	env[META_VARIABLES.size()] = NULL;
 	return ((char *const *)env);
 }
 

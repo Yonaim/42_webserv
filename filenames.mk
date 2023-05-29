@@ -81,6 +81,7 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/ServerParseDirective \
 					$(DIR_HTTP)Server/LocationNotFound \
 					$(DIR_HTTP)Server/ClientNotFound \
+					$(DIR_CGI)const_values \
 					$(DIR_CGI)Request \
 					$(DIR_CGI)Response \
 					$(DIR_CGI)RequestHandler \
