@@ -15,8 +15,8 @@ static const std::pair<std::string, int> _METHOD[]
 	   std::pair<std::string, int>("GET", METHOD_GET),
 	   std::pair<std::string, int>("HEAD", METHOD_HEAD),
 	   std::pair<std::string, int>("POST", METHOD_POST),
-	   std::pair<std::string, int>("DELETE", METHOD_DELETE),
-	   std::pair<std::string, int>("PUT", METHOD_POST)};
+	   std::pair<std::string, int>("PUT", METHOD_PUT),
+	   std::pair<std::string, int>("DELETE", METHOD_DELETE)};
 
 const BidiMap<std::string, int> HTTP::METHOD(_METHOD, sizeof(_METHOD)
 														  / sizeof(_METHOD[0]));
