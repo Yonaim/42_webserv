@@ -74,10 +74,10 @@ const Server::Location &Server::getLocation(const std::string &path) const
 	return (result->second);
 }
 
-std::string Server::getResourcePath(const Request &req) const
+std::string Server::getResourcePath(const Request &req,
+									const Location &location) const
 {
 	std::string uri_path = req.getURIPath();
-	const Location &location = getLocation(uri_path);
 	const std::string &alias = location.getAlias();
 
 	_logger << async::verbose << __func__ << ": URI path before replace \""
