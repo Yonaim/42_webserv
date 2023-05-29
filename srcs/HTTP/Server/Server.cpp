@@ -69,8 +69,8 @@ const Server::Location &Server::getLocation(const std::string &path) const
 
 	if (cur_diff == ULLONG_MAX)
 		throw(LocationNotFound(path));
-	_logger << "path " << path << " is for location " << result->first
-			<< async::verbose;
+	_logger << async::verbose << "path " << path << " is for location "
+			<< result->first;
 	return (result->second);
 }
 
@@ -80,14 +80,15 @@ std::string Server::getResourcePath(const Request &req) const
 	const Location &location = getLocation(uri_path);
 	const std::string &alias = location.getAlias();
 
-	_logger << __func__ << ": URI path before replace \"" << uri_path;
+	_logger << async::verbose << __func__ << ": URI path before replace \""
+			<< uri_path;
 	uri_path.replace(0, location.getPath().length(), alias);
-	_logger << "\" after \"" << uri_path << "\"" << async::verbose;
+	_logger << "\" after \"" << uri_path << "\"";
 	if (req.getURIPath().back() == '/' && location.hasIndex())
 	{
 		uri_path += location.getNthIndex(0);
-		_logger << __func__ << ": add index to URI path, result: \"" << uri_path
-				<< "\"" << async::verbose;
+		_logger << async::verbose << __func__
+				<< ": add index to URI path, result: \"" << uri_path << "\"";
 	}
 
 	return (uri_path);

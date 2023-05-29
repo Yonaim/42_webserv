@@ -13,8 +13,8 @@ void WebServer::parseMaxBodySize(const ConfigContext &root_context)
 
 	if (root_context.countDirectivesByName(dir_name) != 1)
 	{
-		_logger << root_context.name() << " should have 1 " << dir_name
-				<< async::error;
+		_logger << async::error << root_context.name() << " should have 1 "
+				<< dir_name;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 
@@ -23,17 +23,17 @@ void WebServer::parseMaxBodySize(const ConfigContext &root_context)
 
 	if (body_size_directive.is_context())
 	{
-		_logger << dir_name << " should not be context" << async::error;
+		_logger << async::error << dir_name << " should not be context";
 		root_context.throwException(PARSINGEXC_UNDEF_DIR);
 	}
 	if (body_size_directive.nParameters() != 1)
 	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
 		body_size_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 
 	_max_body_size = toNum<size_t>(body_size_directive.parameter(0));
-	_logger << "global max body size is " << _max_body_size << async::info;
+	_logger << async::info << "global max body size is " << _max_body_size;
 }
 
 void WebServer::parseUploadStore(const ConfigContext &root_context)
@@ -42,8 +42,8 @@ void WebServer::parseUploadStore(const ConfigContext &root_context)
 
 	if (root_context.countDirectivesByName(dir_name) != 1)
 	{
-		_logger << root_context.name() << " should have 1 " << dir_name
-				<< async::error;
+		_logger << async::error << root_context.name() << " should have 1 "
+				<< dir_name;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 
@@ -52,17 +52,17 @@ void WebServer::parseUploadStore(const ConfigContext &root_context)
 
 	if (upload_directive.is_context())
 	{
-		_logger << dir_name << " should not be context" << async::error;
+		_logger << async::error << dir_name << " should not be context";
 		root_context.throwException(PARSINGEXC_UNDEF_DIR);
 	}
 	if (upload_directive.nParameters() != 1)
 	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
 		upload_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 
 	_upload_store = upload_directive.parameter(0);
-	_logger << "upload store path set to " << _upload_store << async::info;
+	_logger << async::info << "upload store path set to " << _upload_store;
 }
 
 void WebServer::parseTimeout(const ConfigContext &root_context)
@@ -71,8 +71,8 @@ void WebServer::parseTimeout(const ConfigContext &root_context)
 
 	if (root_context.countDirectivesByName(dir_name) != 1)
 	{
-		_logger << root_context.name() << " should have 1 " << dir_name
-				<< async::error;
+		_logger << async::error << root_context.name() << " should have 1 "
+				<< dir_name;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 
@@ -81,30 +81,30 @@ void WebServer::parseTimeout(const ConfigContext &root_context)
 
 	if (timeout_directive.is_context())
 	{
-		_logger << dir_name << " should not be context" << async::error;
+		_logger << async::error << dir_name << " should not be context";
 		root_context.throwException(PARSINGEXC_UNDEF_DIR);
 	}
 	if (timeout_directive.nParameters() != 1)
 	{
-		_logger << dir_name << " should have 1 parameter(s)" << async::error;
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
 		timeout_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
 
 	_timeout_ms = toNum<unsigned int>(timeout_directive.parameter(0));
-	_logger << "global timeout is " << _timeout_ms << async::info;
+	_logger << async::info << "global timeout is " << _timeout_ms;
 }
 
 void WebServer::parseServer(const ConfigContext &server_context)
 {
 	HTTP::Server server(server_context, _max_body_size, _timeout_ms);
 	int port = server.getPort();
-	_logger << "Created Server at port " << port << async::info;
+	_logger << async::info << "Created Server at port " << port;
 	if (_tcp_procs.find(port) == _tcp_procs.end())
 	{
 		_tcp_procs[port] = async::TCPIOProcessor(port);
 		_tcp_procs[port].initialize();
-		_logger << "Created TCP IO Processor at port " << port
-				<< async::verbose;
+		_logger << async::verbose << "Created TCP IO Processor at port "
+				<< port;
 		_servers[port] = _Servers();
 		_request_buffer[port] = _ReqBufFdMap();
 	}
@@ -122,8 +122,8 @@ WebServer::WebServer(const ConfigContext &root_context)
 	size_t n_servers = root_context.countDirectivesByName(dir_name);
 	if (n_servers < 1)
 	{
-		_logger << root_context.name() << " should have 1 or more " << dir_name
-				<< async::error;
+		_logger << async::error << root_context.name()
+				<< " should have 1 or more " << dir_name;
 		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
 	}
 	for (size_t i = 0; i < n_servers; i++)
@@ -221,8 +221,8 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 			return;
 		}
 	}
-	_logger << "No matching server for " << request.getHeaderValue("Host", 0)
-			<< async::warning;
+	_logger << async::warning << "No matching server for "
+			<< request.getHeaderValue("Host", 0);
 	// 일치하는 Host가 없을 시, 해당 포트의 server_name이 없는 서버를 찾아보고
 	// 그러한 서버가 없다면 해당 포트의 첫 서버에 등록
 	if (findNoneNameServer(port) != _servers[port].end())
@@ -242,12 +242,12 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 			int client_fd = server_it->hasResponses();
 			if (client_fd < 0)
 				break;
-			_logger << "Response for client " << client_fd << " has been found"
-					<< async::verbose;
+			_logger << async::verbose << "Response for client " << client_fd
+					<< " has been found";
 			HTTP::Response res = server_it->retrieveResponse(client_fd);
 			_tcp_procs[port].wrbuf(client_fd) += res.toString();
-			_logger << "Added to wrbuf: \"" << res.toString() << "\""
-					<< async::debug;
+			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
+					<< "\"";
 		}
 	}
 }
@@ -267,8 +267,8 @@ void WebServer::disconnect(int port, int client_fd)
 			(void)e;
 		}
 	}
-	_logger << "Disconnected client fd " << client_fd << " from port " << port
-			<< async::info;
+	_logger << async::info << "Disconnected client fd " << client_fd
+			<< " from port " << port;
 }
 
 void WebServer::task(void)

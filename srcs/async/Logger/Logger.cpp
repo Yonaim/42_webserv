@@ -10,16 +10,17 @@ const std::string Logger::_name_default = "root";
 int Logger::_log_level = INFO;
 const char *Logger::_level_names[]
 	= {"DEBUG  ", "VERBOSE", "INFO   ", "WARNING", "ERROR  "};
+bool Logger::_active = false;
 
-Logger::Logger(void) : _name(_name_default), _buf("")
+Logger::Logger(void) : _name(_name_default)
 {
 }
 
-Logger::Logger(const std::string &name) : _name(name), _buf("")
+Logger::Logger(const std::string &name) : _name(name)
 {
 }
 
-Logger::Logger(const Logger &orig) : _name(orig._name), _buf(orig._buf)
+Logger::Logger(const Logger &orig) : _name(orig._name)
 {
 }
 
@@ -46,24 +47,27 @@ std::string Logger::getPrefix(int level)
 	return (prefix);
 }
 
-void Logger::registerLog(const std::string &content)
+void Logger::log(const std::string &content)
 {
-	_buf += content;
+	if (!_active)
+		return;
+	for (_Procs::const_iterator it = _target.begin(); it != _target.end(); it++)
+		it->second->setWriteBuf(content);
 }
 
-void Logger::log(int level)
+bool Logger::isActive(void)
 {
-	if (level < _log_level)
-	{
-		_buf = "";
-		return;
-	}
-	for (_Procs::const_iterator it = _target.begin(); it != _target.end(); it++)
-	{
-		it->second->setWriteBuf(getPrefix(level));
-		it->second->setWriteBuf(_buf);
-	}
-	_buf = "";
+	return (_active);
+}
+
+void Logger::activate(void)
+{
+	_active = true;
+}
+
+void Logger::deactivate(void)
+{
+	_active = false;
 }
 
 void Logger::setLogLevel(int log_filter)
@@ -83,6 +87,11 @@ void Logger::setLogLevel(const std::string &log_level)
 		}
 	}
 	throw(std::runtime_error("Log level " + log_level + " does not exist."));
+}
+
+int Logger::getLogLevel(void)
+{
+	return (_log_level);
 }
 
 void Logger::registerFd(int fd)
@@ -108,12 +117,22 @@ void Logger::task(void)
 
 void Logger::blockingWrite(void)
 {
+	for (std::map<std::string, Logger *>::iterator it = _loggers.begin();
+		 it != _loggers.end(); it++)
+	{
+		Logger &logger = *(it->second);
+		logger.log("\n");
+	}
 	IOTaskHandler::blockingWrite();
 }
 
 Logger &operator<<(Logger &io, const Logger::EndMarker mark)
 {
-	io.registerLog("\n");
-	io.log(mark.level);
+	io.log("\n");
+	if (mark.level < Logger::getLogLevel())
+		Logger::deactivate();
+	else
+		Logger::activate();
+	io.log(io.getPrefix(mark.level));
 	return (io);
 }

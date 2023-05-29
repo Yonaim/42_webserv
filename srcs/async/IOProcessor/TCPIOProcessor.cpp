@@ -48,7 +48,7 @@ void TCPIOProcessor::task(void)
 				finalize("Error from server socket");
 			else
 			{
-				_logger << "Error from client socket" << async::warning;
+				_logger << async::warning << "Error from client socket";
 				disconnect(ident);
 			}
 		}
@@ -64,8 +64,9 @@ void TCPIOProcessor::task(void)
 				}
 				catch (const std::runtime_error &e)
 				{
-					_logger << "Error while reading from client " << ident
-							<< ": " << e.what() << async::warning;
+					_logger << async::warning
+							<< "Error while reading from client " << ident
+							<< ": " << e.what();
 					disconnect(ident);
 				}
 			}
@@ -80,8 +81,9 @@ void TCPIOProcessor::task(void)
 				}
 				catch (const IOProcessor::WriteError &e)
 				{
-					_logger << "Error while writing to client " << ident << ": "
-							<< e.what() << async::warning;
+					_logger << async::warning
+							<< "Error while writing to client " << ident << ": "
+							<< e.what();
 				}
 			}
 		}
@@ -98,7 +100,7 @@ void TCPIOProcessor::initialize(void)
 	int option = 1;
 	setsockopt(_listening_socket, SOL_SOCKET, SO_REUSEADDR, &option,
 			   sizeof(option));
-	_logger << "Created socket " << _listening_socket << async::info;
+	_logger << async::info << "Created socket " << _listening_socket;
 
 	struct sockaddr_in addr;
 	std::memset(&addr, 0, sizeof(struct sockaddr_in));
@@ -109,25 +111,25 @@ void TCPIOProcessor::initialize(void)
 				  sizeof(struct sockaddr_in));
 	if (result < 0)
 		finalize(strerror(errno));
-	_logger << "Bind socket " << _listening_socket << " at port " << _port
-			<< async::info;
+	_logger << async::info << "Bind socket " << _listening_socket << " at port "
+			<< _port;
 
 	result = listen(_listening_socket, _backlog);
 	if (result < 0)
 		finalize(strerror(errno));
-	_logger << "Listen with backlog size " << _backlog << async::info;
+	_logger << async::info << "Listen with backlog size " << _backlog;
 
 	result = fcntl(_listening_socket, F_SETFL, O_NONBLOCK);
 	if (result < 0)
 		finalize(strerror(errno));
 	_watchlist.push_back(constructKevent(_listening_socket, IOEVENT_READ));
 	flushKQueue();
-	_logger << "TCPIOProcessor initialization complete" << async::verbose;
+	_logger << async::verbose << "TCPIOProcessor initialization complete";
 }
 
 void TCPIOProcessor::finalize(const char *with_error)
 {
-	_logger << "Finalize TCPIOProcessor" << async::verbose;
+	_logger << async::verbose << "Finalize TCPIOProcessor";
 	close(_listening_socket);
 	_listening_socket = 0;
 	if (with_error)
@@ -140,7 +142,7 @@ void TCPIOProcessor::accept(void)
 	int new_client_socket = ::accept(_listening_socket, NULL, NULL);
 	if (new_client_socket < 0)
 		finalize(strerror(errno));
-	_logger << "Accepted new client: " << new_client_socket << async::info;
+	_logger << async::info << "Accepted new client: " << new_client_socket;
 	int result = fcntl(new_client_socket, F_SETFL, O_NONBLOCK);
 	if (result < 0)
 		finalize(strerror(errno));
@@ -156,7 +158,7 @@ void TCPIOProcessor::disconnect(const int client_socket)
 	_rdbuf.erase(client_socket);
 	_wrbuf.erase(client_socket);
 	disconnected_clients.push(client_socket);
-	_logger << "Disconnected " << client_socket << async::info;
+	_logger << async::info << "Disconnected " << client_socket;
 }
 
 std::string &TCPIOProcessor::rdbuf(const int fd)
