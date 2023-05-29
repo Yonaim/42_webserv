@@ -253,6 +253,18 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 	}
 }
 
+HTTP::Response WebServer::generateErrorResponse(const int code)
+{
+	HTTP::Response response;
+
+	std::string body = HTTP::generateErrorPage(code);
+	response.setStatus(code);
+	response.setBody(body);
+	response.setContentLength(body.length());
+	response.setContentType("text/html");
+	return (response);
+}
+
 void WebServer::disconnect(int port, int client_fd)
 {
 	_request_buffer[port].erase(client_fd);
