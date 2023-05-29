@@ -52,6 +52,11 @@ void TCPIOProcessor::task(void)
 				disconnect(ident);
 			}
 		}
+		else if (flags & EV_EOF)
+		{
+			_logger << async::info << "client " << ident << " reports EOF";
+			disconnect(ident);
+		}
 		else if (filter == EVFILT_READ)
 		{
 			if (static_cast<int>(ident) == _listening_socket)

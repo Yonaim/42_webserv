@@ -56,6 +56,10 @@ void SingleIOProcessor::task(void)
 				std::string("Failed to register EVFILT code " + toStr(event)
 							+ " into kqueue, data " + toStr(data))));
 		}
+		else if (flags & EV_EOF)
+		{
+			throw(IOProcessor::FileClosed());
+		}
 		else if (event == EVFILT_READ)
 		{
 			read(_fd, data);
