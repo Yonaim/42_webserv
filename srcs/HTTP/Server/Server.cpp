@@ -1,7 +1,7 @@
 #include "HTTP/Server.hpp"
 #include "../const_values.hpp"
-#include "../error_pages.hpp"
 #include "ConfigDirective.hpp"
+#include "HTTP/error_pages.hpp"
 #include "utils/string.hpp"
 #include <cctype>
 
