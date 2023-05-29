@@ -33,11 +33,6 @@ void CGI::Response::setError(int status_code)
 	(void)status_code;
 }
 
-int CGI::Response::getType() const
-{
-	return (_type);
-}
-
 std::string CGI::Response::getContentType() const
 {
 	return (_content_type);

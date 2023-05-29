@@ -9,19 +9,11 @@ namespace CGI
 class Response
 {
   private:
-	int _type;
 	std::string _content_type;
 	int _status;
 	std::string _response_body;
 
   public:
-	// enum _response_type_e
-	// {
-	// 	RESPONSE_DOCUMENT,
-	// 	RESPONSE_LOCAL_REDIR,
-	// 	RESPONSE_CLIENT_REDIR,
-	// 	RESPONSE_CLIENT_REDIRDOC
-	// };
 	Response();
 	~Response();
 	Response(const Response &orig);
