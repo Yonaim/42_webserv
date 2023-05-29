@@ -85,6 +85,8 @@ FILENAMES			= \
 					$(DIR_CGI)Response \
 					$(DIR_CGI)RequestHandler \
 					$(DIR_WEBSERVER)WebServer \
+					$(DIR_WEBSERVER)WebServerMethod \
+					$(DIR_WEBSERVER)WebServerParseDirective \
 
 SRCS				= $(addprefix $(DIR_SRCS), $(addsuffix .cpp, $(FILENAMES)))
 OBJS				= $(addprefix $(DIR_OBJS), $(addsuffix .o, $(FILENAMES)))
