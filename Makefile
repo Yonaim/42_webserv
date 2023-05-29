@@ -62,6 +62,9 @@ test_bidimap: $(OBJS) $(DIR_TESTOBJS)test_bidimap.o
 test_cgirequesthandler: $(OBJS) $(DIR_TESTOBJS)test_cgirequesthandler.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_cgirequesthandler.o -o $@ $(LDFLAGS)
 
+test_cgi_script: $(OBJS) $(DIR_TESTOBJS)test_cgi_script.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_cgi_script.o -o $@ $(LDFLAGS)
+
 -include $(DEPS) $(TESTDRIVERDEPS)
 
 clean:
