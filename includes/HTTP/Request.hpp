@@ -16,7 +16,6 @@ enum consume_exc_e
 	CONSUME_EXC_INVALID_FIELD,
 	CONSUME_EXC_INVALID_VALUE,
 	CONSUME_EXC_INVALID_SIZE,
-
 };
 
 class Request
@@ -34,8 +33,7 @@ class Request
 	int _method;
 	std::string _uri;
 	std::string _query_string;
-	std::string _version_string; // 1.1 2.0 1.0
-	int _version;                // 1001 2000 1000
+	std::string _version; // 1.1 2.0 1.0
 	Header _header;
 	std::string _body;
 	int _current_state; // enum parse_state_e

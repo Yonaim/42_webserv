@@ -77,14 +77,14 @@ int Request::consumeStartLine(std::string &buffer)
 		trimbackstr(_uri, question_mark_pos);
 	}
 
-	_version_string = tokens[2];
+	_version = tokens[2];
 
 	{
 		_logger << async::verbose << __func__ << ": URI: \"" << _uri << "\"";
 		_logger << async::verbose << __func__ << ": QUERY: \"" << _query_string
 				<< "\"";
 		_logger << async::verbose << __func__ << ": version: \""
-				<< _version_string << "\"";
+				<< _version << "\"";
 		_logger << async::debug << __func__ << ": buffer result in :\""
 				<< buffer << "\"";
 	}
