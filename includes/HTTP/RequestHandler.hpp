@@ -19,7 +19,6 @@ class Server::RequestHandler
 	Response _response;
 	int _status;
 	std::string _resource_path;
-	CGI::RequestHandler *_cgi_handler;
 	async::Logger &_logger;
 
 	void registerErrorResponse(const int code, const std::exception &e);
@@ -35,12 +34,8 @@ class Server::RequestHandler
 				   const Server::Location &location);
 	virtual ~RequestHandler();
 
-	int task(void);
+	virtual int task(void) = 0;
 	Response retrieve(void);
-	void setCGIRequestValues(CGI::Request &cgi_request);
-	void handleCGI(void);
-	virtual void handleRequest(void) = 0;
-	void CGIResponseToHTTPResponse(const CGI::Response &cgi_response);
 
 	bool isDirectory(void) const;
 	bool isInvalidDirectoryFormat(void) const;
@@ -56,7 +51,7 @@ class Server::RequestGetHandler : public Server::RequestHandler
 					  const Server::Location &location);
 	virtual ~RequestGetHandler();
 
-	virtual void handleRequest(void);
+	virtual int task(void);
 };
 
 class Server::RequestHeadHandler : public Server::RequestHandler
@@ -69,7 +64,7 @@ class Server::RequestHeadHandler : public Server::RequestHandler
 					   const Server::Location &location);
 	virtual ~RequestHeadHandler();
 
-	virtual void handleRequest(void);
+	virtual int task(void);
 };
 
 class Server::RequestPostHandler : public Server::RequestHandler
@@ -82,7 +77,7 @@ class Server::RequestPostHandler : public Server::RequestHandler
 					   const Server::Location &location);
 	virtual ~RequestPostHandler();
 
-	virtual void handleRequest(void);
+	virtual int task(void);
 };
 
 class Server::RequestPutHandler : public Server::RequestHandler
@@ -95,7 +90,7 @@ class Server::RequestPutHandler : public Server::RequestHandler
 					  const Server::Location &location);
 	virtual ~RequestPutHandler();
 
-	virtual void handleRequest(void);
+	virtual int task(void);
 };
 
 class Server::RequestDeleteHandler : public Server::RequestHandler
@@ -105,7 +100,7 @@ class Server::RequestDeleteHandler : public Server::RequestHandler
 						 const Server::Location &location);
 	virtual ~RequestDeleteHandler();
 
-	virtual void handleRequest(void);
+	virtual int task(void);
 };
 } // namespace HTTP
 

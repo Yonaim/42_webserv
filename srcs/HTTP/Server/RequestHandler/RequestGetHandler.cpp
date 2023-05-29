@@ -6,26 +6,23 @@ using namespace HTTP;
 Server::RequestGetHandler::RequestGetHandler(Server *server,
 											 const Request &request,
 											 const Server::Location &location)
-	: RequestHandler(server, request, location), _reader(NULL)
+	: RequestHandler(server, request, location),
+	  _reader(new async::FileReader(_server->_timeout_ms, _resource_path))
 {
-	if (_cgi_handler)
-		return;
-	_reader = new async::FileReader(_server->_timeout_ms, _resource_path);
 }
 
 Server::RequestGetHandler::~RequestGetHandler()
 {
-	if (_reader)
-		delete _reader;
+	delete _reader;
 }
 
 // uri = <스킴>://<사용자
 // 이름>:<비밀번호>@<호스트>:<포트>/<경로>;<파라미터>?<질의>#<프래그먼트>
 
-void Server::RequestGetHandler::handleRequest(void)
+int Server::RequestGetHandler::task(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return;
+		return (_status);
 
 	if (isInvalidDirectoryFormat())
 	{
@@ -34,7 +31,7 @@ void Server::RequestGetHandler::handleRequest(void)
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		_logger << async::warning << "invalid directory format, redirect to \""
 				<< _request.getURIPath() + "\"";
-		return;
+		return (_status);
 	}
 
 	try
@@ -83,4 +80,5 @@ void Server::RequestGetHandler::handleRequest(void)
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		registerErrorResponse(500, e); // Internal Server Error
 	}
+	return (_status);
 }

@@ -5,23 +5,20 @@ using namespace HTTP;
 Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 											   const Request &request,
 											   const Server::Location &location)
-	: RequestHandler(server, request, location), _reader(NULL)
+	: RequestHandler(server, request, location),
+	  _reader(new async::FileReader(_server->_timeout_ms, _resource_path))
 {
-	if (_cgi_handler)
-		return;
-	_reader = new async::FileReader(_server->_timeout_ms, _resource_path);
 }
 
 Server::RequestHeadHandler::~RequestHeadHandler()
 {
-	if (_reader)
-		delete _reader;
+	delete _reader;
 }
 
-void Server::RequestHeadHandler::handleRequest(void)
+int Server::RequestHeadHandler::task(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return;
+		return (_status);
 
 	if (isInvalidDirectoryFormat())
 	{
@@ -30,7 +27,7 @@ void Server::RequestHeadHandler::handleRequest(void)
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		_logger << async::warning << "invalid directory format, redirect to \""
 				<< _request.getURIPath() + "\"";
-		return;
+		return (_status);
 	}
 
 	try
@@ -67,4 +64,5 @@ void Server::RequestHeadHandler::handleRequest(void)
 	{
 		registerErrorResponse(500, e); // Internal Server Error
 	}
+	return (_status);
 }

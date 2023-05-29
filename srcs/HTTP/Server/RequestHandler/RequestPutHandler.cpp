@@ -8,17 +8,15 @@ Server::RequestPutHandler::RequestPutHandler(Server *server,
 											 const Server::Location &location)
 	: RequestHandler(server, request, location), _writer(NULL)
 {
-	if (_cgi_handler)
-		return;
-	if (location.uploadAllowed())
+	if (!location.uploadAllowed())
 	{
-		_writer = new async::FileWriter(_server->_timeout_ms, _resource_path,
-										request.getBody());
+		_response = _server->generateErrorResponse(500);
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		_logger << async::warning << "This location doesn't allow upload";
 		return;
 	}
-	_response = _server->generateErrorResponse(500);
-	_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-	_logger << async::warning << "This location doesn't allow uploads or CGI";
+	_writer = new async::FileWriter(_server->_timeout_ms, _resource_path,
+									request.getBody());
 }
 
 Server::RequestPutHandler::~RequestPutHandler()
@@ -27,10 +25,10 @@ Server::RequestPutHandler::~RequestPutHandler()
 		delete _writer;
 }
 
-void Server::RequestPutHandler::handleRequest(void)
+int Server::RequestPutHandler::task(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return;
+		return (_status);
 
 	try
 	{
@@ -67,4 +65,5 @@ void Server::RequestPutHandler::handleRequest(void)
 	{
 		registerErrorResponse(500, e); // Internal Server Error
 	}
+	return (_status);
 }

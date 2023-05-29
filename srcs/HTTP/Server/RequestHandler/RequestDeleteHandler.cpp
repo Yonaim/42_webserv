@@ -14,10 +14,10 @@ Server::RequestDeleteHandler::~RequestDeleteHandler()
 {
 }
 
-void Server::RequestDeleteHandler::handleRequest(void)
+int Server::RequestDeleteHandler::task(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return;
+		return (_status);
 
 	if (unlink(_resource_path.c_str()) == -1)
 	{
@@ -39,4 +39,5 @@ void Server::RequestDeleteHandler::handleRequest(void)
 		_response.setStatus(200);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
+	return (_status);
 }
