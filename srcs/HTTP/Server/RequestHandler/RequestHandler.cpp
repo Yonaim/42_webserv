@@ -63,6 +63,39 @@ void Server::RequestHandler::setCGIRequestValues(CGI::Request &cgi_request)
 	}
 }
 
+void Server::RequestHandler::CGIResponseToHTTPResponse(
+	const CGI::Response &cgi_response)
+{
+	// TODO: 구현
+	(void)cgi_response;
+}
+
+void Server::RequestHandler::handleCGI(void)
+{
+	try
+	{
+		CGI::Request cgi_request;
+		setCGIRequestValues(cgi_request);
+		CGI::RequestHandler cgi_request_handler(cgi_request, 1000);
+
+		int rc = cgi_request_handler.task();
+		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
+		{
+			const CGI::Response &cgi_response = cgi_request_handler.retrieve();
+			CGIResponseToHTTPResponse(cgi_response);
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+		else
+		{
+			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		}
+	}
+	catch (const std::exception &e)
+	{
+		registerErrorResponse(500, e); // Internal Server Error
+	}
+}
+
 bool Server::RequestHandler::isDirectory(void) const
 {
 	return (::isDirectory(_resource_path));
