@@ -2,7 +2,8 @@
 
 // special token
 const std::string CGI::NL = "\n";
-const size_t CGI::NL_SIZE = CGI::NL.length();
+const std::string HTTP::LWS = " \t";
+const size_t CGI::NL_LEN = CGI::NL.length();
 
 // meta-variables
 const std::string _META_VARIABLES[]

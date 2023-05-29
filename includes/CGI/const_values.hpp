@@ -8,7 +8,7 @@ namespace CGI
 {
 // special token
 extern const std::string NL;
-extern const size_t NL_SIZE;
+extern const size_t NL_LEN;
 
 // meta-variables
 extern const std::vector<std::string> META_VARIABLES;

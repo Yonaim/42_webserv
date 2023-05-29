@@ -1,6 +1,7 @@
 #ifndef CGI_RESPONSE_HPP
 #define CGI_RESPONSE_HPP
 
+#include "Header.hpp"
 #include <string>
 #include <vector>
 
@@ -12,6 +13,7 @@ class Response
 	std::string _content_type;
 	int _status;
 	std::string _response_body;
+	Header _header;
 
   public:
 	Response();
@@ -19,8 +21,9 @@ class Response
 	Response(const Response &orig);
 	const Response &operator=(const Response &orig);
 
-	void makeResponse(const std::string &cgi_output);
+	void makeResponse(std::string &cgi_output);
 	void setError(const int status_code);
+	void parseHeader(std::string &line);
 
 	// getter
 	int getType() const;
