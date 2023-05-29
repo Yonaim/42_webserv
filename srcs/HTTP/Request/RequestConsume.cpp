@@ -56,7 +56,6 @@ int Request::consumeStartLine(std::string &buffer)
 	{
 		if (tokens[0] == it->first)
 		{
-			_method_string = tokens[0];
 			_method = it->second;
 			break;
 		}

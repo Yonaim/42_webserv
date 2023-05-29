@@ -32,7 +32,6 @@ class Request
 	};
 
 	int _method;
-	std::string _method_string;
 	std::string _uri;
 	std::string _query_string;
 	std::string _version_string; // 1.1 2.0 1.0

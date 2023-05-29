@@ -245,7 +245,7 @@ int Request::getMethod(void) const
 
 const std::string &Request::getMethodString(void) const
 {
-	return (_method_string);
+	return (HTTP::METHOD.getKeyByValue(_method));
 }
 
 const std::string &Request::getURIPath(void) const
