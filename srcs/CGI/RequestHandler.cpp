@@ -1,6 +1,5 @@
 #include "CGI/RequestHandler.hpp"
 #include <cstdlib>
-#include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -86,6 +85,7 @@ int RequestHandler::fork()
 	}
 	else
 	{
+		_logger << async::debug << "successed to fork.";
 		::close(_write_pipe_fd[0]);
 		::close(_read_pipe_fd[1]);
 		_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
@@ -101,15 +101,18 @@ int RequestHandler::sendCGIRequest()
 	switch (rc)
 	{
 	case async::status::OK:
+		_logger << async::debug << "successed to write CGI request";
 		close(_write_pipe_fd[1]);
 		delete _writer;
 		_writer = NULL;
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	case async::status::AGAIN:
+		_logger << async::debug << "writing CGI request";
 		_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	default:
+		_logger << async::debug << "failed to write CGI request";
 		_response.setError(ERROR_CODE);
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
@@ -122,6 +125,7 @@ int RequestHandler::waitExecution()
 
 	if (rc < 0)
 	{
+		_logger << async::debug << "failed to waitpid";
 		_response.setError(ERROR_CODE);
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 	}
@@ -133,7 +137,7 @@ int RequestHandler::waitExecution()
 	else
 	{
 		// TODO: _waitpid_status 값 체크하기
-		_logger << async::debug << "waitpid done";
+		_logger << async::debug << "child process done";
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 	}
 
