@@ -27,10 +27,9 @@ void CGI::Response::makeResponse(const std::string &cgi_output)
 	// TODO: string으로 받은 Response 메시지 기반으로 CGI/Response 초기화
 }
 
-void CGI::Response::setError(int status_code)
+void CGI::Response::setError(const int status_code)
 {
-	// TODO: setError
-	(void)status_code;
+	_status = status_code;
 }
 
 std::string CGI::Response::getContentType() const
