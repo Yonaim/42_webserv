@@ -19,8 +19,8 @@ class Server::RequestHandler
 	Response _response;
 	int _status;
 	std::string _resource_path;
+	CGI::RequestHandler *_cgi_handler;
 	async::Logger &_logger;
-	void *_cgi_handler;
 
 	void registerErrorResponse(const int code, const std::exception &e);
 

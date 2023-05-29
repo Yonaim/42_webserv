@@ -17,17 +17,18 @@ Server::RequestHandler::RequestHandler(Server *server, const Request &request,
 		_response.setConnection(true);
 	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
 	{
-		// TODO: CGI 핸들러 완성시 주석 해제
-		// _cgi_handler = new CGIHandler(args);
+		CGI::Request cgi_request;
+		setCGIRequestValues(cgi_request);
+		_cgi_handler
+			= new CGI::RequestHandler(cgi_request, server->_timeout_ms);
 		return;
 	}
 }
 
 Server::RequestHandler::~RequestHandler()
 {
-	// TODO: CGI 핸들러 완성시 주석 해제
-	// if (_cgi_handler)
-	// 	delete _cgi_handler;
+	if (_cgi_handler)
+		delete _cgi_handler;
 }
 
 int Server::RequestHandler::task(void)
@@ -93,14 +94,10 @@ void Server::RequestHandler::handleCGI(void)
 {
 	try
 	{
-		CGI::Request cgi_request;
-		setCGIRequestValues(cgi_request);
-		CGI::RequestHandler cgi_request_handler(cgi_request, 1000);
-
-		int rc = cgi_request_handler.task();
+		int rc = _cgi_handler->task();
 		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 		{
-			const CGI::Response &cgi_response = cgi_request_handler.retrieve();
+			const CGI::Response &cgi_response = _cgi_handler->retrieve();
 			CGIResponseToHTTPResponse(cgi_response);
 			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		}
