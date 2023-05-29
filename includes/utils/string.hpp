@@ -12,12 +12,45 @@ void passLWS(std::string &str);
 void strtrim(std::string &str, const std::string &charset);
 std::vector<std::string> split(const std::string &s, const char c);
 std::vector<std::string> split(const std::string &s, const std::string &sep);
-std::string getfrontstr(const std::string &str, const size_t until);
-void trimbackstr(std::string &str, const size_t until);
-std::string getbackstr(const std::string &str, const size_t from);
-void trimfrontstr(std::string &str, const size_t from);
-std::string consumestr(std::string &str, const size_t from);
-std::string getExtension(const std::string &filename);
+
+// returns substring from start to (until).
+inline std::string getfrontstr(const std::string &str, const size_t until)
+{
+	return (str.substr(0, until));
+}
+
+// trims the end of string except `until` characters.
+inline void trimbackstr(std::string &str, const size_t until)
+{
+	str.erase(until, std::string::npos);
+}
+
+// returns substring from `from` to end.
+inline std::string getbackstr(const std::string &str, const size_t from)
+{
+	return (str.substr(from, str.size() - from));
+}
+
+// trims `from` characters from the front of str.
+inline void trimfrontstr(std::string &str, const size_t from)
+{
+	str.erase(0, from);
+}
+
+inline std::string consumestr(std::string &str, const size_t from)
+{
+	std::string buf = str.substr(0, from);
+	trimfrontstr(str, from);
+	return (buf);
+}
+
+inline std::string getExtension(const std::string &filename)
+{
+	size_t pos = filename.rfind('.');
+	if (pos != std::string::npos)
+		return (filename.substr(pos + 1));
+	return ("");
+}
 
 template <typename T> std::string toStr(T num, T num2)
 {
