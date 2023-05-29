@@ -9,7 +9,7 @@ static const char *meta_variable_names[]
 	   "SCRIPT_NAME",    "SERVER_NAME",     "SERVER_PORT",  "SERVER_PROTOCOL",
 	   "SERVER_SOFTWARE"};
 
-Request::Request() : _message_body("this is the body got you")
+Request::Request()
 {
 	for (size_t i = 0; i < _n_meta_variables; i++)
 	{
