@@ -82,6 +82,17 @@ std::string Server::getResourcePath(const Request &req,
 
 	_logger << async::verbose << __func__ << ": URI path before replace \""
 			<< uri_path;
+	if ((req.getMethod() == METHOD_POST || req.getMethod() == METHOD_PUT)
+		&& location.uploadAllowed())
+	{
+		uri_path.replace(0, location.getPath().length(),
+						 location.getUploadPath());
+		_logger << "\" after \"" << uri_path << "\"";
+		_logger << async::verbose << __func__
+				<< ": above path is for uploading";
+		return (uri_path);
+	}
+
 	uri_path.replace(0, location.getPath().length(), alias);
 	_logger << "\" after \"" << uri_path << "\"";
 	if (req.getURIPath().back() == '/' && location.hasIndex())
