@@ -22,6 +22,8 @@ class Request
 	const std::string getPath(void) const;
 	// setter
 	void setMetaVariable(const std::string &name, const std::string &value);
+	void setValues(const HTTP::Request &http_req,
+				   const std::string &resource_path);
 
 	// getter
 	const std::string &getMessageBody(void) const;

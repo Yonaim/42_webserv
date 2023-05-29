@@ -1,5 +1,6 @@
 #include "CGI/Request.hpp"
 #include "CGI/const_values.hpp"
+#include "utils/string.hpp"
 
 using namespace CGI;
 
@@ -73,4 +74,32 @@ const std::string Request::getPath() const
 void Request::setMetaVariable(const std::string &name, const std::string &value)
 {
 	_meta_variables[name] = value;
+}
+
+void Request::setValues(const HTTP::Request &http_req,
+						const std::string &resource_path)
+{
+	// TODO: setValues 완성하기
+	// TODO: 생성자로 옮기는 것 고려해보기
+	_meta_variables["CONTENT_LENGTH"]
+		= toStr<size_t>(http_req.getBody().length());
+	if (http_req.hasHeaderValue("Content-Type"))
+		_meta_variables["CONTENT_TYPE"]
+			= http_req.getHeaderValue("Content-Type", 0);
+	_meta_variables["PATH_INFO"] = http_req.getURIPath();
+	_meta_variables["PATH_TRANSLATED"] = resource_path;
+	_meta_variables["QUERY_STRING"] = http_req.getQueryString();
+	_meta_variables["REQUEST_METHOD"] = http_req.getMethodString();
+	std::string host_header = http_req.getHeaderValue("Host", 0);
+	size_t colon_pos = host_header.find(':');
+	if (colon_pos == std::string::npos)
+	{
+		_meta_variables["SERVER_NAME"] = host_header;
+		_meta_variables["SERVER_PORT"] = "80";
+	}
+	else
+	{
+		_meta_variables["SERVER_NAME"] = getfrontstr(host_header, colon_pos);
+		_meta_variables["SERVER_PORT"] = getbackstr(host_header, colon_pos + 1);
+	}
 }
