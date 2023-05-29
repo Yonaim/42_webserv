@@ -178,7 +178,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		{
 			// TODO: 오류 상황에 따라 에러 코드 세분화
 			// TODO: 에러 코드에 따라 연결 끊을 수도 있게 처리
-			_logger << "Parsing failure: " << e.what() << '\n';
+			_logger << async::warning << "Parsing failure: " << e.what();
 			_request_buffer[port][client_fd] = HTTP::Request();
 			HTTP::Response res = generateErrorResponse(400); // Bad Request
 			_tcp_procs[port].wrbuf(client_fd) += res.toString();
