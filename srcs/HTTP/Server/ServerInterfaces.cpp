@@ -108,6 +108,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	{
 		_logger << async::warning << e.what();
 		registerErrorResponse(client_fd, 404); // Not Found
+		return;
 	}
 
 	if (_request_handlers.find(client_fd) == _request_handlers.end())
