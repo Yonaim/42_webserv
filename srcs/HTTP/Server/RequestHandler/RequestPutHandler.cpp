@@ -3,9 +3,9 @@
 
 using namespace HTTP;
 
-Server::RequestPostHandler::RequestPostHandler(Server *server,
-											   const Request &request,
-											   const Server::Location &location)
+Server::RequestPutHandler::RequestPutHandler(Server *server,
+											 const Request &request,
+											 const Server::Location &location)
 	: RequestHandler(server, request, location), _writer(NULL)
 {
 	if (_cgi_handler)
@@ -21,13 +21,13 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 	_logger << async::warning << "This location doesn't allow uploads or CGI";
 }
 
-Server::RequestPostHandler::~RequestPostHandler()
+Server::RequestPutHandler::~RequestPutHandler()
 {
 	if (_writer)
 		delete _writer;
 }
 
-void Server::RequestPostHandler::handleRequest(void)
+void Server::RequestPutHandler::handleRequest(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return;

@@ -74,26 +74,6 @@ const Server::Location &Server::getLocation(const std::string &path) const
 	return (result->second);
 }
 
-std::string Server::getResourcePath(const Request &req) const
-{
-	std::string uri_path = req.getURIPath();
-	const Location &location = getLocation(uri_path);
-	const std::string &alias = location.getAlias();
-
-	_logger << async::verbose << __func__ << ": URI path before replace \""
-			<< uri_path;
-	uri_path.replace(0, location.getPath().length(), alias);
-	_logger << "\" after \"" << uri_path << "\"";
-	if (req.getURIPath().back() == '/' && location.hasIndex())
-	{
-		uri_path += location.getNthIndex(0);
-		_logger << async::verbose << __func__
-				<< ": add index to URI path, result: \"" << uri_path << "\"";
-	}
-
-	return (uri_path);
-}
-
 bool Server::isCGIextension(const std::string &path) const
 {
 	std::string ext = getExtension(path);

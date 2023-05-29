@@ -8,17 +8,36 @@ Server::RequestHandler::RequestHandler(Server *server, const Request &request,
 									   const Server::Location &location)
 	: _request(request), _location(location), _server(server),
 	  _status(RESPONSE_STATUS_AGAIN),
-	  _resource_path(server->getResourcePath(request)),
-	  _logger(async::Logger::getLogger("RequestHandler")), _cgi_handler(NULL)
+	  _resource_path(location.generateResourcePath(request)),
+	  _cgi_handler(NULL), _logger(async::Logger::getLogger("RequestHandler"))
 {
 	if (_request.hasHeaderValue("Connection", "close"))
 		_response.setConnection(false);
 	else
 		_response.setConnection(true);
+	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
+	{
+		CGI::Request cgi_request;
+		setCGIRequestValues(cgi_request);
+		_cgi_handler
+			= new CGI::RequestHandler(cgi_request, server->_timeout_ms);
+		return;
+	}
 }
 
 Server::RequestHandler::~RequestHandler()
 {
+	if (_cgi_handler)
+		delete _cgi_handler;
+}
+
+int Server::RequestHandler::task(void)
+{
+	if (_cgi_handler)
+		handleCGI();
+	else
+		handleRequest();
+	return (_status);
 }
 
 void Server::RequestHandler::registerErrorResponse(const int code,
@@ -75,14 +94,10 @@ void Server::RequestHandler::handleCGI(void)
 {
 	try
 	{
-		CGI::Request cgi_request;
-		setCGIRequestValues(cgi_request);
-		CGI::RequestHandler cgi_request_handler(cgi_request, 1000);
-
-		int rc = cgi_request_handler.task();
+		int rc = _cgi_handler->task();
 		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 		{
-			const CGI::Response &cgi_response = cgi_request_handler.retrieve();
+			const CGI::Response &cgi_response = _cgi_handler->retrieve();
 			CGIResponseToHTTPResponse(cgi_response);
 			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		}

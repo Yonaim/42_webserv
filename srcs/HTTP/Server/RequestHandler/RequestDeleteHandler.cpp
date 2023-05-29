@@ -8,28 +8,18 @@ Server::RequestDeleteHandler::RequestDeleteHandler(
 	Server *server, const Request &request, const Server::Location &location)
 	: RequestHandler(server, request, location)
 {
-	if (server->cgiEnabled() && server->isCGIextension(_resource_path))
-	{
-		// TODO: CGI 핸들러 완성시 주석 해제
-		// _cgi_handler = new CGIHandler(args);
-		return;
-	}
 }
 
 Server::RequestDeleteHandler::~RequestDeleteHandler()
 {
 }
 
-int Server::RequestDeleteHandler::task(void)
+void Server::RequestDeleteHandler::handleRequest(void)
 {
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
-		return (_status);
+		return;
 
-	if (_cgi_handler)
-	{
-		handleCGI();
-	}
-	else if (unlink(_resource_path.c_str()) == -1)
+	if (unlink(_resource_path.c_str()) == -1)
 	{
 		switch (errno)
 		{
@@ -49,5 +39,4 @@ int Server::RequestDeleteHandler::task(void)
 		_response.setStatus(200);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
-	return (_status);
 }
