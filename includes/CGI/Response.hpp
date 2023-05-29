@@ -20,7 +20,7 @@ class Response
 	const Response &operator=(const Response &orig);
 
 	void makeResponse(const std::string &cgi_output);
-	void setError(int status_code);
+	void setError(const int status_code);
 
 	// getter
 	int getType() const;

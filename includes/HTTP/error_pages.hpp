@@ -1,5 +1,5 @@
-#ifndef ERRORPAGES_HPP
-#define ERRORPAGES_HPP
+#ifndef HTTP_ERRORPAGES_HPP
+#define HTTP_ERRORPAGES_HPP
 
 #include <string>
 
