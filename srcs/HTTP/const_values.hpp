@@ -11,6 +11,7 @@ enum e_http_method
 	METHOD_GET,
 	METHOD_HEAD,
 	METHOD_POST,
+	METHOD_PUT,
 	METHOD_DELETE,
 };
 
