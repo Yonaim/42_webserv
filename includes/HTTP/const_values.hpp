@@ -1,5 +1,5 @@
-#ifndef CONSTVALUES_HPP
-#define CONSTVALUES_HPP
+#ifndef HTTP_CONSTVALUES_HPP
+#define HTTP_CONSTVALUES_HPP
 
 #include "BidiMap.hpp"
 #include <map>

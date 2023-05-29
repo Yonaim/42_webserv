@@ -1,5 +1,5 @@
 #include "HTTP/Request.hpp"
-#include "../const_values.hpp"
+#include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
 
 using namespace HTTP;

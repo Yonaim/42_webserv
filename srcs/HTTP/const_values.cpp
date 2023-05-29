@@ -1,4 +1,4 @@
-#include "const_values.hpp"
+#include "HTTP/const_values.hpp"
 #include <map>
 
 // special token
@@ -10,7 +10,7 @@ const size_t HTTP::SP_LEN = HTTP::SP.length();
 const size_t HTTP::LWS_LEN = HTTP::LWS.length();
 
 // method
-const std::pair<std::string, int> _METHOD[]
+static const std::pair<std::string, int> _METHOD[]
 	= {std::pair<std::string, int>("NONE", METHOD_NONE),
 	   std::pair<std::string, int>("GET", METHOD_GET),
 	   std::pair<std::string, int>("HEAD", METHOD_HEAD),
