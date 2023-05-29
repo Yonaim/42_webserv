@@ -1,6 +1,7 @@
 #ifndef HTTP_SERVER_HPP
 #define HTTP_SERVER_HPP
 
+#include "CGI/RequestHandler.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTP/Request.hpp"
 #include "HTTP/Response.hpp"
@@ -35,6 +36,7 @@ class Server
 	std::map<std::string, Location> _locations;
 	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
+	std::map<int, std::queue<CGI::RequestHandler *> > _cgi_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
 	size_t _max_body_size;
 	const unsigned int _timeout_ms;
@@ -65,6 +67,11 @@ class Server
 
 	void task(void);
 	bool isForMe(const Request &request);
+	void registerCGIRequest(int client_fd, const Request &request,
+							const std::string &resource_path);
+	void registerHTTPRequest(int client_fd, const Request &request,
+							 const Location &location,
+							 const std::string &resource_path);
 	void registerRequest(int client_fd, const Request &request);
 	Response retrieveResponse(int client_fd);
 	int hasResponses(void);
@@ -77,6 +84,9 @@ class Server
 	bool cgiEnabled(void) const;
 	const Location &getLocation(const std::string &location) const;
 	bool isCGIextension(const std::string &path) const;
+
+	void iterateRequestHandlers(void);
+	void iterateCGIHandlers(void);
 };
 } // namespace HTTP
 

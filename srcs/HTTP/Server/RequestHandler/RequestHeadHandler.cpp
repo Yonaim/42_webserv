@@ -4,15 +4,15 @@ using namespace HTTP;
 
 Server::RequestHeadHandler::RequestHeadHandler(Server *server,
 											   const Request &request,
-											   const Server::Location &location)
-	: RequestHandler(server, request, location),
-	  _reader(new async::FileReader(_server->_timeout_ms, _resource_path))
+											   const Server::Location &location,
+											   const std::string &resource_path)
+	: RequestHandler(server, request, location, resource_path),
+	  _reader(_server->_timeout_ms, _resource_path)
 {
 }
 
 Server::RequestHeadHandler::~RequestHeadHandler()
 {
-	delete _reader;
 }
 
 int Server::RequestHeadHandler::task(void)
@@ -32,10 +32,10 @@ int Server::RequestHeadHandler::task(void)
 
 	try
 	{
-		int rc = _reader->task();
+		int rc = _reader.task();
 		if (rc == async::status::OK)
 		{
-			const std::string &content = _reader->retrieve();
+			const std::string &content = _reader.retrieve();
 			_response.setStatus(200);
 			_response.setContentLength(content.length());
 			_response.setContentType(_resource_path);

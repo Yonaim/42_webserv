@@ -1,6 +1,6 @@
-#include "HTTP/const_values.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTP/Server.hpp"
+#include "HTTP/const_values.hpp"
 #include "HTTP/error_pages.hpp"
 #include "utils/string.hpp"
 #include <cctype>
@@ -8,6 +8,12 @@
 using namespace HTTP;
 
 void Server::task(void)
+{
+	iterateRequestHandlers();
+	iterateCGIHandlers();
+}
+
+void Server::iterateRequestHandlers(void)
 {
 	for (std::map<int, std::queue<RequestHandler *> >::iterator it
 		 = _request_handlers.begin();
@@ -39,6 +45,40 @@ void Server::task(void)
 	}
 }
 
+void Server::iterateCGIHandlers(void)
+{
+	for (std::map<int, std::queue<CGI::RequestHandler *> >::iterator it
+		 = _cgi_handlers.begin();
+		 it != _cgi_handlers.end(); it++)
+	{
+		int client_fd = it->first;
+		std::queue<CGI::RequestHandler *> &handlers = it->second;
+		if (handlers.empty())
+			continue;
+		int rc = handlers.front()->task();
+		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
+		{
+			/* TODO: CGI Response 큐를 하나 더 만들거나 CGI Response -> HTTP
+			 * Response 변환 메소드 제작 */
+			// _output_queue[client_fd].push(handlers.front()->retrieve());
+			delete handlers.front();
+			handlers.pop();
+			_logger << async::verbose << "Response for client " << client_fd
+					<< " has been retrieved";
+		}
+		else if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_AGAIN)
+			continue;
+		else
+		{
+			delete handlers.front();
+			handlers.pop();
+			_logger << async::error << "CGI::RequestHandler return code " << rc
+					<< ", causing code 500";
+			registerErrorResponse(client_fd, 500); // Internal Server Error}
+		}
+	}
+}
+
 bool Server::isForMe(const Request &request)
 {
 	if (!request.hasHeaderValue("Host"))
@@ -60,6 +100,78 @@ bool Server::isForMe(const Request &request)
 	return (false);
 }
 
+void Server::registerHTTPRequest(int client_fd, const Request &request,
+								 const Server::Location &location,
+								 const std::string &resource_path)
+{
+	const std::string &path = resource_path; // code shortener
+	RequestHandler *handler;
+	try
+	{
+		switch (request.getMethod())
+		{
+		case METHOD_GET:
+			handler = new RequestGetHandler(this, request, location, path);
+			break;
+		case METHOD_HEAD:
+			handler = new RequestHeadHandler(this, request, location, path);
+			break;
+		case METHOD_POST:
+			handler = new RequestPostHandler(this, request, location, path);
+			break;
+		case METHOD_PUT:
+			handler = new RequestPutHandler(this, request, location, path);
+			break;
+		case METHOD_DELETE:
+			handler = new RequestDeleteHandler(this, request, location, path);
+			break;
+		default:
+			registerErrorResponse(client_fd, 501); // Not Implemented
+			return;
+		}
+	}
+	catch (const LocationNotFound &e)
+	{
+		_logger << async::warning << e.what();
+		registerErrorResponse(client_fd, 404); // Not Found
+		return;
+	}
+
+	if (_request_handlers.find(client_fd) == _request_handlers.end())
+		_request_handlers[client_fd] = std::queue<RequestHandler *>();
+	if (_output_queue.find(client_fd) == _output_queue.end())
+		_output_queue[client_fd] = std::queue<Response>();
+	_request_handlers[client_fd].push(handler);
+	_logger << async::verbose << "Registered HTTP RequestHandler for "
+			<< METHOD[request.getMethod()];
+}
+
+void Server::registerCGIRequest(int client_fd, const Request &request,
+								const std::string &resource_path)
+{
+	CGI::Request cgi_request;
+	cgi_request.setValues(request, resource_path);
+	CGI::RequestHandler *handler;
+	try
+	{
+		handler = new CGI::RequestHandler(cgi_request, _timeout_ms);
+	}
+	catch (const std::runtime_error &e)
+	{
+		_logger << async::warning << e.what();
+		registerErrorResponse(client_fd, 500); // Internal Server Error
+		return;
+	}
+
+	if (_cgi_handlers.find(client_fd) == _cgi_handlers.end())
+		_cgi_handlers[client_fd] = std::queue<CGI::RequestHandler *>();
+	if (_output_queue.find(client_fd) == _output_queue.end())
+		_output_queue[client_fd] = std::queue<Response>();
+	_cgi_handlers[client_fd].push(handler);
+	_logger << async::verbose << "Registered CGI RequestHandler for "
+			<< METHOD[request.getMethod()];
+}
+
 void Server::registerRequest(int client_fd, const Request &request)
 {
 	const Server::Location &location = getLocation(request.getURIPath());
@@ -78,47 +190,12 @@ void Server::registerRequest(int client_fd, const Request &request)
 		registerRedirectResponse(client_fd, location);
 		return;
 	}
+	const std::string resource_path = location.generateResourcePath(request);
 
-	RequestHandler *handler;
-	try
-	{
-		switch (method)
-		{
-		case METHOD_GET:
-			handler = new RequestGetHandler(this, request, location);
-			break;
-		case METHOD_HEAD:
-			handler = new RequestHeadHandler(this, request, location);
-			break;
-		case METHOD_POST:
-			handler = new RequestPostHandler(this, request, location);
-			break;
-		case METHOD_PUT:
-			handler = new RequestPutHandler(this, request, location);
-			break;
-		case METHOD_DELETE:
-			handler = new RequestDeleteHandler(this, request, location);
-			break;
-		default:
-			registerErrorResponse(client_fd, 501); // Not Implemented
-			return;
-		}
-	}
-	catch (const LocationNotFound &e)
-	{
-		_logger << async::warning << e.what();
-		registerErrorResponse(client_fd, 404); // Not Found
-		return;
-	}
-
-	if (_request_handlers.find(client_fd) == _request_handlers.end())
-	{
-		_request_handlers[client_fd] = std::queue<RequestHandler *>();
-		_output_queue[client_fd] = std::queue<Response>();
-	}
-	_request_handlers[client_fd].push(handler);
-	_logger << async::verbose << "Registered RequestHandler for "
-			<< METHOD[request.getMethod()];
+	if (cgiEnabled() && isCGIextension(request.getURIPath()))
+		registerCGIRequest(client_fd, request, resource_path);
+	else
+		registerHTTPRequest(client_fd, request, location, resource_path);
 }
 
 Response Server::retrieveResponse(int client_fd)
@@ -166,7 +243,16 @@ void Server::disconnect(int client_fd)
 			_request_handlers[client_fd].pop();
 		}
 	}
+	if (_cgi_handlers.find(client_fd) != _cgi_handlers.end())
+	{
+		while (!_cgi_handlers[client_fd].empty())
+		{
+			delete _cgi_handlers[client_fd].front();
+			_cgi_handlers[client_fd].pop();
+		}
+	}
 	_request_handlers.erase(client_fd);
+	_cgi_handlers.erase(client_fd);
 	_output_queue.erase(client_fd);
 	_logger << async::info << "Disconnected client fd " << client_fd;
 }

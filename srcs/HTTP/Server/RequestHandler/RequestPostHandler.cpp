@@ -5,24 +5,21 @@ using namespace HTTP;
 
 Server::RequestPostHandler::RequestPostHandler(Server *server,
 											   const Request &request,
-											   const Server::Location &location)
-	: RequestHandler(server, request, location), _writer(NULL)
+											   const Server::Location &location,
+											   const std::string &resource_path)
+	: RequestHandler(server, request, location, resource_path),
+	  _writer(_server->_timeout_ms, _resource_path, request.getBody())
 {
 	if (!location.uploadAllowed())
 	{
 		_response = _server->generateErrorResponse(500);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		_logger << async::warning << "This location doesn't allow upload";
-		return;
 	}
-	_writer = new async::FileWriter(_server->_timeout_ms, _resource_path,
-									request.getBody());
 }
 
 Server::RequestPostHandler::~RequestPostHandler()
 {
-	if (_writer)
-		delete _writer;
 }
 
 int Server::RequestPostHandler::task(void)
@@ -32,7 +29,7 @@ int Server::RequestPostHandler::task(void)
 
 	try
 	{
-		int rc = _writer->task();
+		int rc = _writer.task();
 		if (rc == async::status::OK)
 		{
 			std::string body = "made the file\n"

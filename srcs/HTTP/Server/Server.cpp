@@ -1,6 +1,6 @@
 #include "HTTP/Server.hpp"
-#include "HTTP/const_values.hpp"
 #include "ConfigDirective.hpp"
+#include "HTTP/const_values.hpp"
 #include "HTTP/error_pages.hpp"
 #include "utils/string.hpp"
 #include <cctype>
@@ -26,8 +26,9 @@ Server::~Server()
 Server::Server(const Server &orig)
 	: _port(orig._port), _cgi_enabled(orig._cgi_enabled),
 	  _server_name(orig._server_name), _error_pages(orig._error_pages),
-	  _locations(orig._locations), _max_body_size(orig._max_body_size),
-	  _timeout_ms(orig._timeout_ms), _logger(async::Logger::getLogger("Server"))
+	  _locations(orig._locations), _cgi_extensions(orig._cgi_extensions),
+	  _max_body_size(orig._max_body_size), _timeout_ms(orig._timeout_ms),
+	  _logger(async::Logger::getLogger("Server"))
 {
 }
 
@@ -38,6 +39,7 @@ Server &Server::operator=(const Server &orig)
 	_server_name = orig._server_name;
 	_error_pages = orig._error_pages;
 	_locations = orig._locations;
+	_cgi_extensions = orig._cgi_extensions;
 	_max_body_size = orig._max_body_size;
 	return (*this);
 }

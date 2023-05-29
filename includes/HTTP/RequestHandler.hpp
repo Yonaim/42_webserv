@@ -31,7 +31,8 @@ class Server::RequestHandler
 	};
 
 	RequestHandler(Server *server, const Request &request,
-				   const Server::Location &location);
+				   const Server::Location &location,
+				   const std::string &resource_path);
 	virtual ~RequestHandler();
 
 	virtual int task(void) = 0;
@@ -44,11 +45,12 @@ class Server::RequestHandler
 class Server::RequestGetHandler : public Server::RequestHandler
 {
   private:
-	async::FileReader *_reader;
+	async::FileReader _reader;
 
   public:
 	RequestGetHandler(Server *server, const Request &request,
-					  const Server::Location &location);
+					  const Server::Location &location,
+					  const std::string &resource_path);
 	virtual ~RequestGetHandler();
 
 	virtual int task(void);
@@ -57,11 +59,12 @@ class Server::RequestGetHandler : public Server::RequestHandler
 class Server::RequestHeadHandler : public Server::RequestHandler
 {
   private:
-	async::FileReader *_reader;
+	async::FileReader _reader;
 
   public:
 	RequestHeadHandler(Server *server, const Request &request,
-					   const Server::Location &location);
+					   const Server::Location &location,
+					   const std::string &resource_path);
 	virtual ~RequestHeadHandler();
 
 	virtual int task(void);
@@ -70,11 +73,12 @@ class Server::RequestHeadHandler : public Server::RequestHandler
 class Server::RequestPostHandler : public Server::RequestHandler
 {
   private:
-	async::FileWriter *_writer;
+	async::FileWriter _writer;
 
   public:
 	RequestPostHandler(Server *server, const Request &request,
-					   const Server::Location &location);
+					   const Server::Location &location,
+					   const std::string &resource_path);
 	virtual ~RequestPostHandler();
 
 	virtual int task(void);
@@ -83,11 +87,12 @@ class Server::RequestPostHandler : public Server::RequestHandler
 class Server::RequestPutHandler : public Server::RequestHandler
 {
   private:
-	async::FileWriter *_writer;
+	async::FileWriter _writer;
 
   public:
 	RequestPutHandler(Server *server, const Request &request,
-					  const Server::Location &location);
+					  const Server::Location &location,
+					  const std::string &resource_path);
 	virtual ~RequestPutHandler();
 
 	virtual int task(void);
@@ -97,7 +102,8 @@ class Server::RequestDeleteHandler : public Server::RequestHandler
 {
   public:
 	RequestDeleteHandler(Server *server, const Request &request,
-						 const Server::Location &location);
+						 const Server::Location &location,
+						 const std::string &resource_path);
 	virtual ~RequestDeleteHandler();
 
 	virtual int task(void);

@@ -5,10 +5,10 @@
 using namespace HTTP;
 
 Server::RequestHandler::RequestHandler(Server *server, const Request &request,
-									   const Server::Location &location)
+									   const Server::Location &location,
+									   const std::string &resource_path)
 	: _request(request), _location(location), _server(server),
-	  _status(RESPONSE_STATUS_AGAIN),
-	  _resource_path(location.generateResourcePath(request)),
+	  _status(RESPONSE_STATUS_AGAIN), _resource_path(resource_path),
 	  _logger(async::Logger::getLogger("RequestHandler"))
 {
 	if (_request.hasHeaderValue("Connection", "close"))
