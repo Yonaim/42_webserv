@@ -143,24 +143,29 @@ int RequestHandler::waitExecution()
 	return ((_status == CGI_RESPONSE_INNER_STATUS_OK)
 				? CGI_RESPONSE_STATUS_OK
 				: CGI_RESPONSE_STATUS_AGAIN);
-};
+}
 
 int RequestHandler::makeCGIResponse()
 {
-	int read_status = _reader->task();
+	int rc = _reader->task();
 
-	switch (read_status)
+	switch (rc)
 	{
-	case async::status::OK:
-		// TODO:
-		//  CGI/Response makeResponse 멤버 함수 구현
-		_logger << async::debug << "read_status is ok: " << read_status;
-		_logger << async::debug << _reader->retrieve();
-		_response.makeResponse(_reader->retrieve());
+	case async::status::OK: {
+		_logger << async::debug << "read_status is ok: " << rc;
+		_logger << async::debug << "buffer: " << _reader->retrieve();
+
+		std::string cgi_output = _reader->retrieve();
+		closePipe(_read_pipe_fd[0]);
+		_response.makeResponse(cgi_output);
+		delete _reader;
+		_reader = NULL;
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
-	case async::status::AGAIN:
-		_logger << async::debug << "read_status is again: " << read_status;
+	}
+	case async::status::AGAIN: {
+		_logger << async::debug << "read_status is again: " << rc;
+
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
