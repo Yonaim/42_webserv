@@ -18,28 +18,6 @@ CGI::Response::Response()
 {
 }
 
-CGI::Response::Response(std::string &cgi_output)
-{
-	while (cgi_output.substr(0, NL_LEN) != NL)
-		consumeHeader(cgi_output);
-	consumestr(cgi_output, NL_LEN);
-
-	if (!_header.hasValue("Content-Type"))
-		throwException(CONSUME_EXC_INVALID_FORMAT);
-
-	if (_header.hasValue("Status"))
-	{
-		const std::vector<std::string> values = _header.getValues("Status");
-		if (values.size() != 2)
-			throwException(CONSUME_EXC_INVALID_FORMAT);
-		_status_code = toNum<int>(values[0]);
-	}
-	else
-		_status_code = 200;
-
-	_response_body = cgi_output;
-}
-
 CGI::Response::~Response()
 {
 }
@@ -59,6 +37,28 @@ const CGI::Response &CGI::Response::operator=(const Response &orig)
 		_response_body = orig._response_body;
 	}
 	return (*this);
+}
+
+void	CGI::Response::makeResponse(std::string &cgi_output)
+{
+	while (cgi_output.substr(0, NL_LEN) != NL)
+		consumeHeader(cgi_output);
+	consumestr(cgi_output, NL_LEN);
+
+	if (!_header.hasValue("Content-Type"))
+		throwException(CONSUME_EXC_INVALID_FORMAT);
+
+	if (_header.hasValue("Status"))
+	{
+		const std::vector<std::string> values = _header.getValues("Status");
+		if (values.size() != 2)
+			throwException(CONSUME_EXC_INVALID_FORMAT);
+		_status_code = toNum<int>(values[0]);
+	}
+	else
+		_status_code = 200;
+
+	_response_body = cgi_output;
 }
 
 void CGI::Response::consumeHeader(std::string &buffer)
@@ -89,11 +89,6 @@ void CGI::Response::consumeHeader(std::string &buffer)
 		_header.insert(name, values);
 }
 
-void CGI::Response::setError(const int status_code)
-{
-	_status_code = status_code;
-}
-
 HTTP::Response CGI::Response::toHTTPResponse(void) const
 {
 	HTTP::Response http_response(_header);
@@ -104,7 +99,7 @@ HTTP::Response CGI::Response::toHTTPResponse(void) const
 	return (http_response);
 }
 
-void CGI::Response::throwException(int code) const
+void CGI::Response::throwException(const int code) const
 {
 	std::stringstream what;
 

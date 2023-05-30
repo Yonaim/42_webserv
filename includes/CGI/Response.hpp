@@ -1,8 +1,8 @@
 #ifndef CGI_RESPONSE_HPP
 #define CGI_RESPONSE_HPP
 
-#include "Header.hpp"
 #include "HTTP/Response.hpp"
+#include "Header.hpp"
 #include <string>
 #include <vector>
 
@@ -32,14 +32,13 @@ class Response
 	};
 
 	Response();
-	Response(std::string &cgi_output);
 	~Response();
 	Response(const Response &orig);
 	const Response &operator=(const Response &orig);
 
-	void setError(const int status_code);
+	void makeResponse(std::string &cgi_output);
 	void consumeHeader(std::string &buffer);
-	void throwException(int code) const;
+	void throwException(const int code) const;
 
 	HTTP::Response toHTTPResponse(void) const;
 };
