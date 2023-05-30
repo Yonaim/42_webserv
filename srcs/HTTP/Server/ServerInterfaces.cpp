@@ -58,18 +58,18 @@ void Server::iterateCGIHandlers(void)
 
 		try
 		{
-		int rc = handlers.front()->task();
-		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
-		{
-			CGI::Response cgi_response = handlers.front()->retrieve();
-			_output_queue[client_fd].push(cgi_response.toHTTPResponse());
-			delete handlers.front();
-			handlers.pop();
-			_logger << async::verbose << "Response for client " << client_fd
-					<< " has been retrieved";
-		}
-		else if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_AGAIN)
-			continue;
+			int rc = handlers.front()->task();
+			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
+			{
+				CGI::Response cgi_response = handlers.front()->retrieve();
+				_output_queue[client_fd].push(cgi_response.toHTTPResponse());
+				delete handlers.front();
+				handlers.pop();
+				_logger << async::verbose << "Response for client " << client_fd
+						<< " has been retrieved";
+			}
+			else if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_AGAIN)
+				continue;
 		}
 		catch (std::exception &e)
 		{
