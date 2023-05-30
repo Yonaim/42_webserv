@@ -55,6 +55,9 @@ void Server::iterateCGIHandlers(void)
 		std::queue<CGI::RequestHandler *> &handlers = it->second;
 		if (handlers.empty())
 			continue;
+
+		try
+		{
 		int rc = handlers.front()->task();
 		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 		{
@@ -67,13 +70,13 @@ void Server::iterateCGIHandlers(void)
 		}
 		else if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_AGAIN)
 			continue;
-		else
+		}
+		catch (std::exception &e)
 		{
 			delete handlers.front();
 			handlers.pop();
-			_logger << async::error << "CGI::RequestHandler return code " << rc
-					<< ", causing code 500";
-			registerErrorResponse(client_fd, 500); // Internal Server Error}
+			_logger << async::error << "CGI failed, causing code 500";
+			registerErrorResponse(client_fd, 500); // Internal Server Error
 		}
 	}
 }
