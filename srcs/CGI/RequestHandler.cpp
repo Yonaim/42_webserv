@@ -22,8 +22,9 @@ void RequestHandler::closeAllPipes(void)
 }
 
 RequestHandler::RequestHandler(const Request *request,
+							   const std::string &exec_path,
 							   const unsigned int timeout_ms)
-	: _reader(NULL), _writer(NULL), _request(request),
+	: _reader(NULL), _writer(NULL), _request(request), _exec_path(exec_path),
 	  _status(CGI_RESPONSE_INNER_STATUS_BEGIN), _pid(-1), _waitpid_status(-1),
 	  _logger(async::Logger::getLogger("CGIRequestHandler"))
 {
@@ -80,7 +81,12 @@ int RequestHandler::fork()
 		closePipe(_write_pipe_fd[1]);
 		closePipe(_read_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
-		execve(_request->getPath().c_str(), NULL, _request->getEnv());
+		_logger << async::verbose << "calling execve(" << _exec_path.c_str()
+				<< "), good bye!";
+		/* TODO: (해야 한다면) argv 만들어 입력 (아닐수도 있고)
+		 * 근거: Your program should call the CGI with the file requested as
+		 * first argument.*/
+		execve(_exec_path.c_str(), NULL, _request->getEnv());
 		std::exit(2);
 	}
 	else

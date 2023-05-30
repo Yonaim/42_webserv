@@ -156,7 +156,8 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 	CGI::RequestHandler *handler;
 	try
 	{
-		handler = new CGI::RequestHandler(cgi_request, _timeout_ms);
+		handler
+			= new CGI::RequestHandler(cgi_request, _cgi_exec_path, _timeout_ms);
 	}
 	catch (const std::runtime_error &e)
 	{

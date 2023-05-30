@@ -17,6 +17,7 @@ class RequestHandler
 	async::FileWriter *_writer;
 	const Request *_request;
 	Response _response;
+	std::string _exec_path;
 	int _status;
 
 	int _read_pipe_fd[2];
@@ -50,7 +51,8 @@ class RequestHandler
 		CGI_RESPONSE_STATUS_OK,
 	};
 
-	RequestHandler(const Request *request, const unsigned int timeout_ms);
+	RequestHandler(const Request *request, const std::string &exec_path,
+				   const unsigned int timeout_ms);
 	~RequestHandler();
 
 	int task(void);
