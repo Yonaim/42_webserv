@@ -1,6 +1,6 @@
-#include "HTTP/const_values.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTP/Server.hpp"
+#include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
 #include <iostream>
 #include <sstream>
@@ -144,11 +144,11 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 
 void Server::parseDirectiveCGI(const ConfigContext &server_context)
 {
-	const char *dir_name = "cgi_extension";
+	const char *dir_name = "cgi_pass";
 	const size_t n_indexs = server_context.countDirectivesByName(dir_name);
 	if (n_indexs == 0)
 		return;
-	if (n_indexs > 1)
+	if (n_indexs > 1) // 맨대토리 버젼, 1개의 확장자만 허용
 	{
 		_logger << async::error << server_context.name()
 				<< " should have 0 or 1 " << dir_name;
@@ -162,31 +162,15 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 		_logger << async::error << dir_name << " should not be context";
 		cgi_directive.throwException(PARSINGEXC_UNDEF_DIR);
 	}
-	// 맨대토리 버젼, 1개의 아규먼트만 허용
-	if (cgi_directive.nParameters() != 1)
+	if (cgi_directive.nParameters() != 2)
 	{
-		_logger << async::error << dir_name << " should have 1 parameter(s)";
+		_logger << async::error << dir_name << " should have 2 parameter(s)";
 		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
 	}
-	_cgi_extensions.insert(cgi_directive.parameter(0));
-	_logger << async::verbose << "CGI call in " << cgi_directive.parameter(0)
-			<< " enabled";
-
-	/*
-	보너스 대비한 버젼
-	if (cgi_directive.nParameters() < 1)
-	{
-		_logger << async::error << dir_name
-				<< " should have more than 0 parameter(s)";
-		cgi_directive.throwException(PARSINGEXC_INVALID_N_ARG);
-	}
-	for (size_t i = 0; i < cgi_directive.nParameters(); i++)
-	{
-		_cgi_extensions.insert(cgi_directive.parameter(i));
-		_logger << async::verbose << "CGI call to in "
-				<< cgi_directive.parameter(i) << " enabled";
-	}
-	*/
+	_cgi_extension = cgi_directive.parameter(0);
+	_cgi_exec_path = cgi_directive.parameter(1);
+	_logger << async::verbose << "CGI pass from URI *." << _cgi_extension
+			<< " to exec " << _cgi_exec_path << " enabled";
 }
 
 bool Server::isValidStatusCode(const int &status_code)

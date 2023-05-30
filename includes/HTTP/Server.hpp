@@ -34,7 +34,8 @@ class Server
 	std::set<std::string> _server_name;
 	std::map<int, async::FileReader *> _error_pages;
 	std::map<std::string, Location> _locations;
-	std::set<std::string> _cgi_extensions; // 보너스 대비하여 set로
+	std::string _cgi_extension;
+	std::string _cgi_exec_path;
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<CGI::RequestHandler *> > _cgi_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
