@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <memory.h>
 
 int main(int argc, char **argv, char **envp)
 {
@@ -8,26 +7,40 @@ int main(int argc, char **argv, char **envp)
 	char *buff_ptr = buff;
 	int temp = 0;
 
-	memset(buff, 0, 300);
-	while ((temp = read(0, buff_ptr, 100)))
+	while (1)
 	{
+		temp = read(STDIN_FILENO, buff_ptr, 100);
 		if (temp < 0)
 		{
 			perror("scanf");
 			return (1);
 		}
+		if (temp == 0)
+		{
+			buff[buff_ptr - buff] = '\0';
+			break;
+		}
 		buff_ptr += temp;
 	}
-	dprintf(2, "scan done\n");
-	printf("message body: %s\n", buff);
+	/// debug
+	dprintf(2, "\n======== CGI Program ========\n");
+	dprintf(2, "\n- Message Body:\n\t%s\n\n", buff);
+	dprintf(2, "- Meta Variables:\n");
 
-	printf("===== META VARIABLES =====\n");
-	printf("this is CGI Program ...\n");
 	int i = 0;
 	while (envp[i])
-		printf("%s\n", envp[i++]);
+		dprintf(2, "\t%s\n", envp[i++]);
+	fflush(stderr);
+
+	// response message
+	printf("\n======== CGI Program ========\n");
+	printf("\n- Message Body: %s\n", buff);
+	printf("- Meta Variables:\n");
+
+	i = 0;
+	while (envp[i])
+		printf("\t%s\n", envp[i++]);
 
 	fflush(stdout);
-	close(STDOUT_FILENO);
 	return (0);
 }
