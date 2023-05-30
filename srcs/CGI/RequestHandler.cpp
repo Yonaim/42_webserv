@@ -133,7 +133,9 @@ int RequestHandler::waitExecution()
 	}
 	else
 	{
-		// TODO: _waitpid_status 값 체크하기
+		if ((WIFEXITED(_waitpid_status) && (WEXITSTATUS(_waitpid_status) == 2))
+			|| WIFSIGNALED(_waitpid_status))
+			throw(std::runtime_error("CGI execution failed"));
 		_logger << async::debug << "child process done";
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 	}
