@@ -2,7 +2,7 @@
 
 // special token
 const std::string CGI::NL = "\n";
-const std::string HTTP::LWS = " \t";
+const std::string CGI::LWS = " \t";
 const size_t CGI::NL_LEN = CGI::NL.length();
 
 // meta-variables
