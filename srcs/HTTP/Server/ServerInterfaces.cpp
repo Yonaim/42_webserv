@@ -194,7 +194,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	}
 	const std::string resource_path = location.generateResourcePath(request);
 
-	if (cgiEnabled() && isCGIextension(request.getURIPath()))
+	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
 		registerCGIRequest(client_fd, request, resource_path);
 	else
 		registerHTTPRequest(client_fd, request, location, resource_path);

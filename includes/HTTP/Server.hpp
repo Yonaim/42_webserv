@@ -84,7 +84,7 @@ class Server
 
 	int getPort(void) const;
 	unsigned int getTimeout(void) const;
-	bool cgiEnabled(void) const;
+	bool cgiAllowed(const int method) const;
 	const Location &getLocation(const std::string &location) const;
 	bool isCGIextension(const std::string &path) const;
 

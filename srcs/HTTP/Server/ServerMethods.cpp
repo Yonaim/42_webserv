@@ -17,9 +17,11 @@ unsigned int Server::getTimeout(void) const
 	return (_timeout_ms);
 }
 
-bool Server::cgiEnabled() const
+bool Server::cgiAllowed(const int method) const
 {
-	return (_cgi_enabled);
+	bool method_allowed
+		= _allowed_cgi_methods.find(method) != _allowed_cgi_methods.end();
+	return (_cgi_enabled && method_allowed);
 }
 
 std::string Server::getErrorPage(const int code)
