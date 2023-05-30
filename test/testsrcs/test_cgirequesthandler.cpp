@@ -10,20 +10,20 @@ int main()
 	async::Logger::setLogLevel("DEBUG");
 	try
 	{
-		CGI::Request cgi_request;
+		CGI::Request *cgi_request = new CGI::Request();
 
-		cgi_request.setMessageBody("");
-		cgi_request.setMetaVariable("CONTENT_LENGTH", "10");
-		cgi_request.setMetaVariable("CONTENT_TYPE", "text/html");
-		cgi_request.setMetaVariable("PATH_INFO",
+		cgi_request->setMessageBody("");
+		cgi_request->setMetaVariable("CONTENT_LENGTH", "10");
+		cgi_request->setMetaVariable("CONTENT_TYPE", "text/html");
+		cgi_request->setMetaVariable("PATH_INFO",
 									"./test/testcase/cgi_script/simple_cgi.py");
-		cgi_request.setMetaVariable("PATH_TRANSLATED",
+		cgi_request->setMetaVariable("PATH_TRANSLATED",
 									"./test/testcase/"
 									"cgi_script/simple_cgi.py");
-		cgi_request.setMetaVariable("QUERY_STRING", "hi hi");
-		cgi_request.setMetaVariable("REQUEST_METHOD", "GET");
-		cgi_request.setMetaVariable("SERVER_NAME", "localhost");
-		cgi_request.setMetaVariable("SERVER_PORT", "80");
+		cgi_request->setMetaVariable("QUERY_STRING", "hi hi");
+		cgi_request->setMetaVariable("REQUEST_METHOD", "GET");
+		cgi_request->setMetaVariable("SERVER_NAME", "localhost");
+		cgi_request->setMetaVariable("SERVER_PORT", "80");
 
 		CGI::RequestHandler cgi_request_handler(cgi_request, 10000);
 		async::Logger::blockingWrite();
