@@ -36,6 +36,7 @@ class Server
 	std::map<std::string, Location> _locations;
 	std::string _cgi_extension;
 	std::string _cgi_exec_path;
+	std::set<int> _allowed_cgi_methods;
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
 	std::map<int, std::queue<CGI::RequestHandler *> > _cgi_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
@@ -48,6 +49,7 @@ class Server
 	void parseDirectiveServerName(const ConfigContext &server_context);
 	void parseDirectiveLocation(const ConfigContext &server_context);
 	void parseDirectiveCGI(const ConfigContext &server_context);
+	void parseDirectiveCGILimitExcept(const ConfigContext &server_context);
 	void ensureClientConnected(int client_fd);
 	static bool isValidStatusCode(const int &status_code);
 	std::string getErrorPage(const int code);

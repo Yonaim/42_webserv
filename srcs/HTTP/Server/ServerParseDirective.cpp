@@ -173,6 +173,59 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 			<< " to exec " << _cgi_exec_path << " enabled";
 }
 
+void Server::parseDirectiveCGILimitExcept(const ConfigContext &server_context)
+{
+	if (!_cgi_enabled)
+		return;
+
+	const char *dir_name = "cgi_limit_except";
+	const size_t n_limit_excepts
+		= server_context.countDirectivesByName(dir_name);
+	if (n_limit_excepts != 1)
+	{
+		_logger << async::error << server_context.name()
+				<< " should have 0 or 1 " << dir_name;
+		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+	_allowed_cgi_methods.clear();
+
+	for (size_t i = 0; i < n_limit_excepts; i++)
+	{
+		const ConfigDirective &limit_except_directive
+			= server_context.getNthDirectiveByName(dir_name, i);
+		if (limit_except_directive.is_context())
+		{
+			_logger << async::error << dir_name << " should not be context";
+			limit_except_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		}
+
+		const size_t n_methods = limit_except_directive.nParameters();
+		if (n_methods == 0)
+		{
+			_logger << async::error << dir_name
+					<< " should have more than 0 parameter(s)";
+			limit_except_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		}
+
+		for (size_t j = 0; j < n_methods; j++)
+		{
+			const BidiMap<std::string, int>::const_iterator it
+				= METHOD.find(limit_except_directive.parameter(j));
+			if (it == METHOD.end())
+			{
+				_logger << async::error << dir_name
+						<< " has invalid HTTP method";
+				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
+			}
+
+			const int method = it->second;
+			_logger << async::verbose << "CGI Method "
+					<< limit_except_directive.parameter(j) << " allowed";
+			_allowed_cgi_methods.insert(method);
+		}
+	}
+}
+
 bool Server::isValidStatusCode(const int &status_code)
 {
 	return (STATUS_CODE.find(status_code) != STATUS_CODE.end());
