@@ -79,7 +79,6 @@ void Request::setMetaVariable(const std::string &name, const std::string &value)
 void Request::setValues(const HTTP::Request &http_req,
 						const std::string &resource_path)
 {
-	// TODO: setValues 완성하기
 	// TODO: 생성자로 옮기는 것 고려해보기
 	_meta_variables["CONTENT_LENGTH"]
 		= toStr<size_t>(http_req.getBody().length());
@@ -102,4 +101,9 @@ void Request::setValues(const HTTP::Request &http_req,
 		_meta_variables["SERVER_NAME"] = getfrontstr(host_header, colon_pos);
 		_meta_variables["SERVER_PORT"] = getbackstr(host_header, colon_pos + 1);
 	}
+}
+
+void Request::setMessageBody(std::string message_body)
+{
+	_message_body = message_body;
 }

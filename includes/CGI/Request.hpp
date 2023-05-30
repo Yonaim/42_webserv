@@ -18,16 +18,16 @@ class Request
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
 
-	// 생성자에서 사용할 파싱 메서드 추가 예정
-	const std::string getPath(void) const;
 	// setter
 	void setMetaVariable(const std::string &name, const std::string &value);
 	void setValues(const HTTP::Request &http_req,
 				   const std::string &resource_path);
+	void setMessageBody(std::string message_body);
 
 	// getter
-	const std::string &getMessageBody(void) const;
 	char *const *getEnv(void) const;
+	const std::string getPath(void) const;
+	const std::string &getMessageBody(void) const;
 };
 } // namespace CGI
 
