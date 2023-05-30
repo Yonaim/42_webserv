@@ -6,7 +6,8 @@ int main(int argc, char **argv, char **envp)
 	char buff[300];
 	char *buff_ptr = buff;
 	int temp = 0;
-
+	int i;
+	
 	while (1)
 	{
 		temp = read(STDIN_FILENO, buff_ptr, 100);
@@ -23,24 +24,25 @@ int main(int argc, char **argv, char **envp)
 		buff_ptr += temp;
 	}
 	/// debug
-	dprintf(2, "\n======== CGI Program ========\n");
-	dprintf(2, "\n- Message Body:\n\t%s\n\n", buff);
-	dprintf(2, "- Meta Variables:\n");
+	// dprintf(2, "\n======== CGI Program ========\n");
+	// dprintf(2, "\n- Message Body:\n\t%s\n\n", buff);
+	// // dprintf(2, "- Meta Variables:\n");
 
-	int i = 0;
-	while (envp[i])
-		dprintf(2, "\t%s\n", envp[i++]);
-	fflush(stderr);
+	// i = 0;
+	// // while (envp[i])
+	// 	dprintf(2, "\t%s\n", envp[i++]);
+	// fflush(stderr);
 
 	// response message
 	printf("\n======== CGI Program ========\n");
 	printf("\n- Message Body: %s\n", buff);
 	printf("- Meta Variables:\n");
-
 	i = 0;
 	while (envp[i])
 		printf("\t%s\n", envp[i++]);
 
 	fflush(stdout);
+	dprintf(2, "End\n");
+	fflush(stderr);
 	return (0);
 }

@@ -17,6 +17,11 @@ Response::Response(void) : _logger(async::Logger::getLogger("Response"))
 	initEntityHeaderFields();
 }
 
+Response::Response(Header header)
+	: _header(header), _logger(async::Logger::getLogger("Response"))
+{
+}
+
 Response::Response(Response const &other)
 	: _response(other._response), _status_code(other._status_code),
 	  _reason_phrase(other._reason_phrase), _header(other._header),

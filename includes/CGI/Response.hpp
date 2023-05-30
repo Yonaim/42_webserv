@@ -1,32 +1,46 @@
 #ifndef CGI_RESPONSE_HPP
 #define CGI_RESPONSE_HPP
 
+#include "HTTP/Response.hpp"
+#include "Header.hpp"
 #include <string>
 #include <vector>
 
 namespace CGI
 {
+enum consume_exc_e
+{
+	CONSUME_EXC_EMPTY_LINE = 0,
+	CONSUME_EXC_INVALID_FORMAT,
+	CONSUME_EXC_INVALID_FIELD,
+	CONSUME_EXC_INVALID_VALUE,
+	CONSUME_EXC_INVALID_SIZE,
+};
+
 class Response
 {
   private:
-	std::string _content_type;
-	int _status;
+	Header _header;
+	int _status_code;
 	std::string _response_body;
 
   public:
+	class ParsingFail : public std::runtime_error
+	{
+	  public:
+		ParsingFail(const std::string &why);
+	};
+
 	Response();
 	~Response();
 	Response(const Response &orig);
 	const Response &operator=(const Response &orig);
 
-	void makeResponse(const std::string &cgi_output);
-	void setError(const int status_code);
+	void makeResponse(std::string &cgi_output);
+	void consumeHeader(std::string &buffer);
+	void throwException(const int code) const;
 
-	// getter
-	int getType() const;
-	std::string getContentType() const;
-	std::string getLocation() const;
-	int getStatus() const;
+	HTTP::Response toHTTPResponse(void) const;
 };
 } // namespace CGI
 

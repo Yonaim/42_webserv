@@ -25,9 +25,9 @@ class Request
 	void setMessageBody(std::string message_body);
 
 	// getter
-	const std::string &getMessageBody(void) const;
-	const std::string &getPath(void) const;
 	char *const *getEnv(void) const;
+	const std::string getPath(void) const;
+	const std::string &getMessageBody(void) const;
 };
 } // namespace CGI
 
