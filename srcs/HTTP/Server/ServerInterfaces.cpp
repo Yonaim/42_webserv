@@ -58,9 +58,8 @@ void Server::iterateCGIHandlers(void)
 		int rc = handlers.front()->task();
 		if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 		{
-			/* TODO: CGI Response 큐를 하나 더 만들거나 CGI Response -> HTTP
-			 * Response 변환 메소드 제작 */
-			// _output_queue[client_fd].push(handlers.front()->retrieve());
+			CGI::Response cgi_response = handlers.front()->retrieve();
+			_output_queue[client_fd].push(cgi_response.toHTTPResponse());
 			delete handlers.front();
 			handlers.pop();
 			_logger << async::verbose << "Response for client " << client_fd
