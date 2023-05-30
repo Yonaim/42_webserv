@@ -51,6 +51,7 @@ class Response
 
   public:
 	Response();
+	Response(Header header);
 	Response(Response const &other);
 	Response &operator=(Response const &other);
 	~Response();
