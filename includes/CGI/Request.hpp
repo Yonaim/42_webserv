@@ -26,7 +26,7 @@ class Request
 
 	// getter
 	char *const *getEnv(void) const;
-	const std::string getPath(void) const;
+	const std::string &getPath(void) const;
 	const std::string &getMessageBody(void) const;
 };
 } // namespace CGI
