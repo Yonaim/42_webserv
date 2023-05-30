@@ -17,7 +17,6 @@ class RequestHandler
 	async::FileWriter *_writer;
 	const Request &_request;
 	Response _response;
-	// std::string _cgi_path;
 	int _status;
 
 	int _read_pipe_fd[2];
@@ -37,10 +36,12 @@ class RequestHandler
 		CGI_RESPONSE_INNER_STATUS_OK
 	};
 
+	void closePipe(int &fd);
 	int fork(void);
 	int sendCGIRequest(void);
 	int waitExecution(void);
 	int makeCGIResponse(void);
+	void closeAllPipes(void);
 
   public:
 	enum cgi_response_status_e
@@ -53,7 +54,7 @@ class RequestHandler
 	~RequestHandler();
 
 	int task(void);
-	const CGI::Response &retrieve(void);
+	const Response &retrieve(void);
 };
 } // namespace CGI
 
