@@ -10,7 +10,7 @@ Request::Request()
 {
 	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
-		std::string name = META_VARIABLES[i];
+		const std::string &name = META_VARIABLES[i];
 		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
 	}
 	_meta_variables.find("GATEWAY_INTERFACE")->second = "CGI/" + _version;
@@ -66,7 +66,7 @@ const std::string &Request::getMessageBody(void) const
 	return (_message_body);
 }
 
-const std::string Request::getPath() const
+const std::string &Request::getPath() const
 {
 	return (_meta_variables.find("PATH_TRANSLATED")->second);
 }
@@ -102,4 +102,9 @@ void Request::setValues(const HTTP::Request &http_req,
 		_meta_variables["SERVER_NAME"] = getfrontstr(host_header, colon_pos);
 		_meta_variables["SERVER_PORT"] = getbackstr(host_header, colon_pos + 1);
 	}
+}
+
+void Request::setMessageBody(std::string message_body)
+{
+	_message_body = message_body;
 }
