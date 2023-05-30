@@ -1,7 +1,6 @@
 #include "CGI/Request.hpp"
 #include "CGI/const_values.hpp"
 #include "utils/string.hpp"
-
 using namespace CGI;
 
 const std::string Request::_version = "1.1";
