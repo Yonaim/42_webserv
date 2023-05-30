@@ -96,7 +96,7 @@ int RequestHandler::fork()
 	return (CGI_RESPONSE_STATUS_OK);
 }
 
-int RequestHandler::sendCGIRequest()
+int RequestHandler::sendCGIRequestBody()
 {
 	int rc = _writer->task();
 
@@ -185,7 +185,7 @@ int RequestHandler::task(void)
 		case CGI_RESPONSE_INNER_STATUS_BEGIN:
 			return (fork());
 		case CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN:
-			return (sendCGIRequest());
+			return (sendCGIRequestBody());
 		case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
 			return (waitExecution());
 		case CGI_RESPONSE_INNER_STATUS_READ_AGAIN:

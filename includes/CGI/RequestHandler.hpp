@@ -38,7 +38,7 @@ class RequestHandler
 
 	void closePipe(int &fd);
 	int fork(void);
-	int sendCGIRequest(void);
+	int sendCGIRequestBody(void);
 	int waitExecution(void);
 	int makeCGIResponse(void);
 	void closeAllPipes(void);
