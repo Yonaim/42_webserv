@@ -158,6 +158,11 @@ int IOProcessor::write(const int fd, const size_t size)
 	return (_status);
 }
 
+const int &IOProcessor::stat(void) const
+{
+	return (_status);
+}
+
 void IOProcessor::blockingWrite(void)
 {
 	for (std::map<int, std::string>::iterator it = _wrbuf.begin();

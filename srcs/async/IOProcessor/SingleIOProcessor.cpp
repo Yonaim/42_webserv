@@ -42,7 +42,7 @@ SingleIOProcessor &SingleIOProcessor::operator=(const SingleIOProcessor &orig)
 	return (*this);
 }
 
-int SingleIOProcessor::task(void)
+void SingleIOProcessor::task(void)
 {
 	flushKQueue();
 	while (!_eventlist.empty())
@@ -60,13 +60,12 @@ int SingleIOProcessor::task(void)
 		else if (event == EVFILT_READ)
 		{
 			if (read(_fd, data) >= status::ERROR_GENERIC)
-				return (_status);
+				return;
 			if (flags & EV_EOF)
 			{
 				_status = status::ERROR_FILECLOSED;
-				_error_msg = std::string("Error while reading from file ")
-							 + toStr(_fd);
-				return (_status);
+				_error_msg = std::string("File ") + toStr(_fd) + " is closed";
+				return;
 			}
 		}
 		else if (event == EVFILT_WRITE && _wrbuf[_fd].length() > 0)
@@ -77,7 +76,7 @@ int SingleIOProcessor::task(void)
 			_status = status::OK_AGAIN;
 		}
 	}
-	return (_status);
+	_status = status::OK_AGAIN;
 }
 
 void SingleIOProcessor::initialize()

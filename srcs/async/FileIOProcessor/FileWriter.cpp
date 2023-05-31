@@ -35,7 +35,6 @@ int FileWriter::task(void)
 
 	if (checkTimeout())
 		return (false);
-	_processor->task();
 	if (_processor->writeDone())
 		_status = status::OK_DONE;
 	return (_status);

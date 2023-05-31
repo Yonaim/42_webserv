@@ -41,7 +41,7 @@ int FileReader::task(void)
 		return (_status);
 	_processor->getReadBuf(_buffer);
 
-	switch (_processor->task())
+	switch (_processor->stat())
 	{
 	case status::ERROR_FILECLOSED:
 		_processor->getReadBuf(_buffer);

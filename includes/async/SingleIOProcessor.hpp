@@ -14,6 +14,7 @@ class SingleIOProcessor : public IOProcessor
 
 	SingleIOProcessor();
 	void initialize(void);
+	virtual void task(void);
 
   public:
 	enum IO_event_option
@@ -29,7 +30,6 @@ class SingleIOProcessor : public IOProcessor
 	SingleIOProcessor(const SingleIOProcessor &orig);
 	SingleIOProcessor &operator=(const SingleIOProcessor &orig);
 
-	virtual int task(void);
 	void setWriteBuf(const std::string &str);
 	void getReadBuf(std::string &str);
 	bool writeDone(void);

@@ -32,7 +32,7 @@ TCPIOProcessor &TCPIOProcessor::operator=(const TCPIOProcessor &orig)
 	return (*this);
 }
 
-int TCPIOProcessor::task(void)
+void TCPIOProcessor::task(void)
 {
 	flushKQueue();
 	_status = status::OK_AGAIN;
@@ -48,7 +48,7 @@ int TCPIOProcessor::task(void)
 			if (static_cast<int>(ident) == _listening_socket)
 			{
 				finalize("Error from server socket");
-				return (_status);
+				return;
 			}
 			else
 			{
@@ -92,7 +92,7 @@ int TCPIOProcessor::task(void)
 			}
 		}
 	}
-	return (_status);
+	_status = status::OK_AGAIN;
 }
 
 void TCPIOProcessor::initialize(void)

@@ -34,6 +34,7 @@ class IOProcessor
 	void flushKQueue(void);
 	int read(const int fd, const size_t size);
 	int write(const int fd, const size_t size);
+	virtual void task(void) = 0;
 
   public:
 	IOProcessor(void);
@@ -41,7 +42,7 @@ class IOProcessor
 	IOProcessor(const IOProcessor &orig);
 	IOProcessor &operator=(const IOProcessor &orig);
 
-	virtual int task(void) = 0;
+	const int &stat(void) const;
 	static void doAllTasks(void);
 	static void blockingWriteAll(void);
 	void blockingWrite(void);
