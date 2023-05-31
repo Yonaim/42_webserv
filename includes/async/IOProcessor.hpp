@@ -53,7 +53,7 @@ enum IOEVENT_E
 class IOProcessor::FileClosed : public std::runtime_error
 {
   public:
-	FileClosed(void);
+	FileClosed(const int fd);
 };
 
 class IOProcessor::FileIsDirectory : public std::runtime_error

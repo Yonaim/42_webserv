@@ -59,10 +59,8 @@ void SingleIOProcessor::task(void)
 		else if (event == EVFILT_READ)
 		{
 			read(_fd, data);
-		}
-		else if (flags & EV_EOF)
-		{
-			throw(IOProcessor::FileClosed());
+			if (flags & EV_EOF)
+				throw(IOProcessor::FileClosed(_fd));
 		}
 		else if (event == EVFILT_WRITE && _wrbuf[_fd].length() > 0)
 		{

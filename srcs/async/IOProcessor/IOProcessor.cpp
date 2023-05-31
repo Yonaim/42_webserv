@@ -76,7 +76,7 @@ void IOProcessor::read(const int fd, const size_t size)
 	if (readsize == 0)
 	{
 		delete[] buff;
-		throw(IOProcessor::FileClosed());
+		throw(IOProcessor::FileClosed(fd));
 	}
 	if (readsize < 0)
 	{
