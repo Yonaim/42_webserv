@@ -8,17 +8,26 @@
 using namespace async;
 typedef unsigned long long ull_t;
 
-void FileIOProcessor::openFdByPath(int oflag)
+bool FileIOProcessor::openFdByPath(int oflag)
 {
 	if (!_should_close)
-		return;
+		return (false);
 	if (isDirectory(_path))
-		throw(IOProcessor::FileIsDirectory(_path));
+	{
+		_status = status::ERROR_FILEISDIR;
+		_error_msg = generateErrorMsgFileIsDir(_path);
+		return (true);
+	}
 	int fd
 		= ::open(_path.c_str(), oflag, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fd < 0)
-		throw(FileIOProcessor::FileOpeningError(_path, strerror(errno)));
+	{
+		_status = status::ERROR_FILEOPENING;
+		_error_msg = generateErrorMsgFileOpening(_path);
+		return (true);
+	}
 	_fd = fd;
+	return (false);
 }
 
 static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
@@ -32,14 +41,15 @@ static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
-	: _processor(NULL), _fd(fd), _path(""), _status(status::BEGIN), _buffer(""),
-	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
+	: _processor(NULL), _fd(fd), _path(""), _status(status::OK_BEGIN),
+	  _buffer(""), _timeout_ms(addTimeoutFromNow(timeout_ms)),
+	  _should_close(false)
 {
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
-	: _processor(NULL), _fd(-1), _path(path), _status(status::BEGIN),
+	: _processor(NULL), _fd(-1), _path(path), _status(status::OK_BEGIN),
 	  _buffer(""), _timeout_ms(addTimeoutFromNow(timeout_ms)),
 	  _should_close(true)
 {
@@ -52,29 +62,27 @@ FileIOProcessor::~FileIOProcessor()
 	delete _processor;
 }
 
-void FileIOProcessor::checkTimeout(void)
+bool FileIOProcessor::checkTimeout(void)
 {
 	if (_timeout_ms == 0)
-		return;
+		return (false);
 	if (clock() > _timeout_ms)
-		throw(FileIOProcessor::Timeout(_fd));
+	{
+		_status = status::ERROR_TIMEOUT;
+		_error_msg = generateErrorMsgTimeout(_fd, _timeout_ms);
+		return (true);
+	}
+	return (false);
 }
 
 std::string FileIOProcessor::retrieve(void)
 {
-	if (_status != status::OK)
+	if (_status != status::OK_DONE)
 		throw(std::logic_error("FileIOProcessor: File is not yet loaded."));
 	return (_buffer);
 }
 
-FileIOProcessor::Timeout::Timeout(const int fd)
-	: std::runtime_error("Timeout occured at " + toStr(fd))
+const std::string &FileIOProcessor::errorMsg(void) const
 {
-}
-
-FileIOProcessor::FileOpeningError::FileOpeningError(const std::string &path,
-													const std::string &cause)
-	: std::runtime_error(std::string("Error while opening file \"") + path
-						 + "\": " + cause)
-{
+	return (_error_msg);
 }

@@ -47,8 +47,8 @@ FILENAMES			= \
 					utils/file \
 					utils/hash \
 					Header/Header \
+					$(DIR_ASYNC)generateErrorMsg \
 					$(DIR_ASYNC_IO)IOProcessor \
-					$(DIR_ASYNC_IO)IOException \
 					$(DIR_ASYNC_IO)SingleIOProcessor \
 					$(DIR_ASYNC_IO)TCPIOProcessor \
 					$(DIR_ASYNCFILE)FileIOProcessor \

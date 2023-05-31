@@ -1,4 +1,5 @@
 #include "async/SingleIOProcessor.hpp"
+#include "async/status.hpp"
 #include "utils/string.hpp"
 #include <algorithm>
 #include <errno.h>
@@ -58,24 +59,24 @@ void SingleIOProcessor::task(void)
 		}
 		else if (event == EVFILT_READ)
 		{
-			read(_fd, data);
+			if (read(_fd, data) >= status::ERROR_GENERIC)
+				return;
 			if (flags & EV_EOF)
-				throw(IOProcessor::FileClosed(_fd));
+			{
+				_status = status::ERROR_FILECLOSED;
+				_error_msg = generateErrorMsgFileClosed(_fd);
+				return;
+			}
 		}
 		else if (event == EVFILT_WRITE && _wrbuf[_fd].length() > 0)
 		{
+			write(_fd, _wrbuf[_fd].length());
 			/* 표준 출력같은 FIFO fd에서 발생하는 Resource temporarily
 			 * unavailable 오류 무시 */
-			try
-			{
-				write(_fd, _wrbuf[_fd].length());
-			}
-			catch (const IOProcessor::WriteError &e)
-			{
-				(void)e;
-			}
+			_status = status::OK_AGAIN;
 		}
 	}
+	_status = status::OK_AGAIN;
 }
 
 void SingleIOProcessor::initialize()

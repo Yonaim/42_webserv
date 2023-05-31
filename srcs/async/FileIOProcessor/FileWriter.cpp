@@ -22,19 +22,20 @@ FileWriter::~FileWriter()
 
 int FileWriter::task(void)
 {
-	if (_status == status::OK)
+	if (_status == status::OK_DONE)
 		return (_status);
-	if (_status == status::BEGIN)
+	if (_status == status::OK_BEGIN)
 	{
-		openFdByPath(O_WRONLY | O_CREAT);
+		if (openFdByPath(O_WRONLY | O_CREAT))
+			return (_status);
 		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_W);
 		_processor->setWriteBuf(_content);
-		_status = status::AGAIN;
+		_status = status::OK_AGAIN;
 	}
 
-	checkTimeout();
-	_processor->task();
+	if (checkTimeout())
+		return (false);
 	if (_processor->writeDone())
-		_status = status::OK;
+		_status = status::OK_DONE;
 	return (_status);
 }

@@ -14,6 +14,7 @@ class FileIOProcessor
 	int _fd;
 	const std::string _path;
 	int _status;
+	std::string _error_msg;
 	std::string _buffer;
 	const clock_t _timeout_ms;
 	const bool _should_close; // 소멸자 호출시 fd를 close()해야하는지 여부
@@ -21,24 +22,14 @@ class FileIOProcessor
 	FileIOProcessor(unsigned int timeout_ms, int fd);
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
-	void checkTimeout(void);
-	void openFdByPath(int oflag);
+	bool checkTimeout(void);
+	bool openFdByPath(int oflag);
 
   public:
-	class Timeout : public std::runtime_error
-	{
-	  public:
-		Timeout(const int fd);
-	};
-	class FileOpeningError : public std::runtime_error
-	{
-	  public:
-		FileOpeningError(const std::string &path, const std::string &cause);
-	};
-
 	virtual ~FileIOProcessor();
 
 	virtual int task(void) = 0;
+	const std::string &errorMsg(void) const;
 	std::string retrieve(void);
 };
 

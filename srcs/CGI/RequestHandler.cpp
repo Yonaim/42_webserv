@@ -106,14 +106,14 @@ int RequestHandler::waitRWOperation()
 	{
 		switch (_writer->task())
 		{
-		case async::status::OK:
-			_logger << async::debug << "successed to send CGI request";
+		case async::status::OK_DONE:
+			_logger << async::verbose << "successed to send CGI request";
 			closePipe(_write_pipe_fd[1]);
 			delete _writer;
 			_writer = NULL;
 			break;
-		case async::status::AGAIN:
-			_logger << async::debug << "writing CGI request";
+		case async::status::OK_AGAIN:
+			_logger << async::verbose << "writing CGI request";
 			break;
 		default:
 			throw(std::runtime_error("failed to send CGI Request"));
@@ -124,8 +124,8 @@ int RequestHandler::waitRWOperation()
 	{
 		switch (_reader->task())
 		{
-		case async::status::OK: {
-			_logger << async::debug << "read status is ok";
+		case async::status::OK_DONE: {
+			_logger << async::verbose << "read status is ok";
 			_logger << async::debug << "buffer: " << _reader->retrieve();
 
 			std::string cgi_output = _reader->retrieve();
@@ -135,8 +135,8 @@ int RequestHandler::waitRWOperation()
 			_reader = NULL;
 			break;
 		}
-		case async::status::AGAIN: {
-			_logger << async::debug << "read status is again";
+		case async::status::OK_AGAIN: {
+			_logger << async::verbose << "read status is again";
 			break;
 		}
 		default:

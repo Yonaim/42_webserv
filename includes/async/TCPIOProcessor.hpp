@@ -18,6 +18,7 @@ class TCPIOProcessor : public IOProcessor
 
 	void accept(void);
 	void disconnect(const int client_socket);
+	virtual void task(void);
 
 	class fdIterator
 	{
@@ -47,7 +48,6 @@ class TCPIOProcessor : public IOProcessor
 
 	void initialize(void);
 	void finalize(const char *with_error);
-	virtual void task(void);
 	std::string &rdbuf(const int fd);
 	std::string &wrbuf(const int fd);
 
