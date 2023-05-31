@@ -151,8 +151,7 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 void Server::registerCGIRequest(int client_fd, const Request &request,
 								const std::string &resource_path)
 {
-	CGI::Request *cgi_request = new CGI::Request();
-	cgi_request->setValues(request, resource_path);
+	CGI::Request *cgi_request = new CGI::Request(request, resource_path);
 	CGI::RequestHandler *handler;
 	try
 	{

@@ -15,15 +15,13 @@ class Request
 	async::Logger &_logger;
 
   public:
-	Request();
+	Request(const HTTP::Request &http_req, const std::string &resource_path);
 	~Request();
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
 
 	// setter
 	void setMetaVariable(const std::string &name, const std::string &value);
-	void setValues(const HTTP::Request &http_req,
-				   const std::string &resource_path);
 	void setMessageBody(std::string message_body);
 
 	// getter
