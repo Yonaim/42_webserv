@@ -10,23 +10,27 @@ int main()
 	async::Logger::setLogLevel("DEBUG");
 	try
 	{
-		CGI::Request *cgi_request = new CGI::Request();
+		std::string buffer
+			= "POST /simple.cgi HTTP/1.1\r\n"
+			  "User-Agent: Mozilla/ 4.0(compatible; MSIE5 .01; Windows NT)\r\n"
+			  "Host: localhost\r\n"
+			  "Accept-Language: en-us\r\n"
+			  "Accept-Encoding: gzip, deflate\r\n"
+			  "Connection: Keep-Alive\r\n"
+			  "Content-Length: 10\r\n"
+			  "\r\n"
+			  "aaaaaaaaaa";
 
-		cgi_request->setMessageBody("what the heck");
-		cgi_request->setMetaVariable("CONTENT_LENGTH", "10");
-		cgi_request->setMetaVariable("CONTENT_TYPE", "text/html");
-		cgi_request->setMetaVariable("PATH_INFO",
-									"./test/testcase/cgi_script/simple_cgi.py");
-		cgi_request->setMetaVariable("PATH_TRANSLATED",
-									"./test/testcase/"
-									"cgi_script/simple_cgi.py");
-		cgi_request->setMetaVariable("QUERY_STRING", "hi hi");
-		cgi_request->setMetaVariable("REQUEST_METHOD", "POST");
-		cgi_request->setMetaVariable("SERVER_NAME", "localhost");
-		cgi_request->setMetaVariable("SERVER_PORT", "80");
+		HTTP::Request http_request;
+		http_request.parse(buffer, 100000);
 
-		CGI::RequestHandler cgi_request_handler(cgi_request, "./test/testcase/cgi_script/simple_cgi.py", 10000);
+		CGI::Request cgi_request(http_request,
+								 "./test/testcase/cgi_script/simple_cgi.py",
+								 "what the heck");
+		CGI::RequestHandler cgi_request_handler(
+			cgi_request, "./test/testcase/cgi_script/simple_cgi.py", 10000);
 		async::Logger::blockingWrite();
+
 		while (1)
 		{
 			async::IOTaskHandler::task();
