@@ -34,30 +34,21 @@ int Server::RequestGetHandler::task(void)
 		return (_status);
 	}
 
-	try
+	int rc = _reader.task();
+	if (rc == async::status::OK_DONE)
 	{
-		int rc = _reader.task();
-		if (rc == async::status::OK_DONE)
-		{
-			const std::string &content = _reader.retrieve();
-			_response.setStatus(200);
-			_response.setBody(content);
-			_response.setContentLength(content.length());
-			_response.setContentType(_resource_path);
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		}
-		else if (rc == async::status::OK_AGAIN)
-		{
-			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
-		}
-		else
-		{
-			// TODO: 세분화된 예외 처리
-			_response = _server->generateErrorResponse(500);
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		}
+		const std::string &content = _reader.retrieve();
+		_response.setStatus(200);
+		_response.setBody(content);
+		_response.setContentLength(content.length());
+		_response.setContentType(_resource_path);
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
-	catch (const async::IOProcessor::FileIsDirectory &e)
+	else if (rc == async::status::OK_AGAIN)
+	{
+		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
+	}
+	else if (rc == async::status::ERROR_FILEISDIR)
 	{
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		if (_location.hasAutoIndex() == true)
@@ -68,17 +59,15 @@ int Server::RequestGetHandler::task(void)
 			_logger << async::verbose << "directory listing";
 		}
 		else
-			registerErrorResponse(404, e); // Not Found
+			registerErrorResponse(404); // Not Found
 	}
-	catch (const async::FileIOProcessor::FileOpeningError &e)
+	else if (rc == async::status::ERROR_FILEOPENING)
 	{
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		registerErrorResponse(404, e); // Not Found
+		registerErrorResponse(404); // Not Found
 	}
-	catch (const std::exception &e)
+	else
 	{
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		registerErrorResponse(500, e); // Internal Server Error
+		registerErrorResponse(500); // Internal Server Error
 	}
 	return (_status);
 }

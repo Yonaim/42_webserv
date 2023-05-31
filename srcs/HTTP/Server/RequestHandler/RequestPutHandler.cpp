@@ -27,40 +27,31 @@ int Server::RequestPutHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
-	try
+	int rc = _writer.task();
+	if (rc == async::status::OK_DONE)
 	{
-		int rc = _writer.task();
-		if (rc == async::status::OK_DONE)
-		{
-			std::string body = "made the file\n"
-							   "click <A href=\""
-							   + _resource_path + "\">here</A> to view it.";
+		std::string body = "made the file\n"
+						   "click <A href=\""
+						   + _resource_path + "\">here</A> to view it.";
 
-			_response.setStatus(201); // Created
-			_response.setLocation(_resource_path);
-			_response.setBody(body);
-			_response.setContentType("text/html");
-			_response.setContentLength(body.length());
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		}
-		else if (rc == async::status::OK_AGAIN)
-		{
-			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
-		}
-		else
-		{
-			// TODO: 세분화된 예외 처리
-			_response = _server->generateErrorResponse(500);
-			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		}
+		_response.setStatus(201); // Created
+		_response.setLocation(_resource_path);
+		_response.setBody(body);
+		_response.setContentType("text/html");
+		_response.setContentLength(body.length());
+		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
-	catch (const async::FileIOProcessor::FileOpeningError &e)
+	else if (rc == async::status::OK_AGAIN)
 	{
-		registerErrorResponse(503, e); // Service Unavailable
+		_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
 	}
-	catch (const std::exception &e)
+	else if (rc == async::status::ERROR_FILEOPENING)
 	{
-		registerErrorResponse(500, e); // Internal Server Error
+		registerErrorResponse(503); // Service Unavailable
+	}
+	else
+	{
+		registerErrorResponse(500); // Internal Server Error
 	}
 	return (_status);
 }

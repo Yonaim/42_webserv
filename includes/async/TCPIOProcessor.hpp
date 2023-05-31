@@ -47,7 +47,7 @@ class TCPIOProcessor : public IOProcessor
 
 	void initialize(void);
 	void finalize(const char *with_error);
-	virtual void task(void);
+	virtual int task(void);
 	std::string &rdbuf(const int fd);
 	std::string &wrbuf(const int fd);
 

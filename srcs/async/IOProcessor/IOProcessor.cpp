@@ -1,4 +1,5 @@
 #include "async/IOProcessor.hpp"
+#include "async/status.hpp"
 #include "utils/string.hpp"
 #include <iostream>
 #include <sstream>
@@ -11,7 +12,7 @@ const size_t IOProcessor::_buffsize = 2048;
 bool IOProcessor::_debug = false;
 static const timespec zerosec = {0, 0};
 
-IOProcessor::IOProcessor(void)
+IOProcessor::IOProcessor(void) : _status(status::OK_BEGIN)
 {
 	initializeKQueue();
 	registerObject(this);
@@ -67,17 +68,7 @@ void IOProcessor::doAllTasks(void)
 {
 	for (std::vector<IOProcessor *>::iterator it = _objs.begin();
 		 it != _objs.end(); it++)
-	{
-		// TODO: 궁극적으로 Error Status 기반 방식으로 선회
-		try
-		{
-			(*it)->task();
-		}
-		catch (const std::exception &e)
-		{
-			(void)e;
-		}
-	}
+		(*it)->task();
 }
 
 void IOProcessor::blockingWriteAll(void)
@@ -111,14 +102,16 @@ void IOProcessor::flushKQueue(void)
 	_eventlist.insert(_eventlist.end(), events, events + n_newevents);
 }
 
-void IOProcessor::read(const int fd, const size_t size)
+int IOProcessor::read(const int fd, const size_t size)
 {
 	char *buff = new char[size];
 	ssize_t readsize = ::read(fd, buff, size);
 	if (readsize == 0)
 	{
 		delete[] buff;
-		throw(IOProcessor::FileClosed(fd));
+		_status = status::ERROR_FILECLOSED;
+		_error_msg = std::string("File ") + toStr(fd) + " is closed";
+		return (_status);
 	}
 	if (readsize < 0)
 	{
@@ -128,16 +121,20 @@ void IOProcessor::read(const int fd, const size_t size)
 		a write operation이지만 디버그 목적으로 strerror(errno) 사용하였고
 		제출본에서는 삭제해야 함
 		*/
-		throw(IOProcessor::ReadError(fd, strerror(errno)));
+		_status = status::ERROR_READ;
+		_error_msg = std::string("Error while reading from file ") + toStr(fd);
+		return (_status);
 	}
 	_rdbuf[fd].append(buff, readsize);
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Read " << readsize << " bytes: \""
 				  << std::string(buff, buff + readsize) << "\"\n";
 	delete[] buff;
+	_status = status::OK_AGAIN;
+	return (_status);
 }
 
-void IOProcessor::write(const int fd, const size_t size)
+int IOProcessor::write(const int fd, const size_t size)
 {
 	ssize_t writesize = ::write(fd, _wrbuf[fd].c_str(), size);
 	if (writesize == 0)
@@ -149,12 +146,16 @@ void IOProcessor::write(const int fd, const size_t size)
 		 a write operation이지만 디버그 목적으로 strerror(errno) 사용하였고
 		제출본에서는 삭제해야 함
 		 */
-		throw(IOProcessor::WriteError(fd, strerror(errno)));
+		_status = status::ERROR_WRITE;
+		_error_msg = std::string("Error while writing to file ") + toStr(fd);
+		return (_status);
 	}
 	if (_debug)
 		std::cout << "IOProcessor:[DEBUG]:Wrote " << writesize << " bytes: \""
 				  << getfrontstr(_wrbuf[fd], writesize) << "\"\n";
 	trimfrontstr(_wrbuf[fd], writesize);
+	_status = status::OK_AGAIN;
+	return (_status);
 }
 
 void IOProcessor::blockingWrite(void)
@@ -178,20 +179,10 @@ TODO: stat 함수가 사용 불가능하여 임시로 만든 해결책으로 sta
 */
 bool IOProcessor::isFdClosed(const int fd)
 {
-	try
-	{
-		read(fd, 1);
-	}
-	catch (const IOProcessor::FileClosed &e)
-	{
-		(void)e;
+	int rc = read(fd, 1);
+
+	if (rc >= status::ERROR_GENERIC)
 		return (true);
-	}
-	catch (const std::exception &e)
-	{
-		(void)e;
-		return (true);
-	}
 	return (false);
 }
 

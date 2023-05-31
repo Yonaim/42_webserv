@@ -21,12 +21,10 @@ Server::RequestHandler::~RequestHandler()
 {
 }
 
-void Server::RequestHandler::registerErrorResponse(const int code,
-												   const std::exception &e)
+void Server::RequestHandler::registerErrorResponse(const int code)
 {
 	_response = _server->generateErrorResponse(code);
 	_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-	_logger << async::warning << e.what();
 }
 
 Response Server::RequestHandler::retrieve(void)

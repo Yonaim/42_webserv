@@ -21,7 +21,7 @@ class Server::RequestHandler
 	std::string _resource_path;
 	async::Logger &_logger;
 
-	void registerErrorResponse(const int code, const std::exception &e);
+	void registerErrorResponse(const int code);
 
   public:
 	enum response_status_e

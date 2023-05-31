@@ -32,9 +32,10 @@ TCPIOProcessor &TCPIOProcessor::operator=(const TCPIOProcessor &orig)
 	return (*this);
 }
 
-void TCPIOProcessor::task(void)
+int TCPIOProcessor::task(void)
 {
 	flushKQueue();
+	_status = status::OK_AGAIN;
 	while (!_eventlist.empty())
 	{
 		int flags = _eventlist.front().flags;
@@ -45,7 +46,10 @@ void TCPIOProcessor::task(void)
 		if (flags & EV_ERROR)
 		{
 			if (static_cast<int>(ident) == _listening_socket)
+			{
 				finalize("Error from server socket");
+				return (_status);
+			}
 			else
 			{
 				_logger << async::warning << "Error from client socket";
@@ -63,16 +67,13 @@ void TCPIOProcessor::task(void)
 				accept();
 			else
 			{
-				try
-				{
-					read(ident, data);
-				}
-				catch (const std::runtime_error &e)
+				if (read(ident, data) >= status::ERROR_GENERIC)
 				{
 					_logger << async::warning
 							<< "Error while reading from client " << ident
-							<< ": " << e.what();
+							<< ": " << _error_msg;
 					disconnect(ident);
+					_status = status::OK_AGAIN;
 				}
 			}
 		}
@@ -80,19 +81,18 @@ void TCPIOProcessor::task(void)
 		{
 			if (_wrbuf[ident].length() > 0)
 			{
-				try
-				{
-					write(ident, _wrbuf[ident].length());
-				}
-				catch (const IOProcessor::WriteError &e)
+				if (write(ident, _wrbuf[ident].length())
+					>= status::ERROR_GENERIC)
 				{
 					_logger << async::warning
 							<< "Error while writing to client " << ident << ": "
-							<< e.what();
+							<< _error_msg;
+					_status = status::OK_AGAIN;
 				}
 			}
 		}
 	}
+	return (_status);
 }
 
 void TCPIOProcessor::initialize(void)

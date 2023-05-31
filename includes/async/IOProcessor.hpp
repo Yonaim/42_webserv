@@ -1,6 +1,7 @@
 #ifndef ASYNC_IOPROCESSOR_HPP
 #define ASYNC_IOPROCESSOR_HPP
 
+#include "async/status.hpp"
 #include <cstdlib>
 #include <deque>
 #include <map>
@@ -21,6 +22,8 @@ class IOProcessor
 	static void unregisterObject(IOProcessor *task);
 
   protected:
+	int _status;
+	std::string _error_msg;
 	std::deque<struct kevent> _watchlist;
 	std::deque<struct kevent> _eventlist;
 	std::map<int, std::string> _rdbuf;
@@ -29,21 +32,16 @@ class IOProcessor
 
 	void initializeKQueue(void);
 	void flushKQueue(void);
-	void read(const int fd, const size_t size);
-	void write(const int fd, const size_t size);
+	int read(const int fd, const size_t size);
+	int write(const int fd, const size_t size);
 
   public:
-	class FileClosed;
-	class FileIsDirectory;
-	class ReadError;
-	class WriteError;
-
 	IOProcessor(void);
 	virtual ~IOProcessor();
 	IOProcessor(const IOProcessor &orig);
 	IOProcessor &operator=(const IOProcessor &orig);
 
-	virtual void task(void) = 0;
+	virtual int task(void) = 0;
 	static void doAllTasks(void);
 	static void blockingWriteAll(void);
 	void blockingWrite(void);
@@ -56,33 +54,6 @@ enum IOEVENT_E
 	IOEVENT_READ = 0,
 	IOEVENT_WRITE = 1,
 	IOEVENT_ERROR = 2
-};
-
-class IOProcessor::FileClosed : public std::runtime_error
-{
-  public:
-	FileClosed(const int fd);
-};
-
-class IOProcessor::FileIsDirectory : public std::runtime_error
-{
-  public:
-	FileIsDirectory(void);
-	FileIsDirectory(const std::string &path);
-};
-
-class IOProcessor::ReadError : public std::runtime_error
-{
-  public:
-	ReadError(void);
-	ReadError(int fd, const std::string &why);
-};
-
-class IOProcessor::WriteError : public std::runtime_error
-{
-  public:
-	WriteError(void);
-	WriteError(int fd, const std::string &why);
 };
 } // namespace async
 

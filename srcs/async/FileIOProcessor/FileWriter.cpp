@@ -26,13 +26,15 @@ int FileWriter::task(void)
 		return (_status);
 	if (_status == status::OK_BEGIN)
 	{
-		openFdByPath(O_WRONLY | O_CREAT);
+		if (openFdByPath(O_WRONLY | O_CREAT))
+			return (_status);
 		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_W);
 		_processor->setWriteBuf(_content);
 		_status = status::OK_AGAIN;
 	}
 
-	checkTimeout();
+	if (checkTimeout())
+		return (false);
 	_processor->task();
 	if (_processor->writeDone())
 		_status = status::OK_DONE;

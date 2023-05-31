@@ -21,21 +21,10 @@ class FileIOProcessor
 	FileIOProcessor(unsigned int timeout_ms, int fd);
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
-	void checkTimeout(void);
-	void openFdByPath(int oflag);
+	bool checkTimeout(void);
+	bool openFdByPath(int oflag);
 
   public:
-	class Timeout : public std::runtime_error
-	{
-	  public:
-		Timeout(const int fd);
-	};
-	class FileOpeningError : public std::runtime_error
-	{
-	  public:
-		FileOpeningError(const std::string &path, const std::string &cause);
-	};
-
 	virtual ~FileIOProcessor();
 
 	virtual int task(void) = 0;

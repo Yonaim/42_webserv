@@ -28,7 +28,8 @@ class SingleIOProcessor : public IOProcessor
 	virtual ~SingleIOProcessor();
 	SingleIOProcessor(const SingleIOProcessor &orig);
 	SingleIOProcessor &operator=(const SingleIOProcessor &orig);
-	virtual void task(void);
+
+	virtual int task(void);
 	void setWriteBuf(const std::string &str);
 	void getReadBuf(std::string &str);
 	bool writeDone(void);
