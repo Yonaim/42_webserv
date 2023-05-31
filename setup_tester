@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Create the upload directory
+mkdir tmp
+
 # Create the main directory
 mkdir YoupiBanane
 cd YoupiBanane
