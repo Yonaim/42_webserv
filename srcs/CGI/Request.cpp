@@ -57,29 +57,16 @@ Request::~Request()
 }
 
 Request::Request(const Request &orig)
-	: _message_body(orig._message_body), _logger(orig._logger)
+	: _meta_variables(orig._meta_variables), _message_body(orig._message_body),
+	  _logger(orig._logger)
 {
-	for (size_t i = 0; i < META_VARIABLES.size(); i++)
-	{
-		const std::string &name = META_VARIABLES[i];
-		const std::string &value = orig._meta_variables.find(name)->second;
-		_meta_variables.insert(
-			std::pair<std::string, std::string>(name, value));
-	}
 }
 
 const Request &Request::operator=(const Request &orig)
 {
 	if (this != &orig)
 	{
-		_meta_variables.clear();
-		for (size_t i = 0; i < META_VARIABLES.size(); i++)
-		{
-			const std::string &name = META_VARIABLES[i];
-			const std::string &value = orig._meta_variables.find(name)->second;
-			_meta_variables.insert(
-				std::pair<std::string, std::string>(name, value));
-		}
+		_meta_variables = orig._meta_variables;
 		_message_body = orig._message_body;
 	}
 	return (*this);
