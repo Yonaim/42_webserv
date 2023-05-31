@@ -43,6 +43,12 @@ Request::Request(const HTTP::Request &http_req,
 	_meta_variables["SERVER_PROTOCOL"] = "HTTP/1.1";
 	_meta_variables["SERVER_NAME"] = server_name;
 	_meta_variables["SERVER_PORT"] = server_port;
+
+	for (std::map<std::string, std::string>::iterator it
+		 = _meta_variables.begin();
+		 it != _meta_variables.end(); it++)
+		_logger << async::debug << "CGI metavariable \"" << it->first << "\"=\""
+				<< it->second << "\"";
 }
 
 Request::~Request()
