@@ -110,7 +110,7 @@ int IOProcessor::read(const int fd, const size_t size)
 	{
 		delete[] buff;
 		_status = status::ERROR_FILECLOSED;
-		_error_msg = std::string("File ") + toStr(fd) + " is closed";
+		_error_msg = generateErrorMsgFileClosed(fd);
 		return (_status);
 	}
 	if (readsize < 0)
@@ -122,7 +122,7 @@ int IOProcessor::read(const int fd, const size_t size)
 		제출본에서는 삭제해야 함
 		*/
 		_status = status::ERROR_READ;
-		_error_msg = std::string("Error while reading from file ") + toStr(fd);
+		_error_msg = generateErrorMsgRead(fd);
 		return (_status);
 	}
 	_rdbuf[fd].append(buff, readsize);
@@ -147,7 +147,7 @@ int IOProcessor::write(const int fd, const size_t size)
 		제출본에서는 삭제해야 함
 		 */
 		_status = status::ERROR_WRITE;
-		_error_msg = std::string("Error while writing to file ") + toStr(fd);
+		_error_msg = generateErrorMsgWrite(fd);
 		return (_status);
 	}
 	if (_debug)
@@ -161,6 +161,11 @@ int IOProcessor::write(const int fd, const size_t size)
 const int &IOProcessor::stat(void) const
 {
 	return (_status);
+}
+
+const std::string &IOProcessor::errorMsg(void) const
+{
+	return (_error_msg);
 }
 
 void IOProcessor::blockingWrite(void)

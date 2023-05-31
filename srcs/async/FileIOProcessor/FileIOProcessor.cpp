@@ -15,6 +15,7 @@ bool FileIOProcessor::openFdByPath(int oflag)
 	if (isDirectory(_path))
 	{
 		_status = status::ERROR_FILEISDIR;
+		_error_msg = generateErrorMsgFileIsDir(_path);
 		return (true);
 	}
 	int fd
@@ -22,6 +23,7 @@ bool FileIOProcessor::openFdByPath(int oflag)
 	if (fd < 0)
 	{
 		_status = status::ERROR_FILEOPENING;
+		_error_msg = generateErrorMsgFileOpening(_path);
 		return (true);
 	}
 	_fd = fd;
@@ -67,6 +69,7 @@ bool FileIOProcessor::checkTimeout(void)
 	if (clock() > _timeout_ms)
 	{
 		_status = status::ERROR_TIMEOUT;
+		_error_msg = generateErrorMsgTimeout(_fd, _timeout_ms);
 		return (true);
 	}
 	return (false);
@@ -77,4 +80,9 @@ std::string FileIOProcessor::retrieve(void)
 	if (_status != status::OK_DONE)
 		throw(std::logic_error("FileIOProcessor: File is not yet loaded."));
 	return (_buffer);
+}
+
+const std::string &FileIOProcessor::errorMsg(void) const
+{
+	return (_error_msg);
 }

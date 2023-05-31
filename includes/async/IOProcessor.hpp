@@ -43,6 +43,7 @@ class IOProcessor
 	IOProcessor &operator=(const IOProcessor &orig);
 
 	const int &stat(void) const;
+	const std::string &errorMsg(void) const;
 	static void doAllTasks(void);
 	static void blockingWriteAll(void);
 	void blockingWrite(void);

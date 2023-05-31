@@ -64,7 +64,7 @@ void SingleIOProcessor::task(void)
 			if (flags & EV_EOF)
 			{
 				_status = status::ERROR_FILECLOSED;
-				_error_msg = std::string("File ") + toStr(_fd) + " is closed";
+				_error_msg = generateErrorMsgFileClosed(_fd);
 				return;
 			}
 		}
