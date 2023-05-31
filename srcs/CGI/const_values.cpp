@@ -1,9 +1,9 @@
 #include "CGI/const_values.hpp"
 
 // special token
-const std::string CGI::NL = "\n";
+const std::string CGI::CRLF = "\r\n";
 const std::string CGI::LWS = " \t";
-const size_t CGI::NL_LEN = CGI::NL.length();
+const size_t CGI::CRLF_LEN = CGI::CRLF.length();
 
 // meta-variables
 const std::string _META_VARIABLES[]
