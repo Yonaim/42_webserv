@@ -88,6 +88,7 @@ void Request::setValues(const HTTP::Request &http_req,
 	_meta_variables["PATH_TRANSLATED"] = resource_path;
 	_meta_variables["QUERY_STRING"] = http_req.getQueryString();
 	_meta_variables["REQUEST_METHOD"] = http_req.getMethodString();
+	_meta_variables["SERVER_PROTOCOL"] = "HTTP/1.1";
 	std::string host_header = http_req.getHeaderValue("Host", 0);
 	size_t colon_pos = host_header.find(':');
 	if (colon_pos == std::string::npos)
