@@ -5,21 +5,58 @@ using namespace CGI;
 
 const std::string Request::_version = "1.1";
 
-Request::Request()
+Request::Request(const HTTP::Request &http_req,
+				 const std::string &resource_path, const std::string &body)
+	: _message_body(body), _logger(async::Logger::getLogger("CGIRequest"))
 {
 	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
 		const std::string &name = META_VARIABLES[i];
 		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
 	}
-	_meta_variables.find("GATEWAY_INTERFACE")->second = "CGI/" + _version;
+	std::string content_length = toStr<size_t>(http_req.getBody().size());
+	std::string content_type = http_req.hasHeaderValue("Content-Type")
+								   ? http_req.getHeaderValue("Content-Type", 0)
+								   : "";
+	std::string host_header = http_req.getHeaderValue("Host", 0);
+	size_t colon_pos = host_header.find(':');
+	std::string server_name;
+	std::string server_port;
+	if (colon_pos == std::string::npos)
+	{
+		server_name = host_header;
+		server_port = "80";
+	}
+	else
+	{
+		server_name = getfrontstr(host_header, colon_pos);
+		server_port = getbackstr(host_header, colon_pos + 1);
+	}
+
+	_meta_variables["CONTENT_LENGTH"] = content_length;
+	_meta_variables["CONTENT_TYPE"] = content_type;
+	_meta_variables["GATEWAY_INTERFACE"] = "CGI/" + _version;
+	_meta_variables["PATH_INFO"] = http_req.getURIPath();
+	_meta_variables["PATH_TRANSLATED"] = resource_path;
+	_meta_variables["QUERY_STRING"] = http_req.getQueryString();
+	_meta_variables["REQUEST_METHOD"] = http_req.getMethodString();
+	_meta_variables["SERVER_PROTOCOL"] = "HTTP/1.1";
+	_meta_variables["SERVER_NAME"] = server_name;
+	_meta_variables["SERVER_PORT"] = server_port;
+
+	for (std::map<std::string, std::string>::iterator it
+		 = _meta_variables.begin();
+		 it != _meta_variables.end(); it++)
+		_logger << async::debug << "CGI metavariable \"" << it->first << "\"=\""
+				<< it->second << "\"";
 }
 
 Request::~Request()
 {
 }
 
-Request::Request(const Request &orig) : _message_body(orig._message_body)
+Request::Request(const Request &orig)
+	: _message_body(orig._message_body), _logger(orig._logger)
 {
 	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
@@ -73,36 +110,4 @@ const std::string &Request::getPath() const
 void Request::setMetaVariable(const std::string &name, const std::string &value)
 {
 	_meta_variables[name] = value;
-}
-
-void Request::setValues(const HTTP::Request &http_req,
-						const std::string &resource_path)
-{
-	// TODO: 생성자로 옮기는 것 고려해보기
-	_meta_variables["CONTENT_LENGTH"]
-		= toStr<size_t>(http_req.getBody().length());
-	if (http_req.hasHeaderValue("Content-Type"))
-		_meta_variables["CONTENT_TYPE"]
-			= http_req.getHeaderValue("Content-Type", 0);
-	_meta_variables["PATH_INFO"] = http_req.getURIPath();
-	_meta_variables["PATH_TRANSLATED"] = resource_path;
-	_meta_variables["QUERY_STRING"] = http_req.getQueryString();
-	_meta_variables["REQUEST_METHOD"] = http_req.getMethodString();
-	std::string host_header = http_req.getHeaderValue("Host", 0);
-	size_t colon_pos = host_header.find(':');
-	if (colon_pos == std::string::npos)
-	{
-		_meta_variables["SERVER_NAME"] = host_header;
-		_meta_variables["SERVER_PORT"] = "80";
-	}
-	else
-	{
-		_meta_variables["SERVER_NAME"] = getfrontstr(host_header, colon_pos);
-		_meta_variables["SERVER_PORT"] = getbackstr(host_header, colon_pos + 1);
-	}
-}
-
-void Request::setMessageBody(std::string message_body)
-{
-	_message_body = message_body;
 }

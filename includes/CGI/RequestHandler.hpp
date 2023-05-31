@@ -13,10 +13,10 @@ namespace CGI
 class RequestHandler
 {
   private:
+	const Request _request;
+	Response _response;
 	async::FileReader *_reader;
 	async::FileWriter *_writer;
-	const Request *_request;
-	Response _response;
 	std::string _exec_path;
 	int _status;
 
@@ -51,7 +51,7 @@ class RequestHandler
 		CGI_RESPONSE_STATUS_OK,
 	};
 
-	RequestHandler(const Request *request, const std::string &exec_path,
+	RequestHandler(const Request &request, const std::string &exec_path,
 				   const unsigned int timeout_ms);
 	~RequestHandler();
 

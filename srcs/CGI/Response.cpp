@@ -41,9 +41,9 @@ const CGI::Response &CGI::Response::operator=(const Response &orig)
 
 void	CGI::Response::makeResponse(std::string &cgi_output)
 {
-	while (cgi_output.substr(0, NL_LEN) != NL)
+	while (cgi_output.substr(0, CRLF_LEN) != CRLF)
 		consumeHeader(cgi_output);
-	consumestr(cgi_output, NL_LEN);
+	consumestr(cgi_output, CRLF_LEN);
 
 	if (!_header.hasValue("Content-Type"))
 		throwException(CONSUME_EXC_INVALID_FORMAT);
@@ -63,12 +63,12 @@ void	CGI::Response::makeResponse(std::string &cgi_output)
 
 void CGI::Response::consumeHeader(std::string &buffer)
 {
-	const size_t nl_pos = buffer.find(NL);
+	const size_t nl_pos = buffer.find(CRLF);
 	if (nl_pos == std::string::npos)
 		throwException(CONSUME_EXC_INVALID_FORMAT);
 
 	const std::string header_line = consumestr(buffer, nl_pos);
-	consumestr(buffer, NL_LEN);
+	consumestr(buffer, CRLF_LEN);
 
 	const size_t colon_pos = header_line.find(":");
 	if (colon_pos == std::string::npos)

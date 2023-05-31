@@ -61,7 +61,8 @@ void Server::iterateCGIHandlers(void)
 			int rc = handlers.front()->task();
 			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 			{
-				CGI::Response cgi_response = handlers.front()->retrieve();
+				const CGI::Response &cgi_response
+					= handlers.front()->retrieve();
 				_output_queue[client_fd].push(cgi_response.toHTTPResponse());
 				delete handlers.front();
 				handlers.pop();
@@ -151,8 +152,7 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 void Server::registerCGIRequest(int client_fd, const Request &request,
 								const std::string &resource_path)
 {
-	CGI::Request *cgi_request = new CGI::Request();
-	cgi_request->setValues(request, resource_path);
+	CGI::Request cgi_request(request, resource_path, request.getBody());
 	CGI::RequestHandler *handler;
 	try
 	{
@@ -178,7 +178,15 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 void Server::registerRequest(int client_fd, const Request &request)
 {
 	const Server::Location &location = getLocation(request.getURIPath());
+	const std::string resource_path = location.generateResourcePath(request);
 	const int method = request.getMethod();
+
+	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
+	{
+		registerCGIRequest(client_fd, request, resource_path);
+		return;
+	}
+
 	if (!location.isAllowedMethod(method))
 	{
 		_logger << async::info << "Method " << METHOD[method]
@@ -193,12 +201,8 @@ void Server::registerRequest(int client_fd, const Request &request)
 		registerRedirectResponse(client_fd, location);
 		return;
 	}
-	const std::string resource_path = location.generateResourcePath(request);
 
-	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
-		registerCGIRequest(client_fd, request, resource_path);
-	else
-		registerHTTPRequest(client_fd, request, location, resource_path);
+	registerHTTPRequest(client_fd, request, location, resource_path);
 }
 
 Response Server::retrieveResponse(int client_fd)

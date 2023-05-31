@@ -14,9 +14,9 @@ class Server::RequestHandler
 {
   protected:
 	const Request _request;
+	Response _response;
 	const Server::Location &_location;
 	Server *_server;
-	Response _response;
 	int _status;
 	std::string _resource_path;
 	async::Logger &_logger;

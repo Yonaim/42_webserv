@@ -2,6 +2,7 @@
 #define CGI_REQUEST_HPP
 
 #include "HTTP/Request.hpp"
+#include "async/Logger.hpp"
 
 namespace CGI
 {
@@ -11,18 +12,17 @@ class Request
 	static const std::string _version;
 	std::map<std::string, std::string> _meta_variables;
 	std::string _message_body;
+	async::Logger &_logger;
 
   public:
-	Request();
+	Request(const HTTP::Request &http_req, const std::string &resource_path,
+			const std::string &body);
 	~Request();
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
 
 	// setter
 	void setMetaVariable(const std::string &name, const std::string &value);
-	void setValues(const HTTP::Request &http_req,
-				   const std::string &resource_path);
-	void setMessageBody(std::string message_body);
 
 	// getter
 	char *const *getEnv(void) const;
