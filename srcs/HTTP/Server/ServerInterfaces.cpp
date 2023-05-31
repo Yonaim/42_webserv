@@ -153,6 +153,7 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 {
 	CGI::Request *cgi_request = new CGI::Request();
 	cgi_request->setValues(request, resource_path);
+	cgi_request->setMessageBody(request.getBody());
 	CGI::RequestHandler *handler;
 	try
 	{
