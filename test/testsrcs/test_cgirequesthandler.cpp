@@ -1,5 +1,4 @@
 #include "CGI/RequestHandler.hpp"
-#include "async/IOTaskHandler.hpp"
 #include "async/SingleIOProcessor.hpp"
 #include <iostream>
 #include <unistd.h>
@@ -28,13 +27,13 @@ int main()
 								 "./test/testcase/cgi_script/simple_cgi.py");
 		CGI::RequestHandler cgi_request_handler(
 			cgi_request, "./test/testcase/cgi_script/simple_cgi.py", 10000);
-		async::Logger::blockingWrite();
+		async::Logger::blockingWriteAll();
 
 		while (1)
 		{
-			async::IOTaskHandler::task();
+			async::IOProcessor::doAllTasks();
 			int rc = cgi_request_handler.task();
-			async::Logger::blockingWrite();
+			async::Logger::blockingWriteAll();
 			// sleep(1);
 
 			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
@@ -45,6 +44,6 @@ int main()
 	}
 	catch (std::exception &e)
 	{
-		async::Logger::blockingWrite();
+		async::Logger::blockingWriteAll();
 	}
 }

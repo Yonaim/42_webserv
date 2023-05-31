@@ -1,6 +1,5 @@
 #include "HTTP/error_pages.hpp"
 #include "WebServer.hpp"
-#include "async/IOTaskHandler.hpp"
 #include "async/Logger.hpp"
 #include "utils/string.hpp"
 
@@ -140,7 +139,7 @@ void WebServer::disconnect(int port, int client_fd)
 
 void WebServer::task(void)
 {
-	async::IOTaskHandler::task();
+	async::IOProcessor::doAllTasks();
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
 		 it++)
 	{

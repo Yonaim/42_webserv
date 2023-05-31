@@ -1,5 +1,5 @@
-#include "HTTP/const_values.hpp"
 #include "HTTP/Request.hpp"
+#include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
 #include <iostream>
 
@@ -83,8 +83,8 @@ int Request::consumeStartLine(std::string &buffer)
 		_logger << async::verbose << __func__ << ": URI: \"" << _uri << "\"";
 		_logger << async::verbose << __func__ << ": QUERY: \"" << _query_string
 				<< "\"";
-		_logger << async::verbose << __func__ << ": version: \""
-				<< _version << "\"";
+		_logger << async::verbose << __func__ << ": version: \"" << _version
+				<< "\"";
 		_logger << async::debug << __func__ << ": buffer result in :\""
 				<< buffer << "\"";
 	}
@@ -179,7 +179,7 @@ int Request::consumeChunk(std::string &buffer)
 	}
 
 	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
-	_logger << async::verbose << __func__ << ": content length "
+	_logger << async::debug << __func__ << ": content length "
 			<< content_length;
 	if (content_length < 0)
 	{

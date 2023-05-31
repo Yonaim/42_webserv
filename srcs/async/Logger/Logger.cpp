@@ -1,5 +1,4 @@
 #include "async/Logger.hpp"
-#include "async/IOTaskHandler.hpp"
 #include <cstring>
 
 using namespace async;
@@ -110,12 +109,12 @@ Logger &Logger::getLogger(const std::string &name)
 	return (*(_loggers[name]));
 }
 
-void Logger::task(void)
+void Logger::doAllTasks(void)
 {
-	IOTaskHandler::task();
+	IOProcessor::doAllTasks();
 }
 
-void Logger::blockingWrite(void)
+void Logger::blockingWriteAll(void)
 {
 	for (std::map<std::string, Logger *>::iterator it = _loggers.begin();
 		 it != _loggers.end(); it++)
@@ -123,7 +122,7 @@ void Logger::blockingWrite(void)
 		Logger &logger = *(it->second);
 		logger.log("\n");
 	}
-	IOTaskHandler::blockingWrite();
+	IOProcessor::blockingWriteAll();
 }
 
 Logger &operator<<(Logger &io, const Logger::EndMarker mark)

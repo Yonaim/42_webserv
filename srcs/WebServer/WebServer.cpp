@@ -1,6 +1,5 @@
 #include "WebServer.hpp"
 #include "HTTP/error_pages.hpp"
-#include "async/IOTaskHandler.hpp"
 #include "async/Logger.hpp"
 #include "utils/string.hpp"
 

@@ -1,4 +1,3 @@
-#include "async/IOTaskHandler.hpp"
 #include "async/TCPIOProcessor.hpp"
 #include <iostream>
 
@@ -7,7 +6,7 @@ int main(void)
 	async::TCPIOProcessor listener;
 	while (true)
 	{
-		async::IOTaskHandler::task();
+		async::IOProcessor::doAllTasks();
 		for (async::TCPIOProcessor::iterator it = listener.begin();
 			 it != listener.end(); it++)
 		{

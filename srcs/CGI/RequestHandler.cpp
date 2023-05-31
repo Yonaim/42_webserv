@@ -36,10 +36,10 @@ RequestHandler::RequestHandler(const Request &request,
 		if (::pipe(_read_pipe_fd) < 0 || ::pipe(_write_pipe_fd) < 0)
 			throw(std::runtime_error("Constructor: Failed to create pipe."));
 
-		_logger << async::debug << "read_pipe[0]: " << _read_pipe_fd[0];
-		_logger << async::debug << "read_pipe[1]: " << _read_pipe_fd[1];
-		_logger << async::debug << "write_pipe[0]: " << _write_pipe_fd[0];
-		_logger << async::debug << "write_pipe[1]: " << _write_pipe_fd[1];
+		_logger << async::verbose << "read_pipe[0]: " << _read_pipe_fd[0];
+		_logger << async::verbose << "read_pipe[1]: " << _read_pipe_fd[1];
+		_logger << async::verbose << "write_pipe[0]: " << _write_pipe_fd[0];
+		_logger << async::verbose << "write_pipe[1]: " << _write_pipe_fd[1];
 
 		if (_request.getMessageBody().length() > 0)
 			_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
@@ -49,7 +49,7 @@ RequestHandler::RequestHandler(const Request &request,
 	catch (const std::runtime_error &e)
 	{
 		closeAllPipes();
-		_logger << async::debug << e.what();
+		_logger << async::verbose << e.what();
 		throw(e);
 	}
 }
@@ -73,14 +73,14 @@ int RequestHandler::fork()
 		if (::dup2(_write_pipe_fd[0], STDIN_FILENO) < 0
 			|| ::dup2(_read_pipe_fd[1], STDOUT_FILENO) < 0)
 		{
-			_logger << async::debug << "failed to dup2";
+			_logger << async::verbose << "failed to dup2";
 			std::exit(2);
 		}
 		closePipe(_write_pipe_fd[0]);
 		closePipe(_write_pipe_fd[1]);
 		closePipe(_read_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
-		_logger << async::debug << "calling execve(" << _exec_path.c_str()
+		_logger << async::verbose << "calling execve(" << _exec_path.c_str()
 				<< "), good bye!";
 		/* TODO: (해야 한다면) argv 만들어 입력 (아닐수도 있고)
 		 * 근거: Your program should call the CGI with the file requested as
@@ -90,7 +90,7 @@ int RequestHandler::fork()
 	}
 	else
 	{
-		_logger << async::debug << "successed to fork.";
+		_logger << async::verbose << "successed to fork.";
 		closePipe(_write_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
 
@@ -107,13 +107,13 @@ int RequestHandler::waitRWOperation()
 		switch (_writer->task())
 		{
 		case async::status::OK:
-			_logger << async::debug << "successed to send CGI request";
+			_logger << async::verbose << "successed to send CGI request";
 			closePipe(_write_pipe_fd[1]);
 			delete _writer;
 			_writer = NULL;
 			break;
 		case async::status::AGAIN:
-			_logger << async::debug << "writing CGI request";
+			_logger << async::verbose << "writing CGI request";
 			break;
 		default:
 			throw(std::runtime_error("failed to send CGI Request"));
@@ -125,7 +125,7 @@ int RequestHandler::waitRWOperation()
 		switch (_reader->task())
 		{
 		case async::status::OK: {
-			_logger << async::debug << "read status is ok";
+			_logger << async::verbose << "read status is ok";
 			_logger << async::debug << "buffer: " << _reader->retrieve();
 
 			std::string cgi_output = _reader->retrieve();
@@ -136,7 +136,7 @@ int RequestHandler::waitRWOperation()
 			break;
 		}
 		case async::status::AGAIN: {
-			_logger << async::debug << "read status is again";
+			_logger << async::verbose << "read status is again";
 			break;
 		}
 		default:
@@ -160,7 +160,7 @@ int RequestHandler::waitExecution()
 	}
 	else if (rc == 0)
 	{
-		_logger << async::debug << "waiting child";
+		_logger << async::verbose << "waiting child";
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
@@ -169,8 +169,8 @@ int RequestHandler::waitExecution()
 		if ((WIFEXITED(_waitpid_status) && (WEXITSTATUS(_waitpid_status) == 2))
 			|| WIFSIGNALED(_waitpid_status))
 			throw(std::runtime_error("CGI execution failed"));
-		_logger << async::debug << "child process done";
-		_logger << async::debug << "successed CGI execution";
+		_logger << async::verbose << "child process done";
+		_logger << async::verbose << "successed CGI execution";
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
 	}
@@ -178,7 +178,7 @@ int RequestHandler::waitExecution()
 
 int RequestHandler::task(void)
 {
-	_logger << async::debug << "status : " << _status;
+	_logger << async::verbose << "status : " << _status;
 	try
 	{
 		switch (_status)
@@ -196,7 +196,7 @@ int RequestHandler::task(void)
 	catch (const std::runtime_error &e)
 	{
 		closeAllPipes();
-		_logger << async::debug << e.what();
+		_logger << async::verbose << e.what();
 		throw(e);
 	}
 }

@@ -6,14 +6,19 @@
 #include <map>
 #include <string>
 #include <sys/event.h>
+#include <vector>
 
 namespace async
 {
 class IOProcessor
 {
   private:
+	static std::vector<IOProcessor *> _objs;
 	static const size_t _buffsize;
 	int _kq;
+
+	static void registerObject(IOProcessor *task);
+	static void unregisterObject(IOProcessor *task);
 
   protected:
 	std::deque<struct kevent> _watchlist;
@@ -37,7 +42,10 @@ class IOProcessor
 	virtual ~IOProcessor();
 	IOProcessor(const IOProcessor &orig);
 	IOProcessor &operator=(const IOProcessor &orig);
+
 	virtual void task(void) = 0;
+	static void doAllTasks(void);
+	static void blockingWriteAll(void);
 	void blockingWrite(void);
 	static void setDebug(bool debug);
 	bool isFdClosed(const int fd);

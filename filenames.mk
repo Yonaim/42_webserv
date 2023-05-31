@@ -51,7 +51,6 @@ FILENAMES			= \
 					$(DIR_ASYNC_IO)IOException \
 					$(DIR_ASYNC_IO)SingleIOProcessor \
 					$(DIR_ASYNC_IO)TCPIOProcessor \
-					$(DIR_ASYNC_IO)IOTaskHandler \
 					$(DIR_ASYNCFILE)FileIOProcessor \
 					$(DIR_ASYNCFILE)FileReader \
 					$(DIR_ASYNCFILE)FileWriter \

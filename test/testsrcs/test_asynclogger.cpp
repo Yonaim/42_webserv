@@ -14,6 +14,6 @@ int main(void)
 	root_logger << async::warning << "Hello, World! " << 4;
 	root_logger << async::error << "Hello, World! " << 5;
 
-	async::Logger::blockingWrite();
+	async::Logger::blockingWriteAll();
 	return (0);
 }

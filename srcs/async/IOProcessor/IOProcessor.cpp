@@ -1,5 +1,4 @@
 #include "async/IOProcessor.hpp"
-#include "async/IOTaskHandler.hpp"
 #include "utils/string.hpp"
 #include <iostream>
 #include <sstream>
@@ -7,6 +6,7 @@
 
 using namespace async;
 
+std::vector<IOProcessor *> IOProcessor::_objs;
 const size_t IOProcessor::_buffsize = 2048;
 bool IOProcessor::_debug = false;
 static const timespec zerosec = {0, 0};
@@ -14,13 +14,13 @@ static const timespec zerosec = {0, 0};
 IOProcessor::IOProcessor(void)
 {
 	initializeKQueue();
-	IOTaskHandler::registerTask(this);
+	registerObject(this);
 }
 
 IOProcessor::~IOProcessor()
 {
 	close(_kq);
-	IOTaskHandler::unregisterTask(this);
+	unregisterObject(this);
 }
 
 IOProcessor::IOProcessor(const IOProcessor &orig)
@@ -43,6 +43,48 @@ IOProcessor &IOProcessor::operator=(const IOProcessor &orig)
 	initializeKQueue();
 	flushKQueue();
 	return (*this);
+}
+
+void IOProcessor::registerObject(IOProcessor *obj)
+{
+	std::vector<IOProcessor *>::iterator it
+		= std::lower_bound(_objs.begin(), _objs.end(), obj);
+	if (it != _objs.end() && *it == obj)
+		return;
+	_objs.insert(it, obj);
+}
+
+void IOProcessor::unregisterObject(IOProcessor *obj)
+{
+	std::vector<IOProcessor *>::iterator it
+		= std::lower_bound(_objs.begin(), _objs.end(), obj);
+	if (it == _objs.end())
+		return;
+	_objs.erase(it);
+}
+
+void IOProcessor::doAllTasks(void)
+{
+	for (std::vector<IOProcessor *>::iterator it = _objs.begin();
+		 it != _objs.end(); it++)
+	{
+		// TODO: 궁극적으로 Error Status 기반 방식으로 선회
+		try
+		{
+			(*it)->task();
+		}
+		catch (const std::exception &e)
+		{
+			(void)e;
+		}
+	}
+}
+
+void IOProcessor::blockingWriteAll(void)
+{
+	for (std::vector<IOProcessor *>::iterator it = _objs.begin();
+		 it != _objs.end(); it++)
+		(*it)->blockingWrite();
 }
 
 void IOProcessor::initializeKQueue(void)

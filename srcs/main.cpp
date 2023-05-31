@@ -1,6 +1,5 @@
 #include "ConfigDirective.hpp"
 #include "WebServer.hpp"
-#include "async/IOTaskHandler.hpp"
 #include "async/SingleIOProcessor.hpp"
 #include "parseConfig.hpp"
 #include <iostream>
@@ -45,7 +44,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		async::IOTaskHandler::blockingWrite();
+		async::IOProcessor::blockingWriteAll();
 		std::cerr << "Error while parsing config file: " << e.what() << "\n";
 		return (2);
 	}
@@ -56,7 +55,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		async::IOTaskHandler::blockingWrite();
+		async::IOProcessor::blockingWriteAll();
 		std::cerr << "Error while parsing log level: " << e.what() << "\n";
 		return (2);
 	}
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		async::IOTaskHandler::blockingWrite();
+		async::IOProcessor::blockingWriteAll();
 		std::cerr << "Error while running WebServer: " << e.what() << '\n';
 	}
 

@@ -58,8 +58,8 @@ class Logger
 	static void setLogLevel(const std::string &log_level);
 	static int getLogLevel(void);
 	static Logger &getLogger(const std::string &name);
-	static void task(void);
-	static void blockingWrite(void);
+	static void doAllTasks(void);
+	static void blockingWriteAll(void);
 };
 
 extern const Logger::EndMarker debug;
