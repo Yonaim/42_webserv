@@ -53,7 +53,17 @@ void IOTaskHandler::task(void)
 	IOTaskHandler &instance = getInstance();
 	for (_iterator it = instance._tasks.begin(); it != instance._tasks.end();
 		 it++)
-		(*it)->task();
+	{
+		// TODO: 궁극적으로 Error Status 기반 방식으로 선회
+		try
+		{
+			(*it)->task();
+		}
+		catch (const std::exception &e)
+		{
+			(void)e;
+		}
+	}
 }
 
 void IOTaskHandler::blockingWrite(void)
