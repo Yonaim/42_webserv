@@ -25,8 +25,7 @@ int main()
 		http_request.parse(buffer, 100000);
 
 		CGI::Request cgi_request(http_request,
-								 "./test/testcase/cgi_script/simple_cgi.py",
-								 "what the heck");
+								 "./test/testcase/cgi_script/simple_cgi.py");
 		CGI::RequestHandler cgi_request_handler(
 			cgi_request, "./test/testcase/cgi_script/simple_cgi.py", 10000);
 		async::Logger::blockingWrite();
@@ -36,7 +35,7 @@ int main()
 			async::IOTaskHandler::task();
 			int rc = cgi_request_handler.task();
 			async::Logger::blockingWrite();
-			sleep(1);
+			// sleep(1);
 
 			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 				break;
