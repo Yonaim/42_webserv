@@ -7,10 +7,10 @@ namespace status
 {
 enum job_status_e
 {
-	OK = 0,
-	BEGIN,
-	AGAIN,
-	INVALID
+	OK_DONE = 0,
+	OK_BEGIN,
+	OK_AGAIN,
+	ERROR_GENERIC
 };
 } // namespace status
 } // namespace async

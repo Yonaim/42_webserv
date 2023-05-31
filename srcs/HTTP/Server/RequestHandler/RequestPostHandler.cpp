@@ -30,7 +30,7 @@ int Server::RequestPostHandler::task(void)
 	try
 	{
 		int rc = _writer.task();
-		if (rc == async::status::OK)
+		if (rc == async::status::OK_DONE)
 		{
 			std::string body = "made the file\n"
 							   "click <A href=\""
@@ -43,7 +43,7 @@ int Server::RequestPostHandler::task(void)
 			_response.setContentLength(body.length());
 			_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		}
-		else if (rc == async::status::AGAIN)
+		else if (rc == async::status::OK_AGAIN)
 		{
 			_status = Server::RequestHandler::RESPONSE_STATUS_AGAIN;
 		}

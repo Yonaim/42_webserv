@@ -18,9 +18,9 @@ int main(int argc, char **argv)
 		while (true)
 		{
 			rc = writer.task();
-			if (rc == async::status::OK)
+			if (rc == async::status::OK_DONE)
 				break;
-			else if (rc == async::status::AGAIN)
+			else if (rc == async::status::OK_AGAIN)
 				continue;
 			else
 				throw(std::logic_error("Impossible return code"));

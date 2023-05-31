@@ -106,13 +106,13 @@ int RequestHandler::waitRWOperation()
 	{
 		switch (_writer->task())
 		{
-		case async::status::OK:
+		case async::status::OK_DONE:
 			_logger << async::verbose << "successed to send CGI request";
 			closePipe(_write_pipe_fd[1]);
 			delete _writer;
 			_writer = NULL;
 			break;
-		case async::status::AGAIN:
+		case async::status::OK_AGAIN:
 			_logger << async::verbose << "writing CGI request";
 			break;
 		default:
@@ -124,7 +124,7 @@ int RequestHandler::waitRWOperation()
 	{
 		switch (_reader->task())
 		{
-		case async::status::OK: {
+		case async::status::OK_DONE: {
 			_logger << async::verbose << "read status is ok";
 			_logger << async::debug << "buffer: " << _reader->retrieve();
 
@@ -135,7 +135,7 @@ int RequestHandler::waitRWOperation()
 			_reader = NULL;
 			break;
 		}
-		case async::status::AGAIN: {
+		case async::status::OK_AGAIN: {
 			_logger << async::verbose << "read status is again";
 			break;
 		}
