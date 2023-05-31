@@ -6,8 +6,8 @@ using namespace CGI;
 const std::string Request::_version = "1.1";
 
 Request::Request(const HTTP::Request &http_req,
-				 const std::string &resource_path)
-	: _logger(async::Logger::getLogger("CGIRequest"))
+				 const std::string &resource_path, const std::string &body)
+	: _message_body(body), _logger(async::Logger::getLogger("CGIRequest"))
 {
 	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
@@ -110,9 +110,4 @@ const std::string &Request::getPath() const
 void Request::setMetaVariable(const std::string &name, const std::string &value)
 {
 	_meta_variables[name] = value;
-}
-
-void Request::setMessageBody(std::string message_body)
-{
-	_message_body = message_body;
 }

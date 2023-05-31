@@ -21,10 +21,10 @@ void RequestHandler::closeAllPipes(void)
 	closePipe(_write_pipe_fd[1]);
 }
 
-RequestHandler::RequestHandler(const Request *request,
+RequestHandler::RequestHandler(const Request &request,
 							   const std::string &exec_path,
 							   const unsigned int timeout_ms)
-	: _reader(NULL), _writer(NULL), _request(request), _exec_path(exec_path),
+	: _request(request), _reader(NULL), _writer(NULL), _exec_path(exec_path),
 	  _status(CGI_RESPONSE_INNER_STATUS_BEGIN), _pid(-1), _waitpid_status(-1),
 	  _logger(async::Logger::getLogger("CGIRequestHandler"))
 {
@@ -41,9 +41,9 @@ RequestHandler::RequestHandler(const Request *request,
 		_logger << async::debug << "write_pipe[0]: " << _write_pipe_fd[0];
 		_logger << async::debug << "write_pipe[1]: " << _write_pipe_fd[1];
 
-		if (_request->getMessageBody().length() > 0)
+		if (_request.getMessageBody().length() > 0)
 			_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
-											_request->getMessageBody());
+											_request.getMessageBody());
 		_reader = new async::FileReader(timeout_ms, _read_pipe_fd[0]);
 	}
 	catch (const std::runtime_error &e)
@@ -57,7 +57,6 @@ RequestHandler::RequestHandler(const Request *request,
 RequestHandler::~RequestHandler()
 {
 	closeAllPipes();
-	delete _request;
 	delete _writer;
 	delete _reader;
 }
@@ -86,7 +85,7 @@ int RequestHandler::fork()
 		/* TODO: (해야 한다면) argv 만들어 입력 (아닐수도 있고)
 		 * 근거: Your program should call the CGI with the file requested as
 		 * first argument.*/
-		execve(_exec_path.c_str(), NULL, _request->getEnv());
+		execve(_exec_path.c_str(), NULL, _request.getEnv());
 		std::exit(2);
 	}
 	else
@@ -94,7 +93,7 @@ int RequestHandler::fork()
 		_logger << async::debug << "successed to fork.";
 		closePipe(_write_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
-		if (_request->getMessageBody().length() > 0)
+		if (_request.getMessageBody().length() > 0)
 			_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
 		else
 			_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
