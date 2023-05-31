@@ -31,17 +31,15 @@ class RequestHandler
 	enum cgi_response_inner_status_e
 	{
 		CGI_RESPONSE_INNER_STATUS_BEGIN,
-		CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN,
-		CGI_RESPONSE_INNER_STATUS_READ_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_RW_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_OK
 	};
 
 	void closePipe(int &fd);
 	int fork(void);
-	int sendCGIRequestBody(void);
+	int waitRWOperation(void);
 	int waitExecution(void);
-	int receiveCGIResponse(void);
 	void closeAllPipes(void);
 
   public:
