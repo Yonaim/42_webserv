@@ -25,8 +25,7 @@ int main()
 		http_request.parse(buffer, 100000);
 
 		CGI::Request cgi_request(http_request,
-								 "./test/testcase/cgi_script/simple_cgi.py",
-								 "what the heck");
+								 "./test/testcase/cgi_script/simple_cgi.py");
 		CGI::RequestHandler cgi_request_handler(
 			cgi_request, "./test/testcase/cgi_script/simple_cgi.py", 10000);
 		async::Logger::blockingWrite();
