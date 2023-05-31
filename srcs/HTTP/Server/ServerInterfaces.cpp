@@ -178,7 +178,15 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 void Server::registerRequest(int client_fd, const Request &request)
 {
 	const Server::Location &location = getLocation(request.getURIPath());
+	const std::string resource_path = location.generateResourcePath(request);
 	const int method = request.getMethod();
+
+	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
+	{
+		registerCGIRequest(client_fd, request, resource_path);
+		return;
+	}
+
 	if (!location.isAllowedMethod(method))
 	{
 		_logger << async::info << "Method " << METHOD[method]
@@ -193,12 +201,8 @@ void Server::registerRequest(int client_fd, const Request &request)
 		registerRedirectResponse(client_fd, location);
 		return;
 	}
-	const std::string resource_path = location.generateResourcePath(request);
 
-	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
-		registerCGIRequest(client_fd, request, resource_path);
-	else
-		registerHTTPRequest(client_fd, request, location, resource_path);
+	registerHTTPRequest(client_fd, request, location, resource_path);
 }
 
 Response Server::retrieveResponse(int client_fd)
