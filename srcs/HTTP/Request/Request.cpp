@@ -263,3 +263,17 @@ const Header &Request::getHeader(void) const
 {
 	return (_header);
 }
+
+const std::string Request::getDescription(void) const
+{
+	const size_t bodylen = 20;
+
+	std::stringstream buf;
+	buf << "[" << HTTP::METHOD.getKeyByValue(_method) << " " << _uri << " | ";
+	if (_body.size() > bodylen)
+		buf << _body.substr(0, bodylen - 3) << "...";
+	else
+		buf << _body;
+	buf << "]";
+	return (buf.str());
+}

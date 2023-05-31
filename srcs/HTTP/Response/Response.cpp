@@ -167,3 +167,17 @@ void Response::makeDirectoryListing(const std::string &path,
 
 	setContentLength(_body.length());
 }
+
+const std::string Response::getDescription(void) const
+{
+	const size_t bodylen = 20;
+
+	std::stringstream buf;
+	buf << "[" << _status_code << " " << _reason_phrase << " | ";
+	if (_body.size() > bodylen)
+		buf << _body.substr(0, bodylen - 3) << "...";
+	else
+		buf << _body;
+	buf << "]";
+	return (buf.str());
+}

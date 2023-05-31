@@ -57,6 +57,7 @@ class Response
 	~Response();
 
 	const std::string &toString(void);
+	const std::string getDescription(void) const;
 
 	// setter
 	void setValue(const std::string &key, const std::string &val);
@@ -73,5 +74,13 @@ class Response
 	void makeDirectoryListing(const std::string &path, const std::string &uri);
 };
 } // namespace HTTP
+
+inline async::Logger &operator<<(async::Logger &io, HTTP::Response &content)
+{
+	if (!io.isActive())
+		return (io);
+	io.log(content.getDescription());
+	return (io);
+}
 
 #endif

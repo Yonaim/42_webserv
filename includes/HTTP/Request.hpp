@@ -83,7 +83,16 @@ class Request
 	const std::string &getQueryString(void) const;
 	const std::string &getBody(void) const;
 	const Header &getHeader(void) const;
+	const std::string getDescription(void) const;
 };
 } // namespace HTTP
+
+inline async::Logger &operator<<(async::Logger &io, HTTP::Request &content)
+{
+	if (!io.isActive())
+		return (io);
+	io.log(content.getDescription());
+	return (io);
+}
 
 #endif

@@ -1,3 +1,4 @@
+#include "HTTP/Request.hpp"
 #include "HTTP/error_pages.hpp"
 #include "WebServer.hpp"
 #include "async/Logger.hpp"
@@ -38,6 +39,8 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		switch (rc)
 		{
 		case HTTP::Request::RETURN_TYPE_OK:
+			_logger << async::info << "Inbound request "
+					<< _request_buffer[port][client_fd];
 			registerRequest(port, client_fd, _request_buffer[port][client_fd]);
 			_request_buffer[port][client_fd] = HTTP::Request();
 			break;
@@ -102,6 +105,7 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 			_tcp_procs[port].wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
 					<< "\"";
+			_logger << async::info << "Outbound response " << res;
 		}
 	}
 }
