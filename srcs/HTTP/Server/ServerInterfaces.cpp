@@ -61,7 +61,7 @@ void Server::iterateCGIHandlers(void)
 			int rc = handlers.front()->task();
 			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
 			{
-				CGI::Response cgi_response = handlers.front()->retrieve();
+				const CGI::Response &cgi_response = handlers.front()->retrieve();
 				_output_queue[client_fd].push(cgi_response.toHTTPResponse());
 				delete handlers.front();
 				handlers.pop();
