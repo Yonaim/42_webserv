@@ -4,20 +4,6 @@
 
 using namespace async;
 
-FileReader::FileReader() : FileIOProcessor()
-{
-}
-
-FileReader::FileReader(const FileReader &orig) : FileIOProcessor(orig)
-{
-}
-
-FileReader &FileReader::operator=(const FileReader &orig)
-{
-	FileIOProcessor::operator=(orig);
-	return (*this);
-}
-
 FileReader::FileReader(unsigned int timeout_ms, int fd, bool is_fifo)
 	: FileIOProcessor(timeout_ms, fd), _is_fifo(is_fifo)
 {

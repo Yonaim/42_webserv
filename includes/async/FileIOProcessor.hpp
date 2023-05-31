@@ -18,9 +18,6 @@ class FileIOProcessor
 	const clock_t _timeout_ms;
 	const bool _should_close; // 소멸자 호출시 fd를 close()해야하는지 여부
 
-	FileIOProcessor(void);
-	FileIOProcessor &operator=(const FileIOProcessor &orig);
-	FileIOProcessor(const FileIOProcessor &orig);
 	FileIOProcessor(unsigned int timeout_ms, int fd);
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
@@ -50,10 +47,6 @@ class FileWriter : public FileIOProcessor
   private:
 	const std::string _content;
 
-	FileWriter();
-	FileWriter(const FileWriter &orig);
-	FileWriter &operator=(const FileWriter &orig);
-
   public:
 	FileWriter(unsigned int timeout_ms, int fd, const std::string &content);
 	FileWriter(unsigned int timeout_ms, const std::string &path,
@@ -67,10 +60,6 @@ class FileReader : public FileIOProcessor
 {
   private:
 	bool _is_fifo;
-
-	FileReader();
-	FileReader(const FileReader &orig);
-	FileReader &operator=(const FileReader &orig);
 
   public:
 	FileReader(unsigned int timeout_ms, int fd, bool is_fifo);

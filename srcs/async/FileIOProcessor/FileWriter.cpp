@@ -4,20 +4,6 @@
 
 using namespace async;
 
-FileWriter::FileWriter() : FileIOProcessor()
-{
-}
-
-FileWriter::FileWriter(const FileWriter &orig) : FileIOProcessor(orig)
-{
-}
-
-FileWriter &FileWriter::operator=(const FileWriter &orig)
-{
-	FileIOProcessor::operator=(orig);
-	return (*this);
-}
-
 FileWriter::FileWriter(unsigned int timeout_ms, int fd,
 					   const std::string &content)
 	: FileIOProcessor(timeout_ms, fd), _content(content)

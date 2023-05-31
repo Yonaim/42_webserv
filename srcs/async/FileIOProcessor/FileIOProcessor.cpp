@@ -31,11 +31,6 @@ static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
 	return (result);
 }
 
-FileIOProcessor::FileIOProcessor(void)
-	: _processor(NULL), _timeout_ms(0), _should_close(false)
-{
-}
-
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
 	: _processor(NULL), _fd(fd), _path(""), _status(status::BEGIN), _buffer(""),
 	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
@@ -47,22 +42,6 @@ FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 	: _processor(NULL), _fd(-1), _path(path), _status(status::BEGIN),
 	  _buffer(""), _timeout_ms(addTimeoutFromNow(timeout_ms)),
 	  _should_close(true)
-{
-}
-
-FileIOProcessor &FileIOProcessor::operator=(const FileIOProcessor &orig)
-{
-	_processor = orig._processor;
-	_fd = orig._fd;
-	_status = orig._status;
-	_buffer = orig._buffer;
-	return (*this);
-}
-
-FileIOProcessor::FileIOProcessor(const FileIOProcessor &orig)
-	: _processor(orig._processor), _fd(orig._fd), _path(orig._path),
-	  _status(orig._status), _buffer(orig._buffer),
-	  _timeout_ms(orig._timeout_ms), _should_close(orig._should_close)
 {
 }
 
