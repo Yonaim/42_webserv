@@ -1,6 +1,8 @@
 #include "CGI/Request.hpp"
 #include "CGI/const_values.hpp"
 #include "utils/string.hpp"
+#include <algorithm>
+
 using namespace CGI;
 
 const std::string Request::_version = "1.1";
@@ -45,11 +47,32 @@ Request::Request(const HTTP::Request &http_req,
 	_meta_variables["SERVER_NAME"] = server_name;
 	_meta_variables["SERVER_PORT"] = server_port;
 
+	const Header &header = http_req.getHeader();
+	for (Header::const_iterator it = header.begin(); it != header.end(); ++it)
+	{
+		if (!isProtocolSpecificHeader(it->first))
+			continue;
+
+		const std::string http_meta_variable_name = toHTTPvarname(it->first);
+		std::string value;
+		for (std::vector<std::string>::const_iterator vec_itr
+			 = it->second.begin();
+			 vec_itr != it->second.end(); ++vec_itr)
+		{
+			value += *vec_itr;
+			if (vec_itr + 1 != it->second.end())
+				value += ", ";
+		}
+		addMetaVariable(http_meta_variable_name, value);
+		_logger << async::error << "name:" << http_meta_variable_name << ": "
+				<< value;
+	}
+
 	for (std::map<std::string, std::string>::iterator it
 		 = _meta_variables.begin();
 		 it != _meta_variables.end(); it++)
-		_logger << async::debug << "CGI metavariable \"" << it->first << "\"=\""
-				<< it->second << "\"";
+		_logger << async::verbose << "CGI metavariable \"" << it->first
+				<< "\"=\"" << it->second << "\"";
 }
 
 Request::~Request()
@@ -60,6 +83,29 @@ Request::Request(const Request &orig)
 	: _meta_variables(orig._meta_variables), _message_body(orig._message_body),
 	  _logger(orig._logger)
 {
+}
+
+bool Request::isProtocolSpecificHeader(const std::string &name) const
+{
+	for (std::vector<std::string>::const_iterator it
+		 = NON_PROTOCOL_SPECIFIC_HEADERS.begin();
+		 it != NON_PROTOCOL_SPECIFIC_HEADERS.end(); ++it)
+	{
+		if (name == *it)
+			return (false);
+	}
+	return (true);
+}
+
+std::string Request::toHTTPvarname(const std::string &var_name) const
+{
+	static const std::string prefix = "HTTP_";
+	std::string http_var_name = var_name;
+
+	std::transform(http_var_name.begin(), http_var_name.end(),
+				   http_var_name.begin(), ::toupper);
+	std::replace(http_var_name.begin(), http_var_name.end(), '-', '_');
+	return (prefix + http_var_name);
 }
 
 const Request &Request::operator=(const Request &orig)
@@ -74,14 +120,17 @@ const Request &Request::operator=(const Request &orig)
 
 char *const *Request::getEnv(void) const
 {
-	char **env = new char *[META_VARIABLES.size() + 1];
-	for (size_t i = 0; i < META_VARIABLES.size(); i++)
+	char **env = new char *[_meta_variables.size() + 1];
+	int i = 0;
+	for (std::map<std::string, std::string>::const_iterator it
+		 = _meta_variables.begin();
+		 it != _meta_variables.end(); ++it)
 	{
-		const std::string &name = META_VARIABLES[i];
-		const std::string &value = _meta_variables.find(name)->second;
-		env[i] = strdup((name + '=' + value).c_str());
+		const std::string &name = it->first;
+		const std::string &value = it->second;
+		env[i++] = strdup((name + '=' + value).c_str());
 	}
-	env[META_VARIABLES.size()] = NULL;
+	env[_meta_variables.size()] = NULL;
 	return ((char *const *)env);
 }
 
@@ -95,7 +144,9 @@ const std::string &Request::getPath() const
 	return (_meta_variables.find("PATH_TRANSLATED")->second);
 }
 
-void Request::setMetaVariable(const std::string &name, const std::string &value)
+void Request::addMetaVariable(const std::string &name, const std::string &value)
 {
+	if (_meta_variables.find(name) == _meta_variables.end())
+		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
 	_meta_variables[name] = value;
 }

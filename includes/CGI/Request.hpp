@@ -20,13 +20,15 @@ class Request
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
 
-	// setter
-	void setMetaVariable(const std::string &name, const std::string &value);
 
 	// getter
 	char *const *getEnv(void) const;
 	const std::string &getPath(void) const;
 	const std::string &getMessageBody(void) const;
+
+	void addMetaVariable(const std::string &name, const std::string &value);
+	bool isProtocolSpecificHeader(const std::string &name) const;
+	std::string toHTTPvarname(const std::string &name) const;
 };
 } // namespace CGI
 
