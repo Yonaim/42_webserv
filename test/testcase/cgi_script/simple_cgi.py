@@ -6,16 +6,16 @@ import fileinput
 # import cgi, cgitb
 
 def print_error():
-	print("Content-Type: text/html")
-	print("Status: 600 Invalid data\n")
-	print("<html><head><title>Invalid data</title>")
-	print("<h1>Invalid data typed</h1>")
+	print("Content-Type: text/html\r")
+	print("Status: 600 Invalid data\r\n\r")
+	print("<html><head><title>Invalid data</title>\r")
+	print("<h1>Invalid data typed</h1>\r")
 
 def print_text(output):
-	print("Content-Type: text/html")
-	print("Status: 200 ok\n")
-	print("<html><head><title>ok</title>")
-	print("<h1>ouput : %s</h1>" % output)	
+	print("Content-Type: text/html\r")
+	print("Status: 200 ok\r\n\r")
+	print("<html><head><title>ok</title>\r")
+	print("<h1>ouput : %s</h1>\r" % output)	
 
 def handlePOST():
 	input_data = ""
