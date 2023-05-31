@@ -16,3 +16,13 @@ const std::string _META_VARIABLES[]
 const std::vector<std::string> CGI::META_VARIABLES(
 	_META_VARIABLES,
 	_META_VARIABLES + sizeof(_META_VARIABLES) / sizeof(_META_VARIABLES[0]));
+
+const std::string _NON_PROTOCOL_SPECIFIC_HEADERS[] = {
+	"Connection", "Upgrade",           "Content-Type", "Content-Length",
+	"Trailer",    "Transfer-Encoding", "Authrozation", "Proxy-Authorization"};
+
+const std::vector<std::string> CGI::NON_PROTOCOL_SPECIFIC_HEADERS(
+	_NON_PROTOCOL_SPECIFIC_HEADERS,
+	_NON_PROTOCOL_SPECIFIC_HEADERS
+		+ sizeof(_NON_PROTOCOL_SPECIFIC_HEADERS)
+			  / sizeof(_NON_PROTOCOL_SPECIFIC_HEADERS[0]));
