@@ -260,3 +260,8 @@ const std::string &Request::getBody() const
 {
 	return (_body);
 }
+
+const Header &Request::getHeader(void) const
+{
+	return (_header);
+}

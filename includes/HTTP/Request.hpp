@@ -81,7 +81,8 @@ class Request
 	const std::string &getMethodString(void) const;
 	const std::string &getURIPath(void) const;
 	const std::string &getQueryString(void) const;
-	const std::string &getBody() const;
+	const std::string &getBody(void) const;
+	const Header &getHeader(void) const;
 };
 } // namespace HTTP
 

@@ -14,6 +14,8 @@ extern const std::string LWS;
 // meta-variables
 extern const std::vector<std::string> META_VARIABLES;
 
+extern const std::vector<std::string> NON_PROTOCOL_SPECIFIC_HEADERS;
+
 } // namespace CGI
 
 #endif
