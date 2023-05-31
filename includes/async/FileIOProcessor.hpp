@@ -66,12 +66,14 @@ class FileWriter : public FileIOProcessor
 class FileReader : public FileIOProcessor
 {
   private:
+	bool _is_fifo;
+
 	FileReader();
 	FileReader(const FileReader &orig);
 	FileReader &operator=(const FileReader &orig);
 
   public:
-	FileReader(unsigned int timeout_ms, int fd);
+	FileReader(unsigned int timeout_ms, int fd, bool is_fifo);
 	FileReader(unsigned int timeout_ms, const std::string &path);
 	virtual ~FileReader();
 

@@ -18,13 +18,13 @@ FileReader &FileReader::operator=(const FileReader &orig)
 	return (*this);
 }
 
-FileReader::FileReader(unsigned int timeout_ms, int fd)
-	: FileIOProcessor(timeout_ms, fd)
+FileReader::FileReader(unsigned int timeout_ms, int fd, bool is_fifo)
+	: FileIOProcessor(timeout_ms, fd), _is_fifo(is_fifo)
 {
 }
 
 FileReader::FileReader(unsigned int timeout_ms, const std::string &path)
-	: FileIOProcessor(timeout_ms, path)
+	: FileIOProcessor(timeout_ms, path), _is_fifo(false)
 {
 }
 
@@ -40,12 +40,11 @@ int FileReader::task(void)
 	{
 		openFdByPath(O_RDONLY);
 		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_R);
+		_status = status::AGAIN;
 		// TODO: stat 함수가 사용 가능해지면 isFdClosed는 삭제하든지 하고 파일의
 		// 크기를 구하는 함수 작성하여 사용
-		if (_processor->isFdClosed(_fd))
+		if (!_is_fifo && _processor->isFdClosed(_fd))
 			_status = status::OK;
-		else
-			_status = status::AGAIN;
 	}
 
 	checkTimeout();

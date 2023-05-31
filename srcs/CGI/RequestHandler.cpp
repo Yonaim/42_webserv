@@ -44,7 +44,7 @@ RequestHandler::RequestHandler(const Request &request,
 		if (_request.getMessageBody().length() > 0)
 			_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
 											_request.getMessageBody());
-		_reader = new async::FileReader(timeout_ms, _read_pipe_fd[0]);
+		_reader = new async::FileReader(timeout_ms, _read_pipe_fd[0], true);
 	}
 	catch (const std::runtime_error &e)
 	{
