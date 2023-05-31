@@ -47,10 +47,12 @@ int Server::RequestPutHandler::task(void)
 	}
 	else if (rc == async::status::ERROR_FILEOPENING)
 	{
+		_logger << async::warning << _writer.errorMsg();
 		registerErrorResponse(503); // Service Unavailable
 	}
 	else
 	{
+		_logger << async::warning << _writer.errorMsg();
 		registerErrorResponse(500); // Internal Server Error
 	}
 	return (_status);

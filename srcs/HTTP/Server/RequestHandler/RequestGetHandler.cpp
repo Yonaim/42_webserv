@@ -50,23 +50,30 @@ int Server::RequestGetHandler::task(void)
 	}
 	else if (rc == async::status::ERROR_FILEISDIR)
 	{
+		_logger << async::verbose << "Resource " << _resource_path
+				<< " is directory, attempt autoindex";
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		if (_location.hasAutoIndex() == true)
 		{
 			_response.makeDirectoryListing(_resource_path,
 										   _request.getURIPath());
 			_response.setStatus(200);
-			_logger << async::verbose << "directory listing";
+			_logger << async::verbose << "autoindex success";
 		}
 		else
+		{
 			registerErrorResponse(404); // Not Found
+			_logger << async::verbose << "autoindex is not set";
+		}
 	}
 	else if (rc == async::status::ERROR_FILEOPENING)
 	{
+		_logger << async::error << _reader.errorMsg();
 		registerErrorResponse(404); // Not Found
 	}
 	else
 	{
+		_logger << async::warning << _reader.errorMsg();
 		registerErrorResponse(500); // Internal Server Error
 	}
 	return (_status);
