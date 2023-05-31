@@ -32,8 +32,8 @@ class RequestHandler
 	{
 		CGI_RESPONSE_INNER_STATUS_BEGIN,
 		CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN,
-		CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_READ_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_OK
 	};
 
@@ -41,7 +41,7 @@ class RequestHandler
 	int fork(void);
 	int sendCGIRequestBody(void);
 	int waitExecution(void);
-	int makeCGIResponse(void);
+	int receiveCGIResponse(void);
 	void closeAllPipes(void);
 
   public:

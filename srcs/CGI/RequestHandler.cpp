@@ -81,7 +81,7 @@ int RequestHandler::fork()
 		closePipe(_write_pipe_fd[1]);
 		closePipe(_read_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
-		_logger << async::verbose << "calling execve(" << _exec_path.c_str()
+		_logger << async::debug << "calling execve(" << _exec_path.c_str()
 				<< "), good bye!";
 		/* TODO: (해야 한다면) argv 만들어 입력 (아닐수도 있고)
 		 * 근거: Your program should call the CGI with the file requested as
@@ -97,7 +97,8 @@ int RequestHandler::fork()
 		if (_request->getMessageBody().length() > 0)
 			_status = CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN;
 		else
-			_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+			_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
+		// _status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
 	return (CGI_RESPONSE_STATUS_OK);
@@ -110,11 +111,11 @@ int RequestHandler::sendCGIRequestBody()
 	switch (rc)
 	{
 	case async::status::OK:
-		_logger << async::debug << "successed to write CGI request";
+		_logger << async::debug << "successed to send CGI request";
 		closePipe(_write_pipe_fd[1]);
 		delete _writer;
 		_writer = NULL;
-		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	case async::status::AGAIN:
 		_logger << async::debug << "writing CGI request";
@@ -122,6 +123,35 @@ int RequestHandler::sendCGIRequestBody()
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	default:
 		throw(std::runtime_error("failed to send CGI Request"));
+	}
+}
+
+int RequestHandler::receiveCGIResponse()
+{
+	int rc = _reader->task();
+
+	switch (rc)
+	{
+	case async::status::OK: {
+		_logger << async::debug << "read status is ok: " << rc;
+		_logger << async::debug << "buffer: " << _reader->retrieve();
+
+		std::string cgi_output = _reader->retrieve();
+		closePipe(_read_pipe_fd[0]);
+		_response.makeResponse(cgi_output);
+		delete _reader;
+		_reader = NULL;
+		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+		return (CGI_RESPONSE_STATUS_AGAIN);
+	}
+	case async::status::AGAIN: {
+		_logger << async::debug << "read status is again: " << rc;
+
+		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
+		return (CGI_RESPONSE_STATUS_AGAIN);
+	}
+	default:
+		throw(std::runtime_error("failed to receive CGI response"));
 	}
 }
 
@@ -137,6 +167,7 @@ int RequestHandler::waitExecution()
 	{
 		_logger << async::debug << "waiting child";
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
 	else
 	{
@@ -144,42 +175,10 @@ int RequestHandler::waitExecution()
 			|| WIFSIGNALED(_waitpid_status))
 			throw(std::runtime_error("CGI execution failed"));
 		_logger << async::debug << "child process done";
-		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
-	}
-
-	return ((_status == CGI_RESPONSE_INNER_STATUS_OK)
-				? CGI_RESPONSE_STATUS_OK
-				: CGI_RESPONSE_STATUS_AGAIN);
-}
-
-int RequestHandler::makeCGIResponse()
-{
-	int rc = _reader->task();
-
-	switch (rc)
-	{
-	case async::status::OK: {
-		_logger << async::debug << "read_status is ok: " << rc;
-		_logger << async::debug << "buffer: " << _reader->retrieve();
-
-		std::string cgi_output = _reader->retrieve();
-		closePipe(_read_pipe_fd[0]);
-		_response.makeResponse(cgi_output);
-		delete _reader;
-		_reader = NULL;
+		_logger << async::debug << "successed CGI execution";
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
 	}
-	case async::status::AGAIN: {
-		_logger << async::debug << "read_status is again: " << rc;
-
-		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
-		return (CGI_RESPONSE_STATUS_AGAIN);
-	}
-	default:
-		throw(std::runtime_error("failed to read CGI response"));
-	}
-	return (CGI_RESPONSE_STATUS_OK);
 }
 
 int RequestHandler::task(void)
@@ -193,10 +192,10 @@ int RequestHandler::task(void)
 			return (fork());
 		case CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN:
 			return (sendCGIRequestBody());
+		case CGI_RESPONSE_INNER_STATUS_READ_AGAIN:
+			return (receiveCGIResponse());
 		case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
 			return (waitExecution());
-		case CGI_RESPONSE_INNER_STATUS_READ_AGAIN:
-			return (makeCGIResponse());
 		default:
 			return (CGI_RESPONSE_STATUS_OK);
 		}
