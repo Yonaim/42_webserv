@@ -5,7 +5,9 @@ using namespace CGI;
 
 const std::string Request::_version = "1.1";
 
-Request::Request()
+Request::Request(const HTTP::Request &http_req,
+				 const std::string &resource_path)
+	: _logger(async::Logger::getLogger("CGIRequest"))
 {
 	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
@@ -19,7 +21,8 @@ Request::~Request()
 {
 }
 
-Request::Request(const Request &orig) : _message_body(orig._message_body)
+Request::Request(const Request &orig)
+	: _message_body(orig._message_body), _logger(orig._logger)
 {
 	for (size_t i = 0; i < META_VARIABLES.size(); i++)
 	{
