@@ -15,8 +15,7 @@ class Request
 	async::Logger &_logger;
 
   public:
-	Request(const HTTP::Request &http_req, const std::string &resource_path,
-			const std::string &body);
+	Request(const HTTP::Request &http_req, const std::string &resource_path);
 	~Request();
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
