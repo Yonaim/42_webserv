@@ -83,4 +83,11 @@ inline async::Logger &operator<<(async::Logger &io, T content)
 	return (io);
 }
 
+#define ASYNC_LOG_DEBUG(logger, message)                                       \
+	do                                                                         \
+	{                                                                          \
+		if (async::Logger::DEBUG >= async::Logger::getLogLevel())              \
+			logger << async::debug << message;                                 \
+	} while (0)
+
 #endif

@@ -60,13 +60,13 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 	{
 		int rc;
 
-		_logger << async::debug << __func__ << ": current state is "
-				<< state_names[_current_state];
+		ASYNC_LOG_DEBUG(_logger, __func__ << ": current state is "
+										  << state_names[_current_state]);
 		switch (_current_state)
 		{
 		case PARSE_STATE_STARTLINE:
 			rc = consumeStartLine(buffer);
-			_logger << async::debug << "Got return code " << code_names[rc];
+			ASYNC_LOG_DEBUG(_logger, "Got return code " << code_names[rc]);
 
 			if (rc == RETURN_TYPE_OK)
 				_current_state = PARSE_STATE_HEADER;
@@ -76,7 +76,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 
 		case PARSE_STATE_HEADER:
 			rc = consumeHeader(buffer);
-			_logger << async::debug << "Got return code " << code_names[rc];
+			ASYNC_LOG_DEBUG(_logger, "Got return code " << code_names[rc]);
 
 			if (rc == RETURN_TYPE_OK)
 			{
@@ -145,8 +145,8 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 					}
 					if (_content_length >= 0)
 					{
-						_logger << async::debug
-								<< "header has Content-Length >= 0";
+						ASYNC_LOG_DEBUG(_logger,
+										"header has Content-Length >= 0");
 						_current_state = PARSE_STATE_BODY;
 					}
 				}
@@ -158,23 +158,21 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 			else if (rc == RETURN_TYPE_AGAIN)
 				return (RETURN_TYPE_AGAIN);
 			else
-			{
-				_logger << async::debug << "parsing ing...";
-			}
+				ASYNC_LOG_DEBUG(_logger, "parsing in progress...");
 			break;
 
 		case PARSE_STATE_BODY:
 			rc = consumeBody(buffer);
-			_logger << async::debug << "Got return code " << code_names[rc];
+			ASYNC_LOG_DEBUG(_logger, "Got return code " << code_names[rc]);
 			return (rc);
 
 		case PARSE_STATE_CHUNK:
 			rc = consumeChunk(buffer);
-			_logger << async::debug << "Got return code " << code_names[rc];
-			_logger << async::debug << "total content length "
-					<< _content_length;
-			_logger << async::debug << "client max body size "
-					<< client_max_body_size;
+			ASYNC_LOG_DEBUG(_logger, "Got return code " << code_names[rc]);
+			ASYNC_LOG_DEBUG(_logger,
+							"total content length " << _content_length);
+			ASYNC_LOG_DEBUG(_logger,
+							"client max body size " << client_max_body_size);
 			if (_content_length > client_max_body_size)
 				throwException(CONSUME_EXC_INVALID_SIZE);
 			if (rc == RETURN_TYPE_OK)
@@ -195,7 +193,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 
 		case PARSE_STATE_TRAILER:
 			rc = consumeTrailer(buffer);
-			_logger << async::debug << "Got return code " << code_names[rc];
+			ASYNC_LOG_DEBUG(_logger, "Got return code " << code_names[rc]);
 			return (rc);
 		}
 	}
