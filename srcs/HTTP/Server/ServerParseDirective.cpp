@@ -2,7 +2,6 @@
 #include "HTTP/Server.hpp"
 #include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
-#include <iostream>
 #include <sstream>
 
 using namespace HTTP;

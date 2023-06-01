@@ -1,7 +1,6 @@
 #include "async/IOProcessor.hpp"
 #include "async/status.hpp"
 #include "utils/string.hpp"
-#include <iostream>
 #include <sstream>
 #include <unistd.h>
 
@@ -9,7 +8,6 @@ using namespace async;
 
 std::vector<IOProcessor *> IOProcessor::_objs;
 const size_t IOProcessor::_buffsize = 2048;
-bool IOProcessor::_debug = false;
 static const timespec zerosec = {0, 0};
 
 IOProcessor::IOProcessor(void) : _status(status::OK_BEGIN)
@@ -126,9 +124,6 @@ int IOProcessor::read(const int fd, const size_t size)
 		return (_status);
 	}
 	_rdbuf[fd].append(buff, readsize);
-	if (_debug)
-		std::cout << "IOProcessor:[DEBUG]:Read " << readsize << " bytes: \""
-				  << std::string(buff, buff + readsize) << "\"\n";
 	delete[] buff;
 	_status = status::OK_AGAIN;
 	return (_status);
@@ -150,9 +145,6 @@ int IOProcessor::write(const int fd, const size_t size)
 		_error_msg = generateErrorMsgWrite(fd);
 		return (_status);
 	}
-	if (_debug)
-		std::cout << "IOProcessor:[DEBUG]:Wrote " << writesize << " bytes: \""
-				  << getfrontstr(_wrbuf[fd], writesize) << "\"\n";
 	trimfrontstr(_wrbuf[fd], writesize);
 	_status = status::OK_AGAIN;
 	return (_status);
@@ -176,11 +168,6 @@ void IOProcessor::blockingWrite(void)
 		while (!it->second.empty())
 			task();
 	}
-}
-
-void IOProcessor::setDebug(bool debug)
-{
-	_debug = debug;
 }
 
 /*

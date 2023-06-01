@@ -1,7 +1,6 @@
 #include "HTTP/Request.hpp"
 #include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
-#include <iostream>
 
 using namespace HTTP;
 

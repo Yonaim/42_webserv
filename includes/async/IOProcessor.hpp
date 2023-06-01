@@ -28,7 +28,6 @@ class IOProcessor
 	std::deque<struct kevent> _eventlist;
 	std::map<int, std::string> _rdbuf;
 	std::map<int, std::string> _wrbuf;
-	static bool _debug;
 
 	void initializeKQueue(void);
 	void flushKQueue(void);
@@ -47,7 +46,6 @@ class IOProcessor
 	static void doAllTasks(void);
 	static void blockingWriteAll(void);
 	void blockingWrite(void);
-	static void setDebug(bool debug);
 	bool isFdClosed(const int fd);
 };
 

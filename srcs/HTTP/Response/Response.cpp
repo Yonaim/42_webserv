@@ -3,7 +3,6 @@
 #include "utils/ansi_escape.h"
 #include "utils/string.hpp"
 #include <dirent.h>
-#include <iostream>
 #include <sys/stat.h>
 #include <time.h>
 

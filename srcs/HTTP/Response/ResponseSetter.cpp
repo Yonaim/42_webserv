@@ -2,7 +2,6 @@
 #include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
 #include <ctime>
-#include <iostream>
 
 using namespace HTTP;
 
