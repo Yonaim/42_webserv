@@ -157,8 +157,22 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 	CGI::RequestHandler *handler;
 	try
 	{
-		handler = new CGI::RequestHandlerPipe(cgi_request, _cgi_exec_path,
-											  _timeout_ms);
+		if (request.getBody().size() > CGI::RequestHandler::pipeThreshold)
+		{
+			_logger << async::verbose
+					<< "Create CGI::RequestHandlerVnode for body size "
+					<< request.getBody().size();
+			handler = new CGI::RequestHandlerVnode(cgi_request, _cgi_exec_path,
+												   _timeout_ms);
+		}
+		else
+		{
+			_logger << async::verbose
+					<< "Create CGI::RequestHandlerPipe for body size "
+					<< request.getBody().size();
+			handler = new CGI::RequestHandlerPipe(cgi_request, _cgi_exec_path,
+												  _timeout_ms);
+		}
 	}
 	catch (const std::runtime_error &e)
 	{

@@ -5,6 +5,8 @@
 
 using namespace CGI;
 
+const size_t RequestHandler::pipeThreshold = 1024;
+
 RequestHandler::RequestHandler(const Request &request,
 							   const std::string &exec_path)
 	: _request(request), _reader(NULL), _writer(NULL), _exec_path(exec_path),

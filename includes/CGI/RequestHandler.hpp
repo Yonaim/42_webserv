@@ -17,6 +17,9 @@ class RequestHandler
 	{
 		CGI_RESPONSE_INNER_STATUS_BEGIN,
 		CGI_RESPONSE_INNER_STATUS_RW_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_WRITE_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_READ_AGAIN,
+		CGI_RESPONSE_INNER_STATUS_FORK_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN,
 		CGI_RESPONSE_INNER_STATUS_OK
 	};
@@ -37,6 +40,7 @@ class RequestHandler
 		CGI_RESPONSE_STATUS_AGAIN,
 		CGI_RESPONSE_STATUS_OK,
 	};
+	static const size_t pipeThreshold;
 
 	RequestHandler(const Request &request, const std::string &exec_path);
 	virtual ~RequestHandler();
@@ -61,6 +65,26 @@ class RequestHandlerPipe : public RequestHandler
 	RequestHandlerPipe(const Request &request, const std::string &exec_path,
 					   const unsigned int timeout_ms);
 	virtual ~RequestHandlerPipe();
+
+	virtual int task(void);
+};
+
+class RequestHandlerVnode : public RequestHandler
+{
+  private:
+	std::string _input_file_path;
+	std::string _output_file_path;
+	unsigned int _timeout_ms;
+
+	int waitWriteInputOperation(void);
+	int fork(void);
+	int waitExecution(void);
+	int waitReadOutputOperation(void);
+
+  public:
+	RequestHandlerVnode(const Request &request, const std::string &exec_path,
+						const unsigned int timeout_ms);
+	virtual ~RequestHandlerVnode();
 
 	virtual int task(void);
 };
