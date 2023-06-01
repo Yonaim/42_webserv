@@ -24,6 +24,7 @@ class Header
 	bool hasValue(std::string const &name) const;
 	bool hasValue(const std::string &name, const std::string &value) const;
 	bool hasValue(const const_iterator &iter, const std::string &value) const;
+	size_t countValue(const std::string &name) const;
 	const std::vector<std::string> &getValues(const std::string &name) const;
 	const std::string &getValue(const std::string &name, int idx) const;
 

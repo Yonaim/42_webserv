@@ -77,6 +77,7 @@ class Request
 
 	// getter
 	const std::string &getHeaderValue(const std::string &name, int idx) const;
+	size_t countHeaderValue(const std::string &name) const;
 	int getMethod(void) const;
 	const std::string &getMethodString(void) const;
 	const std::string &getURIPath(void) const;

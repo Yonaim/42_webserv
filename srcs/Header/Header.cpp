@@ -53,6 +53,13 @@ bool Header::hasValue(const Header::const_iterator &iter,
 	return (false);
 }
 
+size_t Header::countValue(const std::string &name) const
+{
+	if (!hasValue(name))
+		return (0);
+	return (_values.find(name)->second.size());
+}
+
 const std::string &Header::getValue(const std::string &name, int idx) const
 {
 	Header::const_iterator name_iter = _values.find(name);

@@ -229,6 +229,11 @@ const std::string &Request::getHeaderValue(std::string const &name,
 	return (_header.getValue(name, idx));
 }
 
+size_t Request::countHeaderValue(const std::string &name) const
+{
+	return (_header.countValue(name));
+}
+
 int Request::getMethod(void) const
 {
 	return (_method);
