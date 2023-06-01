@@ -57,7 +57,7 @@ FILENAMES			= \
 					$(DIR_ASYNCLOGGER)Logger \
 					$(DIR_ASYNCLOGGER)EndMarker \
 					$(DIR_CONFIG_PARSER)ConfigDirective \
-					$(DIR_CONFIG_PARSER)ParsingFail \
+					$(DIR_CONFIG_PARSER)InvalidDirective \
 					$(DIR_CONFIG_PARSER)parseConfig \
 					$(DIR_CONFIG_PARSER)recursiveParser \
 					$(DIR_CONFIG_PARSER)splitIntoTokens \
