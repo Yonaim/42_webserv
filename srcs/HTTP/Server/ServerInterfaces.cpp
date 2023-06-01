@@ -157,8 +157,8 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 	CGI::RequestHandler *handler;
 	try
 	{
-		handler
-			= new CGI::RequestHandler(cgi_request, _cgi_exec_path, _timeout_ms);
+		handler = new CGI::RequestHandlerPipe(cgi_request, _cgi_exec_path,
+											  _timeout_ms);
 	}
 	catch (const std::runtime_error &e)
 	{
@@ -194,7 +194,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 		registerCGIRequest(client_fd, request, resource_path);
 		return;
 	}
-	
+
 	if (!location.isAllowedMethod(method))
 	{
 		_logger << async::info << "Method " << METHOD[method]

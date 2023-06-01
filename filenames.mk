@@ -86,6 +86,7 @@ FILENAMES			= \
 					$(DIR_CGI)Request \
 					$(DIR_CGI)Response \
 					$(DIR_CGI)RequestHandler \
+					$(DIR_CGI)RequestHandlerPipe \
 					$(DIR_WEBSERVER)WebServer \
 					$(DIR_WEBSERVER)WebServerMethod \
 					$(DIR_WEBSERVER)WebServerParseDirective \

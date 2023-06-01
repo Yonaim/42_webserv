@@ -25,7 +25,7 @@ int main()
 
 		CGI::Request cgi_request(http_request,
 								 "./test/testcase/cgi_script/simple_cgi.py");
-		CGI::RequestHandler cgi_request_handler(
+		CGI::RequestHandlerPipe cgi_request_handler(
 			cgi_request, "./test/testcase/cgi_script/simple_cgi.py", 10000);
 		async::Logger::blockingWriteAll();
 
@@ -36,7 +36,7 @@ int main()
 			async::Logger::blockingWriteAll();
 			// sleep(1);
 
-			if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_OK)
+			if (rc == CGI::RequestHandlerPipe::CGI_RESPONSE_STATUS_OK)
 				break;
 			else
 				continue;

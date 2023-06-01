@@ -12,22 +12,7 @@ namespace CGI
 {
 class RequestHandler
 {
-  private:
-	const Request _request;
-	Response _response;
-	async::FileReader *_reader;
-	async::FileWriter *_writer;
-	std::string _exec_path;
-	int _status;
-
-	int _read_pipe_fd[2];
-	int _write_pipe_fd[2];
-	pid_t _pid;
-	int _waitpid_status;
-
-	// debug
-	async::Logger &_logger;
-
+  protected:
 	enum cgi_response_inner_status_e
 	{
 		CGI_RESPONSE_INNER_STATUS_BEGIN,
@@ -36,11 +21,15 @@ class RequestHandler
 		CGI_RESPONSE_INNER_STATUS_OK
 	};
 
-	void closePipe(int &fd);
-	int fork(void);
-	int waitRWOperation(void);
-	int waitExecution(void);
-	void closeAllPipes(void);
+	const Request _request;
+	Response _response;
+	async::FileReader *_reader;
+	async::FileWriter *_writer;
+	std::string _exec_path;
+	pid_t _pid;
+	int _waitpid_status;
+	int _status;
+	async::Logger &_logger;
 
   public:
 	enum cgi_response_status_e
@@ -49,12 +38,31 @@ class RequestHandler
 		CGI_RESPONSE_STATUS_OK,
 	};
 
-	RequestHandler(const Request &request, const std::string &exec_path,
-				   const unsigned int timeout_ms);
-	~RequestHandler();
+	RequestHandler(const Request &request, const std::string &exec_path);
+	virtual ~RequestHandler();
 
-	int task(void);
+	virtual int task(void) = 0;
 	const Response &retrieve(void);
+};
+
+class RequestHandlerPipe : public RequestHandler
+{
+  private:
+	int _read_pipe_fd[2];
+	int _write_pipe_fd[2];
+
+	void closePipe(int &fd);
+	int fork(void);
+	int waitRWOperation(void);
+	int waitExecution(void);
+	void closeAllPipes(void);
+
+  public:
+	RequestHandlerPipe(const Request &request, const std::string &exec_path,
+					   const unsigned int timeout_ms);
+	virtual ~RequestHandlerPipe();
+
+	virtual int task(void);
 };
 } // namespace CGI
 
