@@ -10,10 +10,10 @@ extern const std::string token_semicolon;
 extern const std::string special_tokens[3];
 extern const std::string whitespace;
 
-class ParsingFailException : public std::runtime_error
+class ParsingFail : public std::runtime_error
 {
   public:
-	ParsingFailException(const std::string &why);
+	ParsingFail(const std::string &why);
 };
 
 ConfigDirective parseConfigDirective(std::vector<std::string>::iterator &cursor,

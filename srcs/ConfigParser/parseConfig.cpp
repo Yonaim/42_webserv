@@ -12,8 +12,7 @@ const char comment_marker = '#';
 void splitIntoTokens(std::vector<std::string> &tokens,
 					 const std::string &content);
 
-ParsingFailException::ParsingFailException(const std::string &why)
-	: std::runtime_error(why)
+ParsingFail::ParsingFail(const std::string &why) : std::runtime_error(why)
 {
 }
 
