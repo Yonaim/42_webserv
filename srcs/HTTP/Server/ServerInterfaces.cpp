@@ -85,10 +85,11 @@ void Server::iterateCGIHandlers(void)
 
 bool Server::isForMe(const Request &request)
 {
-	if (!request.hasHeaderValue("Host"))
-		throw(std::runtime_error(
-			"HTTP Request has no header field with name \"Host\""));
-	// TODO: Host 헤더 필드가 여러개일 때 예외 처리
+	if (request.countHeaderValue("Host") != 1)
+	{
+		throw(InvalidRequest("zero or more than one header "
+							 "field found with name \"Host\""));
+	}
 	const std::string &host = request.getHeaderValue("Host", 0);
 	_logger << async::verbose << "Request is for host \"" << host << "\"";
 	for (std::set<std::string>::iterator it = _server_name.begin();

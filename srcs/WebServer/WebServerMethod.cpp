@@ -74,14 +74,21 @@ WebServer::_Servers::iterator WebServer::findNoneNameServer(int port)
 
 void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 {
-	for (_Servers::iterator it = _servers[port].begin();
-		 it != _servers[port].end(); it++)
+	try
 	{
-		if (it->isForMe(request))
+		for (_Servers::iterator it = _servers[port].begin();
+			 it != _servers[port].end(); it++)
 		{
-			it->registerRequest(client_fd, request);
-			return;
+			if (it->isForMe(request))
+			{
+				it->registerRequest(client_fd, request);
+				return;
+			}
 		}
+	}
+	catch (const HTTP::Server::InvalidRequest &e)
+	{
+		_logger << async::warning << e.what();
 	}
 	_logger << async::warning << "No matching server for "
 			<< request.getHeaderValue("Host", 0);
