@@ -9,7 +9,7 @@ using namespace HTTP;
 
 Server::Server(const ConfigContext &server_context, const size_t max_body_size,
 			   const unsigned int timeout_ms)
-	: _cgi_enabled(false), _temp_dir_path("./"), _max_body_size(max_body_size),
+	: _cgi_enabled(false), _temp_dir_path("."), _max_body_size(max_body_size),
 	  _timeout_ms(timeout_ms), _logger(async::Logger::getLogger("Server"))
 {
 	parseDirectiveListen(server_context);
