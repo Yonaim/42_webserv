@@ -96,7 +96,8 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 			uri_path = _upload_store_path;
 			if (uri_path.back() != '/')
 				uri_path += "/";
-			uri_path += generateHash(toStr(clock()) + req.getURIPath());
+			uri_path
+				+= "upload_" + generateHash(toStr(clock()) + req.getURIPath());
 			break;
 		case METHOD_PUT: // URI에서 path에 해당하는 부분 upload_path로 대체
 			uri_path.replace(0, _path.length(), _upload_store_path);
