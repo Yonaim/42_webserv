@@ -3,16 +3,22 @@
 #include "async/Logger.hpp"
 #include "utils/string.hpp"
 
-WebServer::WebServer(void) : _logger(async::Logger::getLogger("WebServer"))
+static const int _backlog_size_default = 8;
+
+WebServer::WebServer(void)
+	: _backlog_size(_backlog_size_default),
+	  _logger(async::Logger::getLogger("WebServer"))
 {
 }
 
 WebServer::WebServer(const ConfigContext &root_context)
-	: _logger(async::Logger::getLogger("WebServer"))
+	: _backlog_size(_backlog_size_default),
+	  _logger(async::Logger::getLogger("WebServer"))
 {
 	parseMaxBodySize(root_context);
 	parseUploadStore(root_context);
 	parseTimeout(root_context);
+	parseBacklogSize(root_context);
 
 	const char *dir_name = "server";
 	size_t n_servers = root_context.countDirectivesByName(dir_name);
@@ -31,7 +37,8 @@ WebServer::WebServer(const ConfigContext &root_context)
 
 WebServer::WebServer(const WebServer &orig)
 	: _tcp_procs(orig._tcp_procs), _servers(orig._servers),
-	  _timeout_ms(orig._timeout_ms), _logger(orig._logger)
+	  _timeout_ms(orig._timeout_ms), _backlog_size(orig._backlog_size),
+	  _logger(orig._logger)
 {
 }
 
@@ -47,5 +54,6 @@ WebServer &WebServer::operator=(const WebServer &orig)
 	_tcp_procs = orig._tcp_procs;
 	_servers = orig._servers;
 	_timeout_ms = orig._timeout_ms;
+	_backlog_size = orig._backlog_size;
 	return (*this);
 }

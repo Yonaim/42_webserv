@@ -90,6 +90,41 @@ void WebServer::parseTimeout(const ConfigContext &root_context)
 	_logger << async::info << "global timeout is " << _timeout_ms;
 }
 
+void WebServer::parseBacklogSize(const ConfigContext &root_context)
+{
+	const char *dir_name = "backlog_size";
+
+	if (root_context.countDirectivesByName(dir_name) == 0)
+	{
+		_logger << async::info << "backlog size is " << _backlog_size
+				<< " (default)";
+		return;
+	}
+	if (root_context.countDirectivesByName(dir_name) > 1)
+	{
+		_logger << async::error << root_context.name() << " should have 0 or 1 "
+				<< dir_name;
+		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+
+	const ConfigDirective &backlog_directive
+		= root_context.getNthDirectiveByName(dir_name, 0);
+
+	if (backlog_directive.is_context())
+	{
+		_logger << async::error << dir_name << " should not be context";
+		root_context.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	if (backlog_directive.nParameters() != 1)
+	{
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
+		backlog_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+
+	_backlog_size = toNum<int>(backlog_directive.parameter(0));
+	_logger << async::info << "backlog size is " << _backlog_size;
+}
+
 void WebServer::parseServer(const ConfigContext &server_context)
 {
 	HTTP::Server server(server_context, _max_body_size, _timeout_ms);

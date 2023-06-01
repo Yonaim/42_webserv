@@ -26,13 +26,15 @@ class WebServer
 	_ServerMap _servers;
 	_ReqBufPortMap _request_buffer;
 	unsigned int _timeout_ms;
+	int _backlog_size;
 	async::Logger &_logger;
 
 	WebServer(void);
 
 	void parseMaxBodySize(const ConfigContext &root_context);
 	void parseUploadStore(const ConfigContext &root_context);
-	void parseTimeout(const ConfigContext &server_context);
+	void parseTimeout(const ConfigContext &root_context);
+	void parseBacklogSize(const ConfigContext &root_context);
 	void parseServer(const ConfigContext &server_context);
 
 	void parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc);
