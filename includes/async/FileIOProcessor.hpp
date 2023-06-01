@@ -18,12 +18,14 @@ class FileIOProcessor
 	int _status;
 	std::string _error_msg;
 	std::string _buffer;
-	const clock_t _timeout_ms;
+	const clock_t _timeout;
+	clock_t _next_timeout;
 	const bool _should_close; // 소멸자 호출시 fd를 close()해야하는지 여부
 
 	FileIOProcessor(unsigned int timeout_ms, int fd);
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
+	void renewTimeout(void);
 	bool checkTimeout(void);
 	bool openFdByPath(const char *mode);
 

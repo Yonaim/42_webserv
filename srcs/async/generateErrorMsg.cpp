@@ -21,9 +21,9 @@ std::string async::generateErrorMsgFileIsDir(const std::string &path)
 	return (std::string("File ") + path + " is directory");
 }
 
-std::string async::generateErrorMsgTimeout(const int fd, const unsigned int timeout_ms)
+std::string async::generateErrorMsgTimeout(const int fd, const clock_t timeout)
 {
-	return (std::string("Timeout (") + toStr(timeout_ms)
+	return (std::string("Timeout (") + toStr(timeout / (CLOCKS_PER_SEC / 1000))
 			+ " ms) occured while reading from fd ")
 		   + toStr(fd);
 }

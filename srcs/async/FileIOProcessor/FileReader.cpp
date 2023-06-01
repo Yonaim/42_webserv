@@ -36,6 +36,8 @@ int FileReader::task(void)
 		}
 	}
 
+	if (_processor->eventCount() > 0)
+		renewTimeout();
 	if (checkTimeout())
 		return (_status);
 	_processor->getReadBuf(_buffer);

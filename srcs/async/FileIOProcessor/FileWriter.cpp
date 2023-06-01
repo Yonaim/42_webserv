@@ -32,8 +32,10 @@ int FileWriter::task(void)
 		_status = status::OK_AGAIN;
 	}
 
+	if (_processor->eventCount() > 0)
+		renewTimeout();
 	if (checkTimeout())
-		return (false);
+		return (_status);
 	if (_processor->writeDone())
 		_status = status::OK_DONE;
 	return (_status);

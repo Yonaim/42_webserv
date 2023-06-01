@@ -26,7 +26,7 @@ std::string generateErrorMsgGeneric(void);
 std::string generateErrorMsgFileClosed(const int fd);
 std::string generateErrorMsgFileOpening(const std::string &path);
 std::string generateErrorMsgFileIsDir(const std::string &path);
-std::string generateErrorMsgTimeout(const int fd, const unsigned int timeout);
+std::string generateErrorMsgTimeout(const int fd, const clock_t timeout);
 std::string generateErrorMsgRead(const int fd);
 std::string generateErrorMsgWrite(const int fd);
 } // namespace async

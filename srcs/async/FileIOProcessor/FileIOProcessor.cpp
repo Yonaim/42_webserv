@@ -28,28 +28,24 @@ bool FileIOProcessor::openFdByPath(const char *mode)
 	return (false);
 }
 
-static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
+static clock_t msToClockT(const unsigned int ms)
 {
-	if (timeout_ms == 0)
-		return (0);
-	ull_t result = (((ull_t)clock() * 1000)
-					+ ((ull_t)timeout_ms * (ull_t)CLOCKS_PER_SEC))
-				   / 1000;
+	ull_t result = (((ull_t)ms) * CLOCKS_PER_SEC) / 1000;
 	return (result);
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
 	: _processor(NULL), _stream(NULL), _fd(fd), _path(""),
-	  _status(status::OK_BEGIN), _buffer(""),
-	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
+	  _status(status::OK_BEGIN), _buffer(""), _timeout(msToClockT(timeout_ms)),
+	  _next_timeout(clock() + _timeout), _should_close(false)
 {
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
 	: _processor(NULL), _stream(NULL), _fd(-1), _path(path),
-	  _status(status::OK_BEGIN), _buffer(""),
-	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(true)
+	  _status(status::OK_BEGIN), _buffer(""), _timeout(msToClockT(timeout_ms)),
+	  _next_timeout(clock() + _timeout), _should_close(true)
 {
 }
 
@@ -60,14 +56,19 @@ FileIOProcessor::~FileIOProcessor()
 	delete _processor;
 }
 
+void FileIOProcessor::renewTimeout(void)
+{
+	_next_timeout += _timeout;
+}
+
 bool FileIOProcessor::checkTimeout(void)
 {
-	if (_timeout_ms == 0)
+	if (_timeout == 0)
 		return (false);
-	if (clock() > _timeout_ms)
+	if (clock() > _next_timeout)
 	{
 		_status = status::ERROR_TIMEOUT;
-		_error_msg = generateErrorMsgTimeout(_fd, _timeout_ms);
+		_error_msg = generateErrorMsgTimeout(_fd, _timeout);
 		return (true);
 	}
 	return (false);
