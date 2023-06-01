@@ -114,11 +114,6 @@ int IOProcessor::read(const int fd, const size_t size)
 	if (readsize < 0)
 	{
 		delete[] buff;
-		/*
-		TODO: Checking the value of errno is strictly forbidden after a read or
-		a write operation이지만 디버그 목적으로 strerror(errno) 사용하였고
-		제출본에서는 삭제해야 함
-		*/
 		_status = status::ERROR_READ;
 		_error_msg = generateErrorMsgRead(fd);
 		return (_status);
@@ -136,11 +131,6 @@ int IOProcessor::write(const int fd, const size_t size)
 		throw(std::logic_error("write(2) call cannot return 0."));
 	if (writesize < 0)
 	{
-		/*
-		 TODO: Checking the value of errno is strictly forbidden after a read or
-		 a write operation이지만 디버그 목적으로 strerror(errno) 사용하였고
-		제출본에서는 삭제해야 함
-		 */
 		_status = status::ERROR_WRITE;
 		_error_msg = generateErrorMsgWrite(fd);
 		return (_status);
