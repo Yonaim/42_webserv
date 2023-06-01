@@ -65,7 +65,7 @@ int RequestHandlerVnode::fork()
 	else if (_pid == 0)
 	{
 		int input_fd = ft_open(_input_file_path, "r");
-		int output_fd = ft_open(_input_file_path, "w");
+		int output_fd = ft_open(_output_file_path, "w");
 		if (input_fd < 0 || output_fd < 0)
 		{
 			_logger << async::error << "Failed to create temporary files";
