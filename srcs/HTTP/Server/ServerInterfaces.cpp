@@ -163,7 +163,7 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 					<< "Create CGI::RequestHandlerVnode for body size "
 					<< request.getBody().size();
 			handler = new CGI::RequestHandlerVnode(cgi_request, _cgi_exec_path,
-												   _timeout_ms);
+												   _timeout_ms, _temp_dir_path);
 		}
 		else
 		{
