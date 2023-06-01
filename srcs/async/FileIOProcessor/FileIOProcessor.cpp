@@ -2,7 +2,6 @@
 #include "async/status.hpp"
 #include "utils/file.hpp"
 #include "utils/string.hpp"
-#include <cstdio>
 #include <unistd.h>
 
 using namespace async;
@@ -18,14 +17,14 @@ bool FileIOProcessor::openFdByPath(const char *mode)
 		_error_msg = generateErrorMsgFileIsDir(_path);
 		return (true);
 	}
-	int fd = ft_open(_path, mode);
-	if (fd < 0)
+	_stream = fopen(_path.c_str(), mode);
+	if (!_stream)
 	{
 		_status = status::ERROR_FILEOPENING;
 		_error_msg = generateErrorMsgFileOpening(_path);
 		return (true);
 	}
-	_fd = fd;
+	_fd = fileno(_stream);
 	return (false);
 }
 
@@ -40,24 +39,24 @@ static unsigned int addTimeoutFromNow(unsigned int timeout_ms)
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
-	: _processor(NULL), _fd(fd), _path(""), _status(status::OK_BEGIN),
-	  _buffer(""), _timeout_ms(addTimeoutFromNow(timeout_ms)),
-	  _should_close(false)
+	: _processor(NULL), _stream(NULL), _fd(fd), _path(""),
+	  _status(status::OK_BEGIN), _buffer(""),
+	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(false)
 {
 }
 
 FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
 								 const std::string &path)
-	: _processor(NULL), _fd(-1), _path(path), _status(status::OK_BEGIN),
-	  _buffer(""), _timeout_ms(addTimeoutFromNow(timeout_ms)),
-	  _should_close(true)
+	: _processor(NULL), _stream(NULL), _fd(-1), _path(path),
+	  _status(status::OK_BEGIN), _buffer(""),
+	  _timeout_ms(addTimeoutFromNow(timeout_ms)), _should_close(true)
 {
 }
 
 FileIOProcessor::~FileIOProcessor()
 {
-	if (_should_close)
-		close(_fd);
+	if (_should_close && _stream)
+		fclose(_stream);
 	delete _processor;
 }
 

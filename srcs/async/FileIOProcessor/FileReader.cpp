@@ -1,6 +1,5 @@
 #include "async/FileIOProcessor.hpp"
 #include "async/status.hpp"
-#include <fcntl.h>
 
 using namespace async;
 
