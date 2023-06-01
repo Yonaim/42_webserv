@@ -232,8 +232,8 @@ Response Server::retrieveResponse(int client_fd)
 {
 	ensureClientConnected(client_fd);
 	if (_output_queue[client_fd].empty())
-		throw(std::runtime_error("No response made for client fd "
-								 + toStr(client_fd)));
+		throw(std::logic_error("No response made for client fd "
+							   + toStr(client_fd)));
 	Response res = _output_queue[client_fd].front();
 	_output_queue[client_fd].pop();
 	return (res);

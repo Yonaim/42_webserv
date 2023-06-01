@@ -30,7 +30,7 @@ void Server::RequestHandler::registerErrorResponse(const int code)
 Response Server::RequestHandler::retrieve(void)
 {
 	if (_status != RESPONSE_STATUS_OK)
-		throw(std::runtime_error("Response has not been made yet."));
+		throw(std::logic_error("Response has not been made yet."));
 	return (_response);
 }
 

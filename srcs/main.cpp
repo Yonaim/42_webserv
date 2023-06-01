@@ -13,15 +13,15 @@ void parseLogLevel(const ConfigContext &root_context)
 	if (n_directives == 0)
 		return;
 	if (n_directives > 1)
-		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+		throw(ConfigDirective::InvalidNumberOfDirective(root_context));
 
 	const ConfigDirective &loglevel_directive
 		= root_context.getNthDirectiveByName(dir_name, 0);
 
 	if (loglevel_directive.is_context())
-		root_context.throwException(PARSINGEXC_UNDEF_DIR);
+		throw(ConfigDirective::UndefinedDirective(root_context));
 	if (loglevel_directive.nParameters() != 1)
-		loglevel_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(loglevel_directive));
 
 	async::Logger::registerFd(STDOUT_FILENO);
 	async::Logger::setLogLevel(loglevel_directive.parameter(0));

@@ -26,7 +26,7 @@ WebServer::WebServer(const ConfigContext &root_context)
 	{
 		_logger << async::error << root_context.name()
 				<< " should have 1 or more " << dir_name;
-		root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+		throw(ConfigDirective::InvalidNumberOfDirective(root_context));
 	}
 	for (size_t i = 0; i < n_servers; i++)
 	{

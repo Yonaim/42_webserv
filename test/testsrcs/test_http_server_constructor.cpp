@@ -14,12 +14,12 @@ int main(int argc, char **argv)
 		const ConfigContext root_context = parseConfig(argv[1]);
 		std::cout << root_context << "\n";
 		if (root_context.countDirectivesByName("server") < 1)
-			root_context.throwException(PARSINGEXC_INVALID_N_DIR);
+			throw(ConfigDirective::InvalidNumberOfDirective(root_context));
 		const ConfigContext &server_context
 			= (const ConfigContext &)(root_context.getNthDirectiveByName(
 				"server", 0));
 		if (server_context.nParameters() != 0)
-			server_context.throwException(PARSINGEXC_INVALID_N_ARG);
+			throw(ConfigDirective::InvalidNumberOfArgument(server_context));
 		const HTTP::Server server(server_context);
 		std::cout << "Server parsing success" << std::endl;
 	}

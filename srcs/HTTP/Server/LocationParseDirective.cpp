@@ -13,19 +13,19 @@ void Server::Location::parseDirectiveAlias(
 	{
 		_logger << async::error << location_context.name() << " should have 1 "
 				<< dir_name;
-		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+		throw(ConfigDirective::InvalidNumberOfArgument(location_context));
 	}
 	const ConfigDirective &alias_directive
 		= location_context.getNthDirectiveByName(dir_name, 0);
 	if (alias_directive.is_context())
 	{
 		_logger << async::error << dir_name << " should not be context";
-		alias_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		throw(ConfigDirective::UndefinedDirective(alias_directive));
 	}
 	if (alias_directive.nParameters() != 1)
 	{
 		_logger << async::error << dir_name << " should have 1 parameter(s)";
-		alias_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(alias_directive));
 	}
 	_alias = alias_directive.parameter(0);
 }
@@ -49,7 +49,7 @@ void Server::Location::parseDirectiveLimitExcept(
 		if (limit_except_directive.is_context())
 		{
 			_logger << async::error << dir_name << " should not be context";
-			limit_except_directive.throwException(PARSINGEXC_UNDEF_DIR);
+			throw(ConfigDirective::UndefinedDirective(limit_except_directive));
 		}
 
 		const size_t n_methods = limit_except_directive.nParameters();
@@ -57,7 +57,8 @@ void Server::Location::parseDirectiveLimitExcept(
 		{
 			_logger << async::error << dir_name
 					<< " should have more than 0 parameter(s)";
-			limit_except_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+			throw(ConfigDirective::InvalidNumberOfArgument(
+				limit_except_directive));
 		}
 
 		for (size_t j = 0; j < n_methods; j++)
@@ -68,7 +69,8 @@ void Server::Location::parseDirectiveLimitExcept(
 			{
 				_logger << async::error << dir_name
 						<< " has invalid HTTP method";
-				limit_except_directive.throwException(PARSINGEXC_UNDEF_ARG);
+				throw(
+					ConfigDirective::UndefinedArgument(limit_except_directive));
 			}
 
 			const int method = it->second;
@@ -91,24 +93,24 @@ void Server::Location::parseDirectiveReturn(
 	{
 		_logger << async::error << location_context.name()
 				<< " should have 0 or 1 " << dir_name;
-		return_directive.throwException(PARSINGEXC_DUP_DIR);
+		throw(ConfigDirective::DuplicateDirective(return_directive));
 	}
 	if (return_directive.nParameters() != 2)
 	{
 		_logger << async::error << dir_name << " should have 2 parameter(s)";
-		return_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(return_directive));
 	}
 	if (!isUnsignedIntStr(return_directive.parameter(0)))
 	{
 		_logger << async::error << dir_name
 				<< " should have integer form first parameter";
-		return_directive.throwException(PARSINGEXC_UNDEF_ARG);
+		throw(ConfigDirective::UndefinedArgument(return_directive));
 	}
 	_do_redirection = true;
 	std::stringstream buf(return_directive.parameter(0));
 	buf >> _redirection.first;
 	if (!(isValidStatusCode(_redirection.first)))
-		return_directive.throwException(PARSINGEXC_DUP_ARG);
+		throw(ConfigDirective::DuplicateArgument(return_directive));
 	_redirection.second = return_directive.parameter(1);
 }
 
@@ -127,12 +129,12 @@ void Server::Location::parseDirectiveAutoIndex(
 	{
 		_logger << async::error << location_context.name()
 				<< " should have 0 or 1 " << dir_name;
-		auto_index_directive.throwException(PARSINGEXC_DUP_DIR);
+		throw(ConfigDirective::DuplicateDirective(auto_index_directive));
 	}
 	if (auto_index_directive.nParameters() != 1)
 	{
 		_logger << async::error << dir_name << " should have 1 parameter(s)";
-		auto_index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(auto_index_directive));
 	}
 	if (auto_index_directive.parameter(0) == "off")
 	{
@@ -148,7 +150,7 @@ void Server::Location::parseDirectiveAutoIndex(
 	{
 		_logger << async::error << dir_name
 				<< " should have parameter either \"on\" or \"off\"";
-		auto_index_directive.throwException(PARSINGEXC_UNDEF_ARG);
+		throw(ConfigDirective::UndefinedArgument(auto_index_directive));
 	}
 }
 
@@ -165,13 +167,13 @@ void Server::Location::parseDirectiveIndex(
 	{
 		_logger << async::error << location_context.name()
 				<< " should have 0 or 1 " << dir_name;
-		index_directive.throwException(PARSINGEXC_DUP_DIR);
+		throw(ConfigDirective::DuplicateDirective(index_directive));
 	}
 	_has_index = true;
 	if (index_directive.nParameters() != 1)
 	{
 		_logger << async::error << dir_name << " should have 1 parameter(s)";
-		index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(index_directive));
 	}
 	_index = index_directive.parameter(0);
 }
@@ -187,7 +189,7 @@ void Server::Location::parseDirectiveUpload(
 	{
 		_logger << async::error << location_context.name()
 				<< " should have 0 or 1 " << dir_name;
-		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+		throw(ConfigDirective::InvalidNumberOfArgument(location_context));
 	}
 	_upload_allowed = true;
 	_logger << async::verbose << "Uploading to " << _alias << " enabled";
@@ -196,12 +198,12 @@ void Server::Location::parseDirectiveUpload(
 	if (upload_directive.is_context())
 	{
 		_logger << async::error << dir_name << " should not be context";
-		upload_directive.throwException(PARSINGEXC_UNDEF_DIR);
+		throw(ConfigDirective::UndefinedDirective(upload_directive));
 	}
 	if (upload_directive.nParameters() != 1)
 	{
 		_logger << async::error << dir_name << " should have 1 parameter(s)";
-		upload_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(upload_directive));
 	}
 	_upload_store_path = upload_directive.parameter(0);
 }
@@ -217,7 +219,7 @@ void Server::Location::parseDirectiveMaxBodySize(
 	{
 		_logger << async::error << location_context.name()
 				<< " should have 0 or 1 " << dir_name;
-		location_context.throwException(PARSINGEXC_INVALID_N_DIR);
+		throw(ConfigDirective::InvalidNumberOfArgument(location_context));
 	}
 
 	const ConfigDirective &body_size_directive
@@ -226,12 +228,12 @@ void Server::Location::parseDirectiveMaxBodySize(
 	if (body_size_directive.is_context())
 	{
 		_logger << async::error << dir_name << " should not be context";
-		location_context.throwException(PARSINGEXC_UNDEF_DIR);
+		throw(ConfigDirective::UndefinedDirective(location_context));
 	}
 	if (body_size_directive.nParameters() != 1)
 	{
 		_logger << async::error << dir_name << " should have 1 parameter(s)";
-		body_size_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(body_size_directive));
 	}
 
 	_max_body_size = toNum<size_t>(body_size_directive.parameter(0));

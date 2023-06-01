@@ -17,7 +17,7 @@ Server::Location::Location(const ConfigContext &location_context,
 	  _logger(async::Logger::getLogger("Location"))
 {
 	if (location_context.nParameters() != 1)
-		location_context.throwException(PARSINGEXC_INVALID_N_ARG);
+		throw(ConfigDirective::InvalidNumberOfArgument(location_context));
 	_path = location_context.parameter(0);
 
 	parseDirectiveAlias(location_context);
