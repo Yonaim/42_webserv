@@ -119,6 +119,7 @@ int IOProcessor::read(const int fd, const size_t size)
 		return (_status);
 	}
 	_rdbuf[fd].append(buff, readsize);
+	_event_count++;
 	delete[] buff;
 	_status = status::OK_AGAIN;
 	return (_status);
@@ -136,6 +137,7 @@ int IOProcessor::write(const int fd, const size_t size)
 		return (_status);
 	}
 	trimfrontstr(_wrbuf[fd], writesize);
+	_event_count++;
 	_status = status::OK_AGAIN;
 	return (_status);
 }
@@ -171,6 +173,13 @@ bool IOProcessor::isFdClosed(const int fd)
 	if (rc >= status::ERROR_GENERIC)
 		return (true);
 	return (false);
+}
+
+int IOProcessor::eventCount(void)
+{
+	int buf = _event_count;
+	_event_count = 0;
+	return (buf);
 }
 
 struct kevent constructKevent(const int fd, const int event)

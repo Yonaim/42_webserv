@@ -23,6 +23,7 @@ class IOProcessor
 
   protected:
 	int _status;
+	int _event_count;
 	std::string _error_msg;
 	std::deque<struct kevent> _watchlist;
 	std::deque<struct kevent> _eventlist;
@@ -47,6 +48,7 @@ class IOProcessor
 	static void blockingWriteAll(void);
 	void blockingWrite(void);
 	bool isFdClosed(const int fd);
+	int eventCount(void);
 };
 
 enum IOEVENT_E
