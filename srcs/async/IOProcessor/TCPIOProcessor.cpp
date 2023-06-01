@@ -7,11 +7,11 @@
 
 using namespace async;
 
-const int TCPIOProcessor::_backlog = 8;
 std::queue<int> TCPIOProcessor::disconnected_clients;
 
-TCPIOProcessor::TCPIOProcessor(const int port)
-	: _port(port), _logger(Logger::getLogger("TCPIOProcessor"))
+TCPIOProcessor::TCPIOProcessor(const int port, const int backlog)
+	: _port(port), _backlog_size(backlog),
+	  _logger(Logger::getLogger("TCPIOProcessor"))
 {
 }
 
@@ -20,14 +20,15 @@ TCPIOProcessor::~TCPIOProcessor()
 }
 
 TCPIOProcessor::TCPIOProcessor(const TCPIOProcessor &orig)
-	: _port(orig._port), _listening_socket(orig._listening_socket),
-	  _logger(orig._logger)
+	: _port(orig._port), _backlog_size(orig._backlog_size),
+	  _listening_socket(orig._listening_socket), _logger(orig._logger)
 {
 }
 
 TCPIOProcessor &TCPIOProcessor::operator=(const TCPIOProcessor &orig)
 {
 	_port = orig._port;
+	_backlog_size = orig._backlog_size;
 	_listening_socket = orig._listening_socket;
 	return (*this);
 }
@@ -130,10 +131,10 @@ void TCPIOProcessor::initialize(void)
 	_logger << async::info << "Bind socket " << _listening_socket << " at port "
 			<< _port;
 
-	result = listen(_listening_socket, _backlog);
+	result = listen(_listening_socket, _backlog_size);
 	if (result < 0)
 		finalize(strerror(errno));
-	_logger << async::info << "Listen with backlog size " << _backlog;
+	_logger << async::info << "Listen with backlog size " << _backlog_size;
 
 	result = fcntl(_listening_socket, F_SETFL, O_NONBLOCK);
 	if (result < 0)

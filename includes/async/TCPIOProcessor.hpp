@@ -11,8 +11,8 @@ class TCPIOProcessor : public IOProcessor
 {
   private:
 	typedef std::map<int, std::string>::iterator _iterator;
-	static const int _backlog;
 	int _port;
+	int _backlog_size;
 	int _listening_socket;
 	Logger &_logger;
 
@@ -41,7 +41,7 @@ class TCPIOProcessor : public IOProcessor
   public:
 	static std::queue<int> disconnected_clients;
 
-	TCPIOProcessor(const int port = 80);
+	TCPIOProcessor(const int port = 80, const int backlog = 8);
 	virtual ~TCPIOProcessor();
 	TCPIOProcessor(const TCPIOProcessor &orig);
 	TCPIOProcessor &operator=(const TCPIOProcessor &orig);
