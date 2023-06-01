@@ -26,7 +26,7 @@ int FileWriter::task(void)
 		return (_status);
 	if (_status == status::OK_BEGIN)
 	{
-		if (openFdByPath(O_WRONLY | O_CREAT))
+		if (openFdByPath("w"))
 			return (_status);
 		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_W);
 		_processor->setWriteBuf(_content);
