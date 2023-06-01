@@ -9,15 +9,6 @@
 
 namespace HTTP
 {
-enum consume_exc_e
-{
-	CONSUME_EXC_EMPTY_LINE = 0,
-	CONSUME_EXC_INVALID_FORMAT,
-	CONSUME_EXC_INVALID_FIELD,
-	CONSUME_EXC_INVALID_VALUE,
-	CONSUME_EXC_INVALID_SIZE,
-};
-
 class Request
 {
   private:
@@ -46,7 +37,6 @@ class Request
 	int consumeBody(std::string &buffer);
 	int consumeChunk(std::string &buffer);
 	int consumeTrailer(std::string &buffer);
-	void throwException(int code) const;
 
   public:
 	enum return_type_e
@@ -55,11 +45,6 @@ class Request
 		RETURN_TYPE_INVALID,
 		RETURN_TYPE_AGAIN,
 		RETURN_TYPE_IN_PROCESS
-	};
-	class ParsingFail : public std::runtime_error
-	{
-	  public:
-		ParsingFail(const std::string &why);
 	};
 
 	Request(void);

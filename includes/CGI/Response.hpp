@@ -8,15 +8,6 @@
 
 namespace CGI
 {
-enum consume_exc_e
-{
-	CONSUME_EXC_EMPTY_LINE = 0,
-	CONSUME_EXC_INVALID_FORMAT,
-	CONSUME_EXC_INVALID_FIELD,
-	CONSUME_EXC_INVALID_VALUE,
-	CONSUME_EXC_INVALID_SIZE,
-};
-
 class Response
 {
   private:
@@ -25,12 +16,6 @@ class Response
 	std::string _response_body;
 
   public:
-	class ParsingFail : public std::runtime_error
-	{
-	  public:
-		ParsingFail(const std::string &why);
-	};
-
 	Response();
 	~Response();
 	Response(const Response &orig);
@@ -38,7 +23,6 @@ class Response
 
 	void makeResponse(std::string &cgi_output);
 	void consumeHeader(std::string &buffer);
-	void throwException(const int code) const;
 
 	HTTP::Response toHTTPResponse(void) const;
 };

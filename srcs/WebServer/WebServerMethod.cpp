@@ -1,3 +1,4 @@
+#include "HTTP/ParsingFail.hpp"
 #include "HTTP/Request.hpp"
 #include "HTTP/error_pages.hpp"
 #include "WebServer.hpp"
@@ -23,7 +24,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			rc = _request_buffer[port][client_fd].parse(
 				tcp_proc.rdbuf(client_fd), _max_body_size);
 		}
-		catch (const HTTP::Request::ParsingFail &e)
+		catch (const HTTP::ParsingFail &e)
 		{
 			// TODO: 오류 상황에 따라 에러 코드 세분화
 			// TODO: 에러 코드에 따라 연결 끊을 수도 있게 처리

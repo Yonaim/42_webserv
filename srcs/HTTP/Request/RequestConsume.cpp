@@ -1,3 +1,4 @@
+#include "HTTP/ParsingFail.hpp"
 #include "HTTP/Request.hpp"
 #include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
@@ -26,13 +27,13 @@ int Request::consumeStartLine(std::string &buffer)
 	{
 		_logger << async::warning << __func__
 				<< ": buffer's first line is empty";
-		throwException(CONSUME_EXC_EMPTY_LINE);
+		throw(HTTP::EmptyLineFound());
 	}
 	if (start_line[0] == ' ')
 	{
 		_logger << async::warning << __func__
 				<< ": buffer's first character is space";
-		throwException(CONSUME_EXC_INVALID_FORMAT);
+		throw(HTTP::InvalidFormat());
 	}
 
 	/* 공백 기준 split */
@@ -40,7 +41,7 @@ int Request::consumeStartLine(std::string &buffer)
 	if (tokens.size() != 3)
 	{
 		_logger << async::warning << __func__ << ": token count mismatch";
-		throwException(CONSUME_EXC_INVALID_FORMAT);
+		throw(HTTP::InvalidFormat());
 	}
 
 	{
@@ -64,7 +65,7 @@ int Request::consumeStartLine(std::string &buffer)
 	if (_method == METHOD_NONE)
 	{
 		_logger << async::warning << __func__ << ": invalid method";
-		throwException(CONSUME_EXC_INVALID_VALUE);
+		throw(HTTP::InvalidValue());
 	}
 
 	/* uri, version 파싱 */
@@ -118,14 +119,14 @@ int Request::consumeHeader(std::string &buffer)
 	if (colon_pos == std::string::npos)
 	{
 		_logger << async::warning << __func__ << ": header line has no colon";
-		throwException(CONSUME_EXC_INVALID_FIELD);
+		throw(HTTP::InvalidField());
 	}
 
 	const std::string name = getfrontstr(header_line, colon_pos);
 	if (hasSpace(name))
 	{
 		_logger << async::warning << __func__ << ": header name has space";
-		throwException(CONSUME_EXC_INVALID_FIELD);
+		throw(HTTP::InvalidField());
 	}
 
 	const std::string value_part = getbackstr(header_line, colon_pos + 1);
@@ -183,7 +184,7 @@ int Request::consumeChunk(std::string &buffer)
 	{
 		_logger << async::warning << __func__
 				<< ": negative content length of chunk";
-		throwException(CONSUME_EXC_INVALID_VALUE);
+		throw(HTTP::InvalidValue());
 	}
 
 	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
@@ -201,7 +202,7 @@ int Request::consumeChunk(std::string &buffer)
 	if (consumestr(buffer, CRLF_LEN) != CRLF)
 	{
 		_logger << async::warning << __func__ << ": chunk must end with CRLF";
-		throwException(CONSUME_EXC_INVALID_FORMAT);
+		throw(HTTP::InvalidFormat());
 	}
 	ASYNC_LOG_DEBUG(_logger,
 					__func__ << ": buffer result in :\"" << buffer << "\"");
@@ -239,14 +240,14 @@ int Request::consumeTrailer(std::string &buffer)
 	if (colon_pos == std::string::npos)
 	{
 		_logger << async::warning << __func__ << ": header line has no colon";
-		throwException(CONSUME_EXC_INVALID_FIELD);
+		throw(HTTP::InvalidField());
 	}
 
 	const std::string name = getfrontstr(header_line, colon_pos);
 	if (hasSpace(name))
 	{
 		_logger << async::warning << __func__ << ": header name has space";
-		throwException(CONSUME_EXC_INVALID_FIELD);
+		throw(HTTP::InvalidField());
 	}
 
 	bool found_name = false;
@@ -264,7 +265,7 @@ int Request::consumeTrailer(std::string &buffer)
 	{
 		_logger << async::warning << __func__
 				<< ": Trailer header doesn't have " << name;
-		throwException(CONSUME_EXC_INVALID_FIELD);
+		throw(HTTP::InvalidField());
 	}
 
 	const std::string value_part = getbackstr(header_line, colon_pos + 1);

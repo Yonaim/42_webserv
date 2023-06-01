@@ -1,21 +1,10 @@
 #include "HTTP/Request.hpp"
+#include "HTTP/ParsingFail.hpp"
 #include "HTTP/const_values.hpp"
 #include "utils/ansi_escape.h"
 #include "utils/string.hpp"
 
 using namespace HTTP;
-
-static const char *consume_exc_description[]
-	= {"Empty line found", "Invalid format", "Invalid header field",
-	   "Invalid header value", "Invalid body size"};
-
-static const char *parse_state_str[]
-	= {"start line", "header", "body", "chunk", "trailer"};
-
-Request::ParsingFail::ParsingFail(const std::string &why)
-	: std::runtime_error(why)
-{
-}
 
 Request::Request(void)
 	: _method(METHOD_NONE), _current_state(PARSE_STATE_STARTLINE),
@@ -80,7 +69,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 				{
 					_logger << async::warning << __func__
 							<< "Header must include Host header field";
-					throwException(CONSUME_EXC_INVALID_VALUE);
+					throw(HTTP::InvalidValue());
 				}
 				if (_header.hasValue("Transfer-Encoding", "chunked"))
 				{
@@ -93,7 +82,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 						_trailer_values = _header.getValues("Trailer");
 						if (_trailer_values.empty())
 						{
-							throwException(CONSUME_EXC_EMPTY_LINE);
+							throw(HTTP::EmptyLineFound());
 						}
 						std::vector<std::string>::const_iterator iter
 							= _trailer_values.begin();
@@ -101,7 +90,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 						{
 							if (*iter == "Trailer" || *iter == "Content-Length"
 								|| *iter == "Transfer-Encoding")
-								throwException(CONSUME_EXC_INVALID_FIELD);
+								throw(HTTP::InvalidField());
 						}
 						_logger << async::verbose << "header has Trailer";
 					}
@@ -111,13 +100,13 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 				{
 					_logger << async::warning << __func__
 							<< ": Trailer with no Transfer-Encoding";
-					throwException(CONSUME_EXC_INVALID_VALUE);
+					throw(HTTP::InvalidValue());
 				}
 				else if (_header.hasValue("Content-Length"))
 				{
 					if (_method == METHOD_GET || _method == METHOD_HEAD
 						|| _method == METHOD_DELETE)
-						throwException(CONSUME_EXC_INVALID_FIELD);
+						throw(HTTP::InvalidField());
 					const std::string &content_length
 						= getHeaderValue("Content-Length", 0);
 					_logger << async::verbose << "header has Content-Length";
@@ -129,14 +118,14 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 					}
 					catch (const std::invalid_argument &e)
 					{
-						throwException(CONSUME_EXC_INVALID_VALUE);
+						throw(HTTP::InvalidValue());
 					}
 
 					if (_content_length > client_max_body_size)
 					{
 						_logger << async::warning << __func__
 								<< ": exceeds the client_max_body_size";
-						throwException(CONSUME_EXC_INVALID_SIZE);
+						throw(HTTP::InvalidSize());
 					}
 					if (_content_length >= 0)
 					{
@@ -146,7 +135,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 					}
 				}
 				else if (_method == METHOD_POST)
-					throwException(CONSUME_EXC_INVALID_FIELD);
+					throw(HTTP::InvalidField());
 				else
 					return (RETURN_TYPE_OK);
 			}
@@ -169,7 +158,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 			ASYNC_LOG_DEBUG(_logger,
 							"client max body size " << client_max_body_size);
 			if (_content_length > client_max_body_size)
-				throwException(CONSUME_EXC_INVALID_SIZE);
+				throw(HTTP::InvalidSize());
 			if (rc == RETURN_TYPE_OK)
 			{
 				if (_header.hasValue("Trailer"))
@@ -192,18 +181,6 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 			return (rc);
 		}
 	}
-}
-
-void Request::throwException(int code) const
-{
-	std::stringstream what;
-
-	if (code < 0 || code > CONSUME_EXC_INVALID_SIZE)
-		what << "Unknown error";
-	else
-		what << consume_exc_description[code];
-	what << ": " << parse_state_str[_current_state];
-	throw(ParsingFail(what.str()));
 }
 
 bool Request::hasHeaderValue(std::string const &name,

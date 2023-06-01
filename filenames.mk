@@ -64,6 +64,7 @@ FILENAMES			= \
 					$(DIR_HTTP)const_values \
 					$(DIR_HTTP)mime_type \
 					$(DIR_HTTP)error_pages \
+					$(DIR_HTTP)ParsingFail \
 					$(DIR_HTTP)Request/Request \
 					$(DIR_HTTP)Request/RequestConsume \
 					$(DIR_HTTP)Response/Response \
