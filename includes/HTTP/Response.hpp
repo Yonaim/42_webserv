@@ -32,7 +32,6 @@ class Response
 	void makeStatusLine(void);
 	void makeHeader(void);
 	void makeBody(void);
-	void alignAutoIndex(size_t minus_len, int to_align);
 
 	std::string _response;
 
