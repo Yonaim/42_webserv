@@ -63,6 +63,7 @@ class Server
   public:
 	class LocationNotFound;
 	class ClientNotFound;
+	class InvalidRequest;
 
 	Server(const ConfigContext &server_context, const size_t max_body_size,
 		   const unsigned int timeout_ms);

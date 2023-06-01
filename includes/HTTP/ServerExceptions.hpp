@@ -15,6 +15,11 @@ class Server::ClientNotFound : public std::runtime_error
   public:
 	ClientNotFound(const int client_fd);
 };
+class Server::InvalidRequest : public std::runtime_error
+{
+  public:
+	InvalidRequest(const std::string &why);
+};
 } // namespace HTTP
 
 #endif
