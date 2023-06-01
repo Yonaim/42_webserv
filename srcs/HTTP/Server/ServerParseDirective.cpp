@@ -225,6 +225,35 @@ void Server::parseDirectiveCGILimitExcept(const ConfigContext &server_context)
 	}
 }
 
+void Server::parseDirectiveTmpDirPath(const ConfigContext &server_context)
+{
+	const char *dir_name = "temp_dir_path";
+	const size_t n_indexs = server_context.countDirectivesByName(dir_name);
+	if (n_indexs == 0)
+		return;
+	if (n_indexs > 1)
+	{
+		_logger << async::error << server_context.name()
+				<< " should have 0 or 1 " << dir_name;
+		server_context.throwException(PARSINGEXC_INVALID_N_DIR);
+	}
+	const ConfigDirective &tmp_directive
+		= server_context.getNthDirectiveByName(dir_name, 0);
+	if (tmp_directive.is_context())
+	{
+		_logger << async::error << dir_name << " should not be context";
+		tmp_directive.throwException(PARSINGEXC_UNDEF_DIR);
+	}
+	if (tmp_directive.nParameters() != 1)
+	{
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
+		tmp_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	_temp_dir_path = tmp_directive.parameter(0);
+	_logger << async::verbose
+			<< "temporary file storage path set to: " << _temp_dir_path;
+}
+
 bool Server::isValidStatusCode(const int &status_code)
 {
 	return (STATUS_CODE.find(status_code) != STATUS_CODE.end());
