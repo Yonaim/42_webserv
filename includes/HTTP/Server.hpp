@@ -61,6 +61,7 @@ class Server
 								  const Server::Location &location);
 
   public:
+	class ServerError;
 	class LocationNotFound;
 	class ClientNotFound;
 	class InvalidRequest;
@@ -96,7 +97,7 @@ class Server
 };
 } // namespace HTTP
 
-#include "HTTP/ServerExceptions.hpp"
+#include "HTTP/ServerError.hpp"
 #include "HTTP/ServerLocation.hpp"
 #include "RequestHandler.hpp"
 

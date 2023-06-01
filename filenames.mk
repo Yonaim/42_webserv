@@ -80,7 +80,7 @@ FILENAMES			= \
 					$(DIR_HTTP)Server/ServerMethods \
 					$(DIR_HTTP)Server/ServerInterfaces \
 					$(DIR_HTTP)Server/ServerParseDirective \
-					$(DIR_HTTP)Server/ServerExceptions \
+					$(DIR_HTTP)Server/ServerError \
 					$(DIR_CGI)const_values \
 					$(DIR_CGI)Request \
 					$(DIR_CGI)Response \
