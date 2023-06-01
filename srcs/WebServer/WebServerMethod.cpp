@@ -50,7 +50,12 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			break;
 
 		default:
-			// handle error
+			_logger << async::warning << "Unknown parsing error";
+			_request_buffer[port][client_fd] = HTTP::Request();
+			HTTP::Response res = generateErrorResponse(500);
+			_tcp_procs[port].wrbuf(client_fd) += res.toString();
+			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
+					<< "\"";
 			break;
 		}
 	}
@@ -134,7 +139,7 @@ void WebServer::disconnect(int port, int client_fd)
 		}
 		catch (const HTTP::Server::ClientNotFound &e)
 		{
-			(void)e;
+			_logger << async::error << e.what();
 		}
 	}
 	_logger << async::info << "Disconnected client fd " << client_fd

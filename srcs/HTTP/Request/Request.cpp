@@ -133,7 +133,7 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 					{
 						_content_length = toNum<size_t>(content_length);
 					}
-					catch (const std::exception &e)
+					catch (const std::invalid_argument &e)
 					{
 						throwException(CONSUME_EXC_INVALID_VALUE);
 					}

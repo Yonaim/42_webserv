@@ -26,30 +26,21 @@ RequestHandlerPipe::RequestHandlerPipe(const Request &request,
 									   const unsigned int timeout_ms)
 	: RequestHandler(request, exec_path)
 {
-	try
-	{
-		_read_pipe_fd[0] = -1, _read_pipe_fd[1] = -1;
-		_write_pipe_fd[0] = -1, _write_pipe_fd[1] = -1;
-
-		if (::pipe(_read_pipe_fd) < 0 || ::pipe(_write_pipe_fd) < 0)
-			throw(std::runtime_error("Constructor: Failed to create pipe."));
-
-		ASYNC_LOG_DEBUG(_logger, "read_pipe[0]: " << _read_pipe_fd[0]);
-		ASYNC_LOG_DEBUG(_logger, "read_pipe[1]: " << _read_pipe_fd[1]);
-		ASYNC_LOG_DEBUG(_logger, "write_pipe[0]: " << _write_pipe_fd[0]);
-		ASYNC_LOG_DEBUG(_logger, "write_pipe[1]: " << _write_pipe_fd[1]);
-
-		if (_request.getMessageBody().length() > 0)
-			_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
-											_request.getMessageBody());
-		_reader = new async::FileReader(timeout_ms, _read_pipe_fd[0], true);
-	}
-	catch (const std::runtime_error &e)
+	if (::pipe(_read_pipe_fd) < 0 || ::pipe(_write_pipe_fd) < 0)
 	{
 		closeAllPipes();
-		ASYNC_LOG_DEBUG(_logger, e.what());
-		throw(e);
+		throw(std::runtime_error("Constructor: Failed to create pipe."));
 	}
+
+	ASYNC_LOG_DEBUG(_logger, "read_pipe[0]: " << _read_pipe_fd[0]);
+	ASYNC_LOG_DEBUG(_logger, "read_pipe[1]: " << _read_pipe_fd[1]);
+	ASYNC_LOG_DEBUG(_logger, "write_pipe[0]: " << _write_pipe_fd[0]);
+	ASYNC_LOG_DEBUG(_logger, "write_pipe[1]: " << _write_pipe_fd[1]);
+
+	if (_request.getMessageBody().length() > 0)
+		_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
+										_request.getMessageBody());
+	_reader = new async::FileReader(timeout_ms, _read_pipe_fd[0], true);
 }
 
 RequestHandlerPipe::~RequestHandlerPipe()
@@ -177,24 +168,15 @@ int RequestHandlerPipe::waitExecution()
 int RequestHandlerPipe::task(void)
 {
 	ASYNC_LOG_DEBUG(_logger, "status : " << _status);
-	try
+	switch (_status)
 	{
-		switch (_status)
-		{
-		case CGI_RESPONSE_INNER_STATUS_BEGIN:
-			return (fork());
-		case CGI_RESPONSE_INNER_STATUS_RW_AGAIN:
-			return (waitRWOperation());
-		case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
-			return (waitExecution());
-		default:
-			return (CGI_RESPONSE_STATUS_OK);
-		}
-	}
-	catch (const std::runtime_error &e)
-	{
-		closeAllPipes();
-		ASYNC_LOG_DEBUG(_logger, e.what());
-		throw(e);
+	case CGI_RESPONSE_INNER_STATUS_BEGIN:
+		return (fork());
+	case CGI_RESPONSE_INNER_STATUS_RW_AGAIN:
+		return (waitRWOperation());
+	case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
+		return (waitExecution());
+	default:
+		return (CGI_RESPONSE_STATUS_OK);
 	}
 }
