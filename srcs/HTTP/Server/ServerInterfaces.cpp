@@ -76,6 +76,7 @@ void Server::iterateCGIHandlers(void)
 		{
 			delete handlers.front();
 			handlers.pop();
+			_logger << async::error << e.what();
 			_logger << async::error << "CGI failed, causing code 500";
 			registerErrorResponse(client_fd, 500); // Internal Server Error
 		}
@@ -180,13 +181,20 @@ void Server::registerRequest(int client_fd, const Request &request)
 	const Server::Location &location = getLocation(request.getURIPath());
 	const std::string resource_path = location.generateResourcePath(request);
 	const int method = request.getMethod();
+	size_t location_body_size = location.getMaxBodySize();
 
+	if (location_body_size != _max_body_size
+		&& location_body_size < request.getBody().length())
+	{
+		registerErrorResponse(client_fd, 413);
+		return;
+	}
 	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
 	{
 		registerCGIRequest(client_fd, request, resource_path);
 		return;
 	}
-
+	
 	if (!location.isAllowedMethod(method))
 	{
 		_logger << async::info << "Method " << METHOD[method]

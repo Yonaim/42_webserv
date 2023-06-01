@@ -40,6 +40,7 @@ class Server::Location
 	const std::string &getAlias(void) const;
 	const std::string &getNthIndex(size_t nth) const;
 	const std::string &getUploadPath(void) const;
+	size_t getMaxBodySize(void) const;
 	std::string generateResourcePath(const Request &req) const;
 	bool isAllowedMethod(int method) const;
 	bool hasIndex() const;

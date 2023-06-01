@@ -81,6 +81,11 @@ const std::string &Server::Location::getUploadPath(void) const
 	return (_upload_store_path);
 }
 
+size_t Server::Location::getMaxBodySize(void) const
+{
+	return (_max_body_size);
+}
+
 std::string Server::Location::generateResourcePath(const Request &req) const
 {
 	std::string uri_path = req.getURIPath();
