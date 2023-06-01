@@ -1,5 +1,6 @@
 #include "HTTP/Response.hpp"
 #include "HTTP/const_values.hpp"
+#include "utils/ansi_escape.h"
 #include "utils/string.hpp"
 #include <dirent.h>
 #include <iostream>
@@ -171,13 +172,22 @@ void Response::makeDirectoryListing(const std::string &path,
 const std::string Response::getDescription(void) const
 {
 	const size_t bodylen = 20;
+	const int status_code = toNum<int>(_status_code);
 
 	std::stringstream buf;
+	if (status_code < 200)
+		buf << ANSI_BCYAN;
+	else if (200 <= status_code && status_code < 400)
+		buf << ANSI_BGREEN;
+	else if (400 <= status_code && status_code < 500)
+		buf << ANSI_BYELLOW;
+	else
+		buf << ANSI_BRED;
 	buf << "[" << _status_code << " " << _reason_phrase << " | ";
 	if (_body.size() > bodylen)
 		buf << _body.substr(0, bodylen - 3) << "...";
 	else
 		buf << _body;
-	buf << "]";
+	buf << "]" << ANSI_RESET;
 	return (buf.str());
 }

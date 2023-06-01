@@ -1,5 +1,6 @@
 #include "HTTP/Request.hpp"
 #include "HTTP/const_values.hpp"
+#include "utils/ansi_escape.h"
 #include "utils/string.hpp"
 
 using namespace HTTP;
@@ -269,11 +270,12 @@ const std::string Request::getDescription(void) const
 	const size_t bodylen = 20;
 
 	std::stringstream buf;
+	buf << ANSI_BBLUE;
 	buf << "[" << HTTP::METHOD.getKeyByValue(_method) << " " << _uri << " | ";
 	if (_body.size() > bodylen)
 		buf << _body.substr(0, bodylen - 3) << "...";
 	else
 		buf << _body;
-	buf << "]";
+	buf << "]" << ANSI_RESET;
 	return (buf.str());
 }

@@ -19,6 +19,7 @@ class Logger
 	static const std::string _name_default;
 	static int _log_level;
 	static const char *_level_names[];
+	static const char *_level_prefixes[];
 	static bool _active;
 
 	const std::string _name;

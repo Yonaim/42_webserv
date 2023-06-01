@@ -1,4 +1,5 @@
 #include "async/Logger.hpp"
+#include "utils/ansi_escape.h"
 #include <cstring>
 
 using namespace async;
@@ -9,6 +10,8 @@ const std::string Logger::_name_default = "root";
 int Logger::_log_level = INFO;
 const char *Logger::_level_names[]
 	= {"DEBUG  ", "VERBOSE", "INFO   ", "WARNING", "ERROR  "};
+const char *Logger::_level_prefixes[]
+	= {ANSI_RESET, ANSI_RESET, ANSI_BWHITE, ANSI_BYELLOW, ANSI_BRED};
 bool Logger::_active = false;
 
 Logger::Logger(void) : _name(_name_default)
@@ -40,10 +43,10 @@ std::string Logger::getPrefix(int level)
 	char buf[64];
 	strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tstruct);
 
-	std::string prefix = std::string(buf) + ", " + "[" + _level_names[level]
-						 + "] " + _name + ": ";
-
-	return (prefix);
+	std::stringstream prefix;
+	prefix << _level_prefixes[level] << buf << ", [" << _level_names[level]
+		   << "]" << _name << ": ";
+	return (prefix.str());
 }
 
 void Logger::log(const std::string &content)
@@ -127,7 +130,7 @@ void Logger::blockingWriteAll(void)
 
 Logger &operator<<(Logger &io, const Logger::EndMarker mark)
 {
-	io.log("\n");
+	io.log("\n" ANSI_RESET);
 	if (mark.level < Logger::getLogLevel())
 		Logger::deactivate();
 	else
