@@ -1,6 +1,6 @@
-#include "HTTP/const_values.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTP/Server.hpp"
+#include "HTTP/const_values.hpp"
 #include "utils/hash.hpp"
 #include "utils/string.hpp"
 
@@ -69,13 +69,6 @@ const std::string &Server::Location::getAlias(void) const
 	return (_alias);
 }
 
-const std::string &Server::Location::getNthIndex(size_t nth) const
-{
-	if (nth > _index.size())
-		throw(std::runtime_error("exceeded the accessible range"));
-	return (_index[nth]);
-}
-
 const std::string &Server::Location::getUploadPath(void) const
 {
 	return (_upload_store_path);
@@ -118,7 +111,7 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 	_logger << async::verbose << __func__ << ": after \"" << uri_path << "\"";
 	if (req.getURIPath().back() == '/' && _has_index)
 	{
-		uri_path += _index[0];
+		uri_path += _index;
 		_logger << async::verbose << __func__
 				<< ": add index to URI path, result: \"" << uri_path << "\"";
 	}

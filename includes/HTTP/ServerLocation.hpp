@@ -14,7 +14,7 @@ class Server::Location
 	bool _upload_allowed;
 	std::string _path;
 	std::string _alias;
-	std::vector<std::string> _index;
+	std::string _index;
 	std::pair<int, std::string> _redirection;
 	std::set<int> _allowed_methods;
 	std::string _upload_store_path;
@@ -38,7 +38,6 @@ class Server::Location
 
 	const std::string &getPath(void) const;
 	const std::string &getAlias(void) const;
-	const std::string &getNthIndex(size_t nth) const;
 	const std::string &getUploadPath(void) const;
 	size_t getMaxBodySize(void) const;
 	std::string generateResourcePath(const Request &req) const;

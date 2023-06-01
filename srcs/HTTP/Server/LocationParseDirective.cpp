@@ -1,6 +1,6 @@
-#include "HTTP/const_values.hpp"
 #include "ConfigDirective.hpp"
 #include "HTTP/Server.hpp"
+#include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
 
 using namespace HTTP;
@@ -159,25 +159,21 @@ void Server::Location::parseDirectiveIndex(
 	const size_t n_indexs = location_context.countDirectivesByName(dir_name);
 	if (n_indexs == 0)
 		return;
-	_has_index = true;
-	for (size_t i = 0; i < n_indexs; i++)
+	const ConfigDirective &index_directive
+		= location_context.getNthDirectiveByName(dir_name, 0);
+	if (n_indexs > 1)
 	{
-		const ConfigDirective &index_directive
-			= location_context.getNthDirectiveByName(dir_name, i);
-		if (index_directive.is_context())
-		{
-			_logger << async::error << dir_name << " should not be context";
-			index_directive.throwException(PARSINGEXC_UNDEF_DIR);
-		}
-		if (index_directive.nParameters() == 0)
-		{
-			_logger << async::error << dir_name
-					<< " should have more than 0 parameter(s)";
-			index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
-		}
-		for (size_t j = 0; j < index_directive.nParameters(); j++)
-			_index.push_back(index_directive.parameter(j));
+		_logger << async::error << location_context.name()
+				<< " should have 0 or 1 " << dir_name;
+		index_directive.throwException(PARSINGEXC_DUP_DIR);
 	}
+	_has_index = true;
+	if (index_directive.nParameters() != 1)
+	{
+		_logger << async::error << dir_name << " should have 1 parameter(s)";
+		index_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
+	_index = index_directive.parameter(0);
 }
 
 void Server::Location::parseDirectiveUpload(
