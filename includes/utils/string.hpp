@@ -12,6 +12,7 @@ void passLWS(std::string &str);
 void strtrim(std::string &str, const std::string &charset);
 std::vector<std::string> split(const std::string &s, const char c);
 std::vector<std::string> split(const std::string &s, const std::string &sep);
+char *duplicateStr(const std::string &str);
 
 // returns substring from start to (until).
 inline std::string getfrontstr(const std::string &str, const size_t until)

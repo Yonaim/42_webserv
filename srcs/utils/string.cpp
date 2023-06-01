@@ -105,3 +105,11 @@ void strtrim(std::string &str, const std::string &charset)
 		++offset;
 	trimbackstr(str, offset);
 }
+
+char *duplicateStr(const std::string &str)
+{
+	char *output = new char[str.size() + 1];
+	memcpy(output, str.c_str(), str.size());
+	output[str.size()] = '\0';
+	return (output);
+}
