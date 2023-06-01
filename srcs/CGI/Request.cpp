@@ -64,7 +64,7 @@ Request::Request(const HTTP::Request &http_req,
 				value += ", ";
 		}
 		addMetaVariable(http_meta_variable_name, value);
-		_logger << async::error << "name:" << http_meta_variable_name << ": "
+		_logger << async::verbose << "name:" << http_meta_variable_name << ": "
 				<< value;
 	}
 
