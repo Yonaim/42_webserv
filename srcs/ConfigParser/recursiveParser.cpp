@@ -22,17 +22,17 @@ ConfigDirective parseConfigDirective(std::vector<std::string>::iterator &cursor,
 	{
 		cursor_end++;
 		if (cursor_end == tokens.end())
-			throw(ConfigDirective::ParsingFail(
+			throw(ConfigDirective::InvalidDirective(
 				"Reached end of tokens without semicolon."));
 		if (isSpecialToken(*cursor_end))
 			break;
 		parameters.push_back(*cursor_end);
 	}
 	if (*cursor_end != token_semicolon)
-		throw(ConfigDirective::ParsingFail("Unexpected token \"" + *cursor_end
-										   + "\"."));
+		throw(ConfigDirective::InvalidDirective("Unexpected token \""
+												+ *cursor_end + "\"."));
 	if (cursor_end == cursor)
-		throw(ConfigDirective::ParsingFail("Not enough tokens to parse."));
+		throw(ConfigDirective::InvalidDirective("Not enough tokens to parse."));
 	cursor = cursor_end;
 	cursor++;
 	return (ConfigDirective(name, parameters));
@@ -49,17 +49,17 @@ ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
 	{
 		cursor_end++;
 		if (cursor_end == tokens.end())
-			throw(ConfigDirective::ParsingFail(
+			throw(ConfigDirective::InvalidDirective(
 				"Reached end of tokens without braces."));
 		if (isSpecialToken(*cursor_end))
 			break;
 		parameters.push_back(*cursor_end);
 	}
 	if (*cursor_end != token_brace_open)
-		throw(ConfigDirective::ParsingFail("Unexpected token \"" + *cursor_end
-										   + "\"."));
+		throw(ConfigDirective::InvalidDirective("Unexpected token \""
+												+ *cursor_end + "\"."));
 	if (cursor_end == cursor)
-		throw(ConfigDirective::ParsingFail("Not enough tokens to parse."));
+		throw(ConfigDirective::InvalidDirective("Not enough tokens to parse."));
 	cursor_end++;
 	while (true)
 	{
@@ -68,11 +68,11 @@ ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
 		directives.push_back(parseAvailableConfigDirective(cursor_end, tokens));
 	}
 	if (cursor_end == tokens.end())
-		throw(ConfigDirective::ParsingFail(
+		throw(ConfigDirective::InvalidDirective(
 			"Reached end of tokens without braces."));
 	if (*cursor_end != token_brace_close)
-		throw(ConfigDirective::ParsingFail("Unexpected token \"" + *cursor_end
-										   + "\"."));
+		throw(ConfigDirective::InvalidDirective("Unexpected token \""
+												+ *cursor_end + "\"."));
 	cursor = cursor_end;
 	cursor++;
 	return (ConfigContext(name, parameters, directives));
