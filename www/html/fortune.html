@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fortune Cookie</title>
+  <!-- <link rel="stylesheet" href="../css/styles.css"> -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 0;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    button[type="submit"] {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .fortune-container {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .fortune-text {
+      font-size: 24px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Random Fortune Cookie</h1>
+  </header>
+
+  <main>
+    <form action="/cgi-bin/fortune.cgi" method="GET">
+      <input type="text" name="name" placeholder="Your Name" required>
+      <button type="submit">Get Your Fortune</button>
+    </form>
+    
+    <div class="fortune-container">
+      <p class="fortune-text">
+        <?php
+        if (isset($_GET['fortune'])) {
+          echo $_GET['fortune'];
+        }
+        ?>
+      </p>
+    </div>
+
+  </main>
+</body>
+
+</html>
