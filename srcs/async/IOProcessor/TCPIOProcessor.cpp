@@ -67,7 +67,8 @@ void TCPIOProcessor::task(void)
 
 			if (flags & EV_EOF)
 			{
-				_logger << async::info << "client " << ident << " reports EOF";
+				_logger << async::verbose << "client " << ident
+						<< " reports EOF";
 				disconnect(ident);
 				_status = status::OK_AGAIN;
 				continue;
@@ -75,7 +76,7 @@ void TCPIOProcessor::task(void)
 			int rc = read(ident, data);
 			if (rc == status::ERROR_FILECLOSED)
 			{
-				_logger << async::info << "client " << ident << " is closed";
+				_logger << async::verbose << "client " << ident << " is closed";
 				disconnect(ident);
 				_status = status::OK_AGAIN;
 				continue;
