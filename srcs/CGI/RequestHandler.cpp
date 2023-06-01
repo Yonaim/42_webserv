@@ -1,4 +1,5 @@
 #include "CGI/RequestHandler.hpp"
+#include "utils/string.hpp"
 #include <cstdlib>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -17,6 +18,15 @@ RequestHandler::RequestHandler(const Request &request,
 
 RequestHandler::~RequestHandler()
 {
+}
+
+char **RequestHandler::getArgv(void)
+{
+	char **output = new char *[3];
+	output[0] = duplicateStr(_exec_path);
+	output[1] = duplicateStr(_request.getPath());
+	output[2] = NULL;
+	return (output);
 }
 
 const CGI::Response &RequestHandler::retrieve(void)

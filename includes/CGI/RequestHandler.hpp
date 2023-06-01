@@ -34,6 +34,8 @@ class RequestHandler
 	int _status;
 	async::Logger &_logger;
 
+	char **getArgv(void);
+
   public:
 	enum cgi_response_status_e
 	{
