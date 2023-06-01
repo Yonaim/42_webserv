@@ -56,25 +56,36 @@ void TCPIOProcessor::task(void)
 				disconnect(ident);
 			}
 		}
-		else if (flags & EV_EOF)
-		{
-			_logger << async::info << "client " << ident << " reports EOF";
-			disconnect(ident);
-		}
 		else if (filter == EVFILT_READ)
 		{
 			if (static_cast<int>(ident) == _listening_socket)
-				accept();
-			else
 			{
-				if (read(ident, data) >= status::ERROR_GENERIC)
-				{
-					_logger << async::warning
-							<< "Error while reading from client " << ident
-							<< ": " << _error_msg;
-					disconnect(ident);
-					_status = status::OK_AGAIN;
-				}
+				accept();
+				continue;
+			}
+
+			if (flags & EV_EOF)
+			{
+				_logger << async::info << "client " << ident << " reports EOF";
+				disconnect(ident);
+				_status = status::OK_AGAIN;
+				continue;
+			}
+			int rc = read(ident, data);
+			if (rc == status::ERROR_FILECLOSED)
+			{
+				_logger << async::info << "client " << ident << " is closed";
+				disconnect(ident);
+				_status = status::OK_AGAIN;
+				continue;
+			}
+			if (rc >= status::ERROR_GENERIC)
+			{
+				_logger << async::warning << "Error while reading from client "
+						<< ident << ": " << _error_msg;
+				disconnect(ident);
+				_status = status::OK_AGAIN;
+				continue;
 			}
 		}
 		else if (filter == EVFILT_WRITE)
