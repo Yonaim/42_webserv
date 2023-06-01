@@ -130,7 +130,7 @@ void Logger::blockingWriteAll(void)
 
 Logger &operator<<(Logger &io, const Logger::EndMarker mark)
 {
-	io.log("\n" ANSI_RESET);
+	io.log(ANSI_RESET "\n");
 	if (mark.level < Logger::getLogLevel())
 		Logger::deactivate();
 	else
