@@ -49,6 +49,8 @@ int RequestHandlerVnode::waitWriteInputOperation(void)
 	case async::status::OK_AGAIN:
 		ASYNC_LOG_DEBUG(_logger, "writing CGI Request body");
 		return (CGI_RESPONSE_STATUS_AGAIN);
+	case async::status::ERROR_TIMEOUT:
+		throw(std::runtime_error("Timeout occured while writing CGI Request"));
 	default:
 		throw(std::runtime_error("failed to write CGI Request"));
 	}
@@ -143,6 +145,9 @@ int RequestHandlerVnode::waitReadOutputOperation(void)
 		ASYNC_LOG_DEBUG(_logger, "read from file " << _output_file_path);
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
+	case async::status::ERROR_TIMEOUT:
+		throw(std::runtime_error(
+			"Timeout occured while reading from CGI Request"));
 	default:
 		throw(std::runtime_error("failed to receive CGI response"));
 	}

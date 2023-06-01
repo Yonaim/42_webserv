@@ -33,6 +33,8 @@ std::string Server::getErrorPage(const int code)
 		return (_error_pages[code]->retrieve());
 	else if (rc == async::status::OK_AGAIN)
 		return (generateErrorPage(code));
+	else if (rc == async::status::ERROR_TIMEOUT)
+		_logger << async::error << _error_pages[code]->errorMsg();
 	_logger << async::error
 			<< "Unknown error while loading error page for code " << code;
 	return ("");

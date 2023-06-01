@@ -101,6 +101,9 @@ int RequestHandlerPipe::waitRWOperation()
 		case async::status::OK_AGAIN:
 			ASYNC_LOG_DEBUG(_logger, "writing CGI request");
 			break;
+		case async::status::ERROR_TIMEOUT:
+			throw(std::runtime_error(
+				"Timeout occured while writing CGI Request"));
 		default:
 			throw(std::runtime_error("failed to send CGI Request"));
 		}
@@ -125,6 +128,9 @@ int RequestHandlerPipe::waitRWOperation()
 			ASYNC_LOG_DEBUG(_logger, "read status is again");
 			break;
 		}
+		case async::status::ERROR_TIMEOUT:
+			throw(std::runtime_error(
+				"Timeout occured while reading from CGI Request"));
 		default:
 			throw(std::runtime_error("failed to receive CGI response"));
 		}
