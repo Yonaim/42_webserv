@@ -83,7 +83,8 @@ class RequestHandlerVnode : public RequestHandler
 
   public:
 	RequestHandlerVnode(const Request &request, const std::string &exec_path,
-						const unsigned int timeout_ms);
+						const unsigned int timeout_ms,
+						const std::string &temp_dir_path);
 	virtual ~RequestHandlerVnode();
 
 	virtual int task(void);

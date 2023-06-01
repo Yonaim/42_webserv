@@ -10,10 +10,11 @@ using namespace CGI;
 
 RequestHandlerVnode::RequestHandlerVnode(const Request &request,
 										 const std::string &exec_path,
-										 const unsigned int timeout_ms)
+										 const unsigned int timeout_ms,
+										 const std::string &temp_dir_path)
 	: RequestHandler(request, exec_path),
-	  _input_file_path(std::string("./") + generateHash(toStr(clock()))),
-	  _output_file_path(std::string("./") + generateHash(toStr(clock()))),
+	  _input_file_path(temp_dir_path + "/" + generateHash(toStr(clock()))),
+	  _output_file_path(temp_dir_path + "/" + generateHash(toStr(clock()))),
 	  _timeout_ms(timeout_ms)
 {
 	_writer = new async::FileWriter(_timeout_ms, _input_file_path,
