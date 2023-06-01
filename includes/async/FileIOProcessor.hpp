@@ -23,7 +23,7 @@ class FileIOProcessor
 	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
 
 	bool checkTimeout(void);
-	bool openFdByPath(int oflag);
+	bool openFdByPath(const char *mode);
 
   public:
 	virtual ~FileIOProcessor();

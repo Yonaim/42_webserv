@@ -2,13 +2,13 @@
 #include "async/status.hpp"
 #include "utils/file.hpp"
 #include "utils/string.hpp"
-#include <fcntl.h>
+#include <cstdio>
 #include <unistd.h>
 
 using namespace async;
 typedef unsigned long long ull_t;
 
-bool FileIOProcessor::openFdByPath(int oflag)
+bool FileIOProcessor::openFdByPath(const char *mode)
 {
 	if (!_should_close)
 		return (false);
@@ -18,8 +18,7 @@ bool FileIOProcessor::openFdByPath(int oflag)
 		_error_msg = generateErrorMsgFileIsDir(_path);
 		return (true);
 	}
-	int fd
-		= ::open(_path.c_str(), oflag, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	int fd = ft_open(_path, mode);
 	if (fd < 0)
 	{
 		_status = status::ERROR_FILEOPENING;

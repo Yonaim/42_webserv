@@ -1,8 +1,9 @@
 #include "CGI/RequestHandler.hpp"
+#include "utils/file.hpp"
 #include "utils/hash.hpp"
 #include "utils/string.hpp"
+#include <cstdio>
 #include <cstdlib>
-#include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -63,10 +64,8 @@ int RequestHandlerVnode::fork()
 	}
 	else if (_pid == 0)
 	{
-		int input_fd = ::open(_input_file_path.c_str(), O_RDONLY,
-							  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		int output_fd = ::open(_output_file_path.c_str(), O_WRONLY | O_CREAT,
-							   S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		int input_fd = ft_open(_input_file_path, "r");
+		int output_fd = ft_open(_output_file_path, "w");
 		if (input_fd < 0 || output_fd < 0)
 		{
 			_logger << async::error << "Failed to create temporary files";
