@@ -12,10 +12,6 @@ const char comment_marker = '#';
 void splitIntoTokens(std::vector<std::string> &tokens,
 					 const std::string &content);
 
-ParsingFail::ParsingFail(const std::string &why) : std::runtime_error(why)
-{
-}
-
 std::string loadFileFromPath(const std::string &path)
 {
 	std::ifstream infile;

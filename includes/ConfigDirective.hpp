@@ -24,6 +24,43 @@ class ConfigDirective
 	bool _is_context;
 
   public:
+	class ParsingFail : public std::runtime_error
+	{
+	  public:
+		ParsingFail(const std::string &why, const ConfigDirective &dir);
+		ParsingFail(const std::string &why);
+	};
+	class UndefinedDirective : public ParsingFail
+	{
+	  public:
+		UndefinedDirective(const ConfigDirective &dir);
+	};
+	class UndefinedArgument : public ParsingFail
+	{
+	  public:
+		UndefinedArgument(const ConfigDirective &dir);
+	};
+	class InvalidNumberOfDirective : public ParsingFail
+	{
+	  public:
+		InvalidNumberOfDirective(const ConfigDirective &dir);
+	};
+	class InvalidNumberOfArgument : public ParsingFail
+	{
+	  public:
+		InvalidNumberOfArgument(const ConfigDirective &dir);
+	};
+	class DuplicateDirective : public ParsingFail
+	{
+	  public:
+		DuplicateDirective(const ConfigDirective &dir);
+	};
+	class DuplicateArgument : public ParsingFail
+	{
+	  public:
+		DuplicateArgument(const ConfigDirective &dir);
+	};
+
 	ConfigDirective(const std::string name = "");
 	ConfigDirective(const std::string &name,
 					const std::vector<std::string> &parameters);
