@@ -69,13 +69,15 @@ int RequestHandlerVnode::fork()
 							   S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (input_fd < 0 || output_fd < 0)
 		{
-			ASYNC_LOG_DEBUG(_logger, "failed to dup2");
+			_logger << async::error << "Failed to create temporary files";
+			async::Logger::blockingWriteAll();
 			std::exit(2);
 		}
 		if (::dup2(input_fd, STDIN_FILENO) < 0
 			|| ::dup2(output_fd, STDOUT_FILENO) < 0)
 		{
-			ASYNC_LOG_DEBUG(_logger, "failed to dup2");
+			_logger << async::error << "failed to dup2";
+			async::Logger::blockingWriteAll();
 			std::exit(2);
 		}
 		close(input_fd);
@@ -124,6 +126,8 @@ int RequestHandlerVnode::waitExecution()
 
 int RequestHandlerVnode::waitReadOutputOperation(void)
 {
+	if (!_reader)
+		_reader = new async::FileReader(_timeout_ms, _output_file_path);
 	switch (_reader->task())
 	{
 	case async::status::OK_DONE: {
@@ -150,26 +154,17 @@ int RequestHandlerVnode::waitReadOutputOperation(void)
 int RequestHandlerVnode::task(void)
 {
 	ASYNC_LOG_DEBUG(_logger, "status : " << _status);
-	try
+	switch (_status)
 	{
-		switch (_status)
-		{
-		case CGI_RESPONSE_INNER_STATUS_BEGIN:
-			return (waitWriteInputOperation());
-		case CGI_RESPONSE_INNER_STATUS_FORK_AGAIN:
-			return (fork());
-		case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
-			return (waitExecution());
-		case CGI_RESPONSE_INNER_STATUS_READ_AGAIN:
-			_reader = new async::FileReader(_timeout_ms, _output_file_path);
-			return (waitReadOutputOperation());
-		default:
-			return (CGI_RESPONSE_STATUS_OK);
-		}
-	}
-	catch (const std::runtime_error &e)
-	{
-		ASYNC_LOG_DEBUG(_logger, e.what());
-		throw(e);
+	case CGI_RESPONSE_INNER_STATUS_BEGIN:
+		return (waitWriteInputOperation());
+	case CGI_RESPONSE_INNER_STATUS_FORK_AGAIN:
+		return (fork());
+	case CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN:
+		return (waitExecution());
+	case CGI_RESPONSE_INNER_STATUS_READ_AGAIN:
+		return (waitReadOutputOperation());
+	default:
+		return (CGI_RESPONSE_STATUS_OK);
 	}
 }
