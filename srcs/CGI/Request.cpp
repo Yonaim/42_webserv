@@ -128,7 +128,7 @@ char *const *Request::getEnv(void) const
 	{
 		const std::string &name = it->first;
 		const std::string &value = it->second;
-		env[i++] = strdup((name + '=' + value).c_str());
+		env[i++] = duplicateStr((name + "=" + value));
 	}
 	env[_meta_variables.size()] = NULL;
 	return ((char *const *)env);
