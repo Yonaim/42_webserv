@@ -122,6 +122,11 @@ void WebServer::parseBacklogSize(const ConfigContext &root_context)
 	}
 
 	_backlog_size = toNum<int>(backlog_directive.parameter(0));
+	if (_backlog_size < 1 || _backlog_size > 128)
+	{
+		_logger << async::error << dir_name << " should be between 1 and 128";
+		backlog_directive.throwException(PARSINGEXC_INVALID_N_ARG);
+	}
 	_logger << async::info << "backlog size is " << _backlog_size;
 }
 
