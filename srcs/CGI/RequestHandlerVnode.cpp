@@ -1,8 +1,8 @@
 #include "CGI/RequestHandler.hpp"
 #include "utils/hash.hpp"
 #include "utils/string.hpp"
+#include <cstdio>
 #include <cstdlib>
-#include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -63,16 +63,16 @@ int RequestHandlerVnode::fork()
 	}
 	else if (_pid == 0)
 	{
-		int input_fd = ::open(_input_file_path.c_str(), O_RDONLY,
-							  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		int output_fd = ::open(_output_file_path.c_str(), O_WRONLY | O_CREAT,
-							   S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		if (input_fd < 0 || output_fd < 0)
+		FILE *input_stream = fopen(_input_file_path.c_str(), "r");
+		FILE *output_stream = fopen(_output_file_path.c_str(), "w");
+		if (!input_stream || !output_stream)
 		{
 			_logger << async::error << "Failed to create temporary files";
 			async::Logger::blockingWriteAll();
 			std::exit(2);
 		}
+		int input_fd = fileno(input_stream);
+		int output_fd = fileno(output_stream);
 		if (::dup2(input_fd, STDIN_FILENO) < 0
 			|| ::dup2(output_fd, STDOUT_FILENO) < 0)
 		{
@@ -80,8 +80,8 @@ int RequestHandlerVnode::fork()
 			async::Logger::blockingWriteAll();
 			std::exit(2);
 		}
-		close(input_fd);
-		close(output_fd);
+		fclose(input_stream);
+		fclose(output_stream);
 		ASYNC_LOG_DEBUG(_logger, "calling execve(" << _exec_path.c_str()
 												   << "), good bye!");
 		/* TODO: (해야 한다면) argv 만들어 입력 (아닐수도 있고)

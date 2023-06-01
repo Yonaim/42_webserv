@@ -1,6 +1,5 @@
 #include "async/FileIOProcessor.hpp"
 #include "async/status.hpp"
-#include <fcntl.h>
 
 using namespace async;
 
@@ -24,7 +23,7 @@ int FileReader::task(void)
 		return (_status);
 	if (_status == status::OK_BEGIN)
 	{
-		if (openFdByPath(O_RDONLY))
+		if (openFdByPath("r"))
 			return (_status);
 		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_R);
 		_status = status::OK_AGAIN;
