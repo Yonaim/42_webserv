@@ -5,7 +5,7 @@ RM			= rm -rf
 CXX			= c++
 CXXFLAGS	= \
 			-Wall -Wextra -Werror \
-			-MMD -MP -std=c++98 -fsanitize=address -g $(ACXXFLAGS) \
+			-MMD -MP -std=c++98 $(ACXXFLAGS) \
 
 CPPFLAGS	= \
 				-I./includes
