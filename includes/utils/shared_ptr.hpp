@@ -55,7 +55,17 @@ template <typename T> class shared_ptr
 		return (*_ptr);
 	}
 
+	const T &operator*(void) const
+	{
+		return (*_ptr);
+	}
+
 	T *operator->(void)
+	{
+		return (_ptr);
+	}
+
+	const T *operator->(void) const
 	{
 		return (_ptr);
 	}
