@@ -32,6 +32,24 @@ class Request
 	size_t _content_length;
 	async::Logger &_logger;
 
+	void parseHeaderEnsureHostHeaderField(void);
+	void parseHeaderEnsureTrailerHeaderField(void);
+	void parseHeaderEnsureCorrectHeadersForPostPutMethod(void);
+	void parseHeaderHandleTransferEncodingChunked(void);
+	void parseHeaderHandlerContentLength(void);
+
+	int parseStartLine(std::string &buffer);
+	int parseHeader(std::string &buffer);
+	int parseBody(std::string &buffer);
+	int parseChunk(std::string &buffer);
+	int parseTrailer(std::string &buffer);
+
+	int consumeLine(std::string &buffer, std::string &line, size_t &crlf_pos);
+
+	void consumeHeaderGetNameValue(std::string &header_line, std::string &name,
+								   std::vector<std::string> &values,
+								   bool is_trailer);
+
 	int consumeStartLine(std::string &buffer);
 	int consumeHeader(std::string &buffer);
 	int consumeBody(std::string &buffer);
@@ -52,7 +70,7 @@ class Request
 	Request(const Request &orig);
 	Request &operator=(const Request &orig);
 
-	int parse(std::string &buffer, size_t client_max_body_size);
+	int parse(std::string &buffer);
 
 	bool hasHeaderValue(const Header::const_iterator &name_iter,
 						const std::string &value) const;

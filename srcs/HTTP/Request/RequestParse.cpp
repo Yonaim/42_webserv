@@ -5,146 +5,133 @@
 
 using namespace HTTP;
 
-int Request::parse(std::string &buffer, size_t client_max_body_size)
+int Request::parseStartLine(std::string &buffer)
+{
+	int rc = consumeStartLine(buffer);
+	LOG_DEBUG("Got return code " << rc);
+
+	switch (rc)
+	{
+	case RETURN_TYPE_OK:
+		_current_state = PARSE_STATE_HEADER;
+		return (RETURN_TYPE_IN_PROCESS);
+
+	case RETURN_TYPE_AGAIN:
+		return (RETURN_TYPE_AGAIN);
+
+	default:
+		return (RETURN_TYPE_IN_PROCESS);
+	}
+}
+
+int Request::parseHeader(std::string &buffer)
+{
+	int rc = consumeHeader(buffer);
+	LOG_DEBUG("Got return code " << rc);
+
+	switch (rc)
+	{
+	case RETURN_TYPE_OK:
+		parseHeaderEnsureHostHeaderField();
+		parseHeaderEnsureTrailerHeaderField();
+		parseHeaderEnsureCorrectHeadersForPostPutMethod();
+		if (_header.hasValue("Transfer-Encoding", "chunked"))
+		{
+			_logger << async::verbose << "Transfer-Encoding is chunked";
+			parseHeaderHandleTransferEncodingChunked();
+		}
+		else if (_header.hasValue("Content-Length"))
+		{
+			_logger << async::verbose << "header has Content-Length";
+			parseHeaderHandlerContentLength();
+		}
+		else
+			return (RETURN_TYPE_OK);
+		break;
+
+	case RETURN_TYPE_AGAIN:
+		return (RETURN_TYPE_AGAIN);
+	}
+	LOG_DEBUG("parsing in progress...");
+	return (RETURN_TYPE_IN_PROCESS);
+}
+
+int Request::parseBody(std::string &buffer)
+{
+	int rc = consumeBody(buffer);
+	LOG_DEBUG("Got return code " << rc);
+	return (rc);
+}
+
+int Request::parseChunk(std::string &buffer)
+{
+	int rc = consumeChunk(buffer);
+	LOG_DEBUG("Got return code " << rc);
+	LOG_DEBUG("total content length " << _content_length);
+
+	switch (rc)
+	{
+	case RETURN_TYPE_OK:
+		if (_header.hasValue("Trailer"))
+		{
+			_logger << async::verbose << "header has Trailer";
+			_current_state = PARSE_STATE_TRAILER;
+			return (RETURN_TYPE_IN_PROCESS);
+		}
+		else
+			return (RETURN_TYPE_OK);
+
+	case RETURN_TYPE_AGAIN:
+		return (RETURN_TYPE_AGAIN);
+	}
+
+	return (RETURN_TYPE_IN_PROCESS);
+}
+
+int Request::parseTrailer(std::string &buffer)
+{
+	int rc = consumeTrailer(buffer);
+	LOG_DEBUG("Got return code " << rc);
+	return (rc);
+}
+
+int Request::parse(std::string &buffer)
 {
 	while (true)
 	{
 		int rc;
-		ASYNC_LOG_DEBUG(_logger,
-						__func__ << ": current state is " << _current_state);
+		LOG_DEBUG(__func__ << ": current state is " << _current_state);
 		switch (_current_state)
 		{
 		case PARSE_STATE_STARTLINE:
-			rc = consumeStartLine(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-
-			if (rc == RETURN_TYPE_OK)
-				_current_state = PARSE_STATE_HEADER;
-			else if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
+			rc = parseStartLine(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
 			break;
 
 		case PARSE_STATE_HEADER:
-			rc = consumeHeader(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-
-			if (rc == RETURN_TYPE_OK)
-			{
-				if (!_header.hasValue("Host")
-					&& !_header.hasValue("Trailer", "Host"))
-				{
-					_logger << async::warning << __func__
-							<< "Header must include Host header field";
-					throw(HTTP::InvalidValue());
-				}
-				if (_header.hasValue("Transfer-Encoding", "chunked"))
-				{
-					// Transfer coding == chunked라면
-					_logger << async::verbose
-							<< "header has Transfer-Encoding == chunked";
-					if (_header.hasValue("Trailer"))
-					{
-						/** 유효한 Trailer 헤더 필드 값을 가지고 있는지 확인**/
-						_trailer_values = _header.getValues("Trailer");
-						if (_trailer_values.empty())
-						{
-							throw(HTTP::EmptyLineFound());
-						}
-						std::vector<std::string>::const_iterator iter
-							= _trailer_values.begin();
-						for (; iter != _trailer_values.end(); ++iter)
-						{
-							if (*iter == "Trailer" || *iter == "Content-Length"
-								|| *iter == "Transfer-Encoding")
-								throw(HTTP::InvalidField());
-						}
-						_logger << async::verbose << "header has Trailer";
-					}
-					_current_state = PARSE_STATE_CHUNK;
-				}
-				else if (_header.hasValue("Trailer"))
-				{
-					_logger << async::warning << __func__
-							<< ": Trailer with no Transfer-Encoding";
-					throw(HTTP::InvalidValue());
-				}
-				else if (_header.hasValue("Content-Length"))
-				{
-					if (_method == METHOD_GET || _method == METHOD_HEAD
-						|| _method == METHOD_DELETE)
-						throw(HTTP::InvalidField());
-					const std::string &content_length
-						= getHeaderValue("Content-Length", 0);
-					_logger << async::verbose << "header has Content-Length";
-					_logger << async::verbose
-							<< "content-length : " << content_length;
-					try
-					{
-						_content_length = toNum<size_t>(content_length);
-					}
-					catch (const std::invalid_argument &e)
-					{
-						throw(HTTP::InvalidValue());
-					}
-
-					if (_content_length > client_max_body_size)
-					{
-						_logger << async::warning << __func__
-								<< ": exceeds the client_max_body_size";
-						throw(HTTP::InvalidSize());
-					}
-					if (_content_length >= 0)
-					{
-						ASYNC_LOG_DEBUG(_logger,
-										"header has Content-Length >= 0");
-						_current_state = PARSE_STATE_BODY;
-					}
-				}
-				else if (_method == METHOD_POST)
-					throw(HTTP::InvalidField());
-				else
-					return (RETURN_TYPE_OK);
-			}
-			else if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
-			else
-				ASYNC_LOG_DEBUG(_logger, "parsing in progress...");
+			rc = parseHeader(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
 			break;
 
 		case PARSE_STATE_BODY:
-			rc = consumeBody(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-			return (rc);
+			rc = parseBody(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
+			break;
 
 		case PARSE_STATE_CHUNK:
-			rc = consumeChunk(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-			ASYNC_LOG_DEBUG(_logger,
-							"total content length " << _content_length);
-			ASYNC_LOG_DEBUG(_logger,
-							"client max body size " << client_max_body_size);
-			if (_content_length > client_max_body_size)
-				throw(HTTP::InvalidSize());
-			if (rc == RETURN_TYPE_OK)
-			{
-				if (_header.hasValue("Trailer"))
-				{
-					_logger << async::verbose << "header has Trailer";
-					_current_state = PARSE_STATE_TRAILER;
-				}
-				else
-					return (RETURN_TYPE_OK);
-			}
-			else if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
-			else
-				;
+			rc = parseChunk(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
 			break;
 
 		case PARSE_STATE_TRAILER:
-			rc = consumeTrailer(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-			return (rc);
+			rc = parseTrailer(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
+			break;
 		}
 	}
 }

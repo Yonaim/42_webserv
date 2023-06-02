@@ -17,6 +17,7 @@ TCPIOProcessor::TCPIOProcessor(const int port, const int backlog)
 
 TCPIOProcessor::~TCPIOProcessor()
 {
+	finalize(NULL);
 }
 
 TCPIOProcessor::TCPIOProcessor(const TCPIOProcessor &orig)
@@ -147,12 +148,17 @@ void TCPIOProcessor::initialize(void)
 
 void TCPIOProcessor::finalize(const char *with_error)
 {
-	_logger << async::verbose << "Finalize TCPIOProcessor";
-	close(_listening_socket);
-	_listening_socket = 0;
-	if (with_error)
-		throw(std::runtime_error(std::string("Error from TCPIOProcessor: ")
-								 + with_error));
+	if (_listening_socket >= 0)
+	{
+		_logger << async::verbose << "Finalize TCPIOProcessor";
+		while (!_wrbuf.empty())
+			disconnect(_wrbuf.begin()->first);
+		close(_listening_socket);
+		if (with_error)
+			throw(std::runtime_error(std::string("Error from TCPIOProcessor: ")
+									 + with_error));
+	}
+	_listening_socket = -1;
 }
 
 void TCPIOProcessor::accept(void)

@@ -4,6 +4,7 @@
 #include "utils/string.hpp"
 
 static const int _backlog_size_default = 8;
+bool WebServer::_terminate = false;
 
 WebServer::WebServer(void)
 	: _backlog_size(_backlog_size_default),
@@ -46,7 +47,7 @@ WebServer::~WebServer()
 {
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
 		 it++)
-		it->second.finalize(NULL);
+		delete it->second;
 }
 
 WebServer &WebServer::operator=(const WebServer &orig)

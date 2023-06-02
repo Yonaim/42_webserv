@@ -41,13 +41,13 @@ int RequestHandlerVnode::waitWriteInputOperation(void)
 	switch (_writer->task())
 	{
 	case async::status::OK_DONE:
-		ASYNC_LOG_DEBUG(_logger, "Finished writing CGI Request body to file");
+		LOG_DEBUG("Finished writing CGI Request body to file");
 		delete _writer;
 		_writer = NULL;
 		_status = CGI_RESPONSE_INNER_STATUS_FORK_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	case async::status::OK_AGAIN:
-		ASYNC_LOG_DEBUG(_logger, "writing CGI Request body");
+		LOG_DEBUG("writing CGI Request body");
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	case async::status::ERROR_TIMEOUT:
 		throw(std::runtime_error("Timeout occured while writing CGI Request"));
@@ -85,14 +85,13 @@ int RequestHandlerVnode::fork()
 		}
 		fclose(input_stream);
 		fclose(output_stream);
-		ASYNC_LOG_DEBUG(_logger, "calling execve(" << _exec_path.c_str()
-												   << "), good bye!");
+		LOG_DEBUG("calling execve(" << _exec_path.c_str() << "), good bye!");
 		execve(_exec_path.c_str(), getArgv(), _request.getEnv());
 		std::exit(2);
 	}
 	else
 	{
-		ASYNC_LOG_DEBUG(_logger, "successed to fork.");
+		LOG_DEBUG("successed to fork.");
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
@@ -109,7 +108,7 @@ int RequestHandlerVnode::waitExecution()
 	}
 	else if (rc == 0)
 	{
-		ASYNC_LOG_DEBUG(_logger, "waiting child");
+		LOG_DEBUG("waiting child");
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
 	else
@@ -117,8 +116,8 @@ int RequestHandlerVnode::waitExecution()
 		if ((WIFEXITED(_waitpid_status) && (WEXITSTATUS(_waitpid_status) == 2))
 			|| WIFSIGNALED(_waitpid_status))
 			throw(std::runtime_error("CGI execution failed"));
-		ASYNC_LOG_DEBUG(_logger, "child process done");
-		ASYNC_LOG_DEBUG(_logger, "successed CGI execution");
+		LOG_DEBUG("child process done");
+		LOG_DEBUG("successed CGI execution");
 		_status = CGI_RESPONSE_INNER_STATUS_READ_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
@@ -131,8 +130,8 @@ int RequestHandlerVnode::waitReadOutputOperation(void)
 	switch (_reader->task())
 	{
 	case async::status::OK_DONE: {
-		ASYNC_LOG_DEBUG(_logger, "read status is ok");
-		ASYNC_LOG_DEBUG(_logger, "buffer: " << _reader->retrieve());
+		LOG_DEBUG("read status is ok");
+		LOG_DEBUG("buffer: " << _reader->retrieve());
 		std::string cgi_output = _reader->retrieve();
 		_response.makeResponse(cgi_output);
 		delete _reader;
@@ -141,8 +140,8 @@ int RequestHandlerVnode::waitReadOutputOperation(void)
 		return (CGI_RESPONSE_STATUS_OK);
 	}
 	case async::status::OK_AGAIN: {
-		ASYNC_LOG_DEBUG(_logger, "read status is again");
-		ASYNC_LOG_DEBUG(_logger, "read from file " << _output_file_path);
+		LOG_DEBUG("read status is again");
+		LOG_DEBUG("read from file " << _output_file_path);
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
 	case async::status::ERROR_TIMEOUT:
@@ -156,7 +155,7 @@ int RequestHandlerVnode::waitReadOutputOperation(void)
 
 int RequestHandlerVnode::task(void)
 {
-	ASYNC_LOG_DEBUG(_logger, "status : " << _status);
+	LOG_DEBUG("status : " << _status);
 	switch (_status)
 	{
 	case CGI_RESPONSE_INNER_STATUS_BEGIN:

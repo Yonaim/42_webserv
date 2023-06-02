@@ -84,11 +84,12 @@ inline async::Logger &operator<<(async::Logger &io, T content)
 	return (io);
 }
 
-#define ASYNC_LOG_DEBUG(logger, message)                                       \
+// _logger라는 이름의 로거 객체가 있을때 사용 가능
+#define LOG_DEBUG(message)                                                     \
 	do                                                                         \
 	{                                                                          \
 		if (async::Logger::DEBUG >= async::Logger::getLogLevel())              \
-			logger << async::debug << message;                                 \
+			_logger << async::debug << message;                                \
 	} while (0)
 
 #endif

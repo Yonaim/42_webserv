@@ -5,6 +5,11 @@
 #include "async/Logger.hpp"
 #include "utils/string.hpp"
 
+void WebServer::setTerminationFlag(void)
+{
+	WebServer::_terminate = true;
+}
+
 void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 {
 	for (async::TCPIOProcessor::iterator it = tcp_proc.begin();
@@ -14,24 +19,25 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		if (tcp_proc.rdbuf(client_fd).empty())
 			continue;
 
-		if (_request_buffer[port].find(client_fd)
-			== _request_buffer[port].end())
-			_request_buffer[port][client_fd] = HTTP::Request();
+		std::map<int, HTTP::Request> &requests
+			= _request_buffer.find(port)->second;
+		if (requests.find(client_fd) == requests.end())
+			resetRequestBuffer(port, client_fd);
 
 		int rc;
 		try
 		{
-			rc = _request_buffer[port][client_fd].parse(
-				tcp_proc.rdbuf(client_fd), _max_body_size);
+			rc = getRequestBuffer(port, client_fd)
+					 .parse(tcp_proc.rdbuf(client_fd));
 		}
 		catch (const HTTP::ParsingFail &e)
 		{
 			// TODO: 오류 상황에 따라 에러 코드 세분화
 			// TODO: 에러 코드에 따라 연결 끊을 수도 있게 처리
 			_logger << async::warning << "Parsing failure: " << e.what();
-			_request_buffer[port][client_fd] = HTTP::Request();
+			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(400); // Bad Request
-			_tcp_procs[port].wrbuf(client_fd) += res.toString();
+			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
 					<< "\"";
 			continue;
@@ -41,9 +47,9 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		{
 		case HTTP::Request::RETURN_TYPE_OK:
 			_logger << async::info << "Inbound request "
-					<< _request_buffer[port][client_fd];
-			registerRequest(port, client_fd, _request_buffer[port][client_fd]);
-			_request_buffer[port][client_fd] = HTTP::Request();
+					<< getRequestBuffer(port, client_fd);
+			registerRequest(port, client_fd, getRequestBuffer(port, client_fd));
+			resetRequestBuffer(port, client_fd);
 			break;
 
 		case HTTP::Request::RETURN_TYPE_AGAIN:
@@ -52,9 +58,9 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 
 		default:
 			_logger << async::warning << "Unknown parsing error";
-			_request_buffer[port][client_fd] = HTTP::Request();
+			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(500);
-			_tcp_procs[port].wrbuf(client_fd) += res.toString();
+			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
 					<< "\"";
 			break;
@@ -71,6 +77,18 @@ WebServer::_Servers::iterator WebServer::findNoneNameServer(int port)
 			return (it);
 	}
 	return (_servers[port].end());
+}
+
+HTTP::Request &WebServer::getRequestBuffer(int port, int client_fd)
+{
+	return (_request_buffer.find(port)->second.find(client_fd)->second);
+}
+
+void WebServer::resetRequestBuffer(int port, int client_fd)
+{
+	_request_buffer.find(port)->second.erase(client_fd);
+	_request_buffer.find(port)->second.insert(
+		std::pair<int, HTTP::Request>(client_fd, HTTP::Request()));
 }
 
 void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
@@ -115,7 +133,7 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 			_logger << async::verbose << "Response for client " << client_fd
 					<< " has been found";
 			HTTP::Response res = server_it->retrieveResponse(client_fd);
-			_tcp_procs[port].wrbuf(client_fd) += res.toString();
+			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
 					<< "\"";
 			_logger << async::info << "Outbound response " << res;
@@ -154,14 +172,39 @@ void WebServer::disconnect(int port, int client_fd)
 			<< " from port " << port;
 }
 
-void WebServer::task(void)
+void WebServer::terminate(void)
 {
+	while (!_tcp_procs.empty())
+	{
+		int port = _tcp_procs.begin()->first;
+		async::TCPIOProcessor *tcp = _tcp_procs.begin()->second;
+
+		tcp->finalize(NULL);
+		while (!tcp->disconnected_clients.empty())
+		{
+			int disconnected_fd = tcp->disconnected_clients.front();
+			tcp->disconnected_clients.pop();
+			disconnect(port, disconnected_fd);
+		}
+		delete tcp;
+		_tcp_procs.erase(_tcp_procs.begin());
+	}
+}
+
+int WebServer::task(void)
+{
+	if (_terminate)
+	{
+		terminate();
+		return (async::status::OK_DONE);
+	}
+
 	async::IOProcessor::doAllTasks();
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
 		 it++)
 	{
 		int port = it->first;
-		async::TCPIOProcessor &tcp = it->second;
+		async::TCPIOProcessor &tcp = *(it->second);
 
 		while (!tcp.disconnected_clients.empty())
 		{
@@ -173,4 +216,5 @@ void WebServer::task(void)
 	}
 	for (_ServerMap::iterator it = _servers.begin(); it != _servers.end(); it++)
 		retrieveResponseForEachFd(it->first, it->second);
+	return (async::status::OK_AGAIN);
 }

@@ -78,20 +78,29 @@ const std::vector<std::string> &Header::getValues(const std::string &name) const
 }
 
 void Header::assign(const std::string &name,
-					const std::vector<std::string> values)
+					const std::vector<std::string> &values)
 {
 	_values[name] = values;
 }
 
 void Header::insert(const std::string &name,
-					const std::vector<std::string> values)
+					const std::vector<std::string> &values)
 {
 	_values[name].insert(_values[name].end(), values.begin(), values.end());
 }
 
-void Header::insert(const std::string &name, const std::string value)
+void Header::insert(const std::string &name, const std::string &value)
 {
 	_values[name].insert(_values[name].end(), value);
+}
+
+void Header::append(const std::string &name,
+					const std::vector<std::string> &values)
+{
+	if (!hasValue(name))
+		assign(name, values);
+	else
+		insert(name, values);
 }
 
 Header::iterator Header::begin(void)
