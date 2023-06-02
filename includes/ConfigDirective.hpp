@@ -1,17 +1,27 @@
 #ifndef CONFIGDIRECTIVE_HPP
 #define CONFIGDIRECTIVE_HPP
 
+#include "utils/shared_ptr.hpp"
 #include <map>
 #include <ostream>
 #include <string>
 #include <vector>
+
+class ConfigDirective;
+
+typedef ft::shared_ptr<ConfigDirective> ConfigDirectivePtr;
 
 class ConfigDirective
 {
   protected:
 	std::string _name;
 	std::vector<std::string> _parameters;
+	std::vector<ConfigDirectivePtr> _directives;
 	bool _is_context;
+
+	ConfigDirective(const std::string &name,
+					const std::vector<std::string> &parameters,
+					const std::vector<ConfigDirectivePtr> &directives);
 
   public:
 	class InvalidDirective : public std::runtime_error
@@ -66,14 +76,11 @@ class ConfigDirective
 
 class ConfigContext : public ConfigDirective
 {
-  private:
-	std::vector<ConfigDirective *> _directives;
-
   public:
 	ConfigContext(const std::string name = "");
 	ConfigContext(const std::string &name,
 				  const std::vector<std::string> &parameters,
-				  const std::vector<ConfigDirective *> &directives);
+				  const std::vector<ConfigDirectivePtr> &directives);
 	virtual ~ConfigContext();
 	ConfigContext(const ConfigContext &orig);
 	ConfigContext &operator=(const ConfigContext &orig);

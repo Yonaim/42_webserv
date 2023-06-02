@@ -63,18 +63,15 @@ std::vector<std::string> tokenizeConfig(std::string &content)
 	return (tokens);
 }
 
-ConfigContext *parseConfig(const std::string &path)
+ConfigDirectivePtr parseConfig(const std::string &path)
 {
 	std::string file_content = loadFileFromPath(path);
 	std::vector<std::string> tokens = tokenizeConfig(file_content);
 	std::vector<std::string>::iterator cursor = tokens.begin();
 	std::vector<std::string> parameters;
-	std::vector<ConfigDirective *> directives;
+	std::vector<ConfigDirectivePtr> directives;
 	while (cursor != tokens.end())
 		directives.push_back(parseAvailableConfigDirective(cursor, tokens));
-	ConfigContext *result = new ConfigContext("root", parameters, directives);
-	for (std::vector<ConfigDirective *>::iterator it = directives.begin();
-		 it != directives.end(); it++)
-		delete *it;
-	return (result);
+	return (
+		ConfigDirectivePtr(new ConfigContext("root", parameters, directives)));
 }

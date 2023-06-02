@@ -10,11 +10,13 @@ extern const std::string token_semicolon;
 extern const std::string special_tokens[3];
 extern const std::string whitespace;
 
-ConfigDirective parseConfigDirective(std::vector<std::string>::iterator &cursor,
-									 const std::vector<std::string> &tokens);
-ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
-								 const std::vector<std::string> &tokens);
-ConfigDirective *parseAvailableConfigDirective(
+ConfigDirectivePtr parseConfigDirective(
+	std::vector<std::string>::iterator &cursor,
+	const std::vector<std::string> &tokens);
+ConfigDirectivePtr parseConfigContext(
+	std::vector<std::string>::iterator &cursor,
+	const std::vector<std::string> &tokens);
+ConfigDirectivePtr parseAvailableConfigDirective(
 	std::vector<std::string>::iterator &cursor,
 	const std::vector<std::string> &tokens);
 

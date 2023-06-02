@@ -12,8 +12,9 @@ bool isSpecialToken(const std::string &token)
 	return (false);
 }
 
-ConfigDirective parseConfigDirective(std::vector<std::string>::iterator &cursor,
-									 const std::vector<std::string> &tokens)
+ConfigDirectivePtr parseConfigDirective(
+	std::vector<std::string>::iterator &cursor,
+	const std::vector<std::string> &tokens)
 {
 	const std::string &name = *cursor;
 	std::vector<std::string> parameters;
@@ -35,15 +36,16 @@ ConfigDirective parseConfigDirective(std::vector<std::string>::iterator &cursor,
 		throw(ConfigDirective::InvalidDirective("Not enough tokens to parse."));
 	cursor = cursor_end;
 	cursor++;
-	return (ConfigDirective(name, parameters));
+	return (ConfigDirectivePtr(new ConfigDirective(name, parameters)));
 }
 
-ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
-								 const std::vector<std::string> &tokens)
+ConfigDirectivePtr parseConfigContext(
+	std::vector<std::string>::iterator &cursor,
+	const std::vector<std::string> &tokens)
 {
 	const std::string &name = *cursor;
 	std::vector<std::string> parameters;
-	std::vector<ConfigDirective *> directives;
+	std::vector<ConfigDirectivePtr> directives;
 	std::vector<std::string>::iterator cursor_end = cursor;
 	while (true)
 	{
@@ -69,9 +71,6 @@ ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
 	}
 	if (cursor_end == tokens.end() || *cursor_end != token_brace_close)
 	{
-		for (std::vector<ConfigDirective *>::iterator it = directives.begin();
-			 it != directives.end(); it++)
-			delete *it;
 		if (cursor_end == tokens.end())
 			throw(ConfigDirective::InvalidDirective(
 				"Reached end of tokens without braces."));
@@ -81,24 +80,21 @@ ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
 	}
 	cursor = cursor_end;
 	cursor++;
-	ConfigContext result(name, parameters, directives);
-	for (std::vector<ConfigDirective *>::iterator it = directives.begin();
-		 it != directives.end(); it++)
-		delete *it;
-	return (result);
+	return (
+		ConfigDirectivePtr(new ConfigContext(name, parameters, directives)));
 }
 
-ConfigDirective *parseAvailableConfigDirective(
+ConfigDirectivePtr parseAvailableConfigDirective(
 	std::vector<std::string>::iterator &cursor,
 	const std::vector<std::string> &tokens)
 {
 	try
 	{
-		return (new ConfigDirective(parseConfigDirective(cursor, tokens)));
+		return (parseConfigDirective(cursor, tokens));
 	}
 	catch (const std::exception &e)
 	{
 		(void)e;
 	}
-	return (new ConfigContext(parseConfigContext(cursor, tokens)));
+	return (parseConfigContext(cursor, tokens));
 }

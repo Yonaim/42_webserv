@@ -12,10 +12,11 @@ void setWebServerTerminationFlag(int arg)
 	WebServer::setTerminationFlag();
 }
 
-void parseLogLevel(const ConfigContext &root_context)
+void parseLogLevel(ConfigDirectivePtr root_config)
 {
 	const char *dir_name = "log_level";
 
+	const ConfigContext &root_context = (const ConfigContext &)(*root_config);
 	size_t n_directives = root_context.countDirectivesByName(dir_name);
 	if (n_directives == 0)
 		return;
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
 		return (2);
 	}
 
-	ConfigContext *rootConfig;
+	ConfigDirectivePtr rootConfig;
 	try
 	{
 		rootConfig = parseConfig(config_path);
@@ -64,13 +65,12 @@ int main(int argc, char **argv)
 
 	try
 	{
-		parseLogLevel(*rootConfig);
+		parseLogLevel(rootConfig);
 	}
 	catch (const std::exception &e)
 	{
 		async::Logger::blockingWriteAll();
 		std::cerr << "\nError while parsing log level: " << e.what() << "\n";
-		delete rootConfig;
 		return (2);
 	}
 
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 
 	try
 	{
-		WebServer webserver(*rootConfig);
+		WebServer webserver((ConfigContext &)(*rootConfig));
 		while (true)
 		{
 			int rc = webserver.task();
@@ -95,8 +95,6 @@ int main(int argc, char **argv)
 
 	root_logger << async::info << "Server terminated\n";
 	async::Logger::blockingWriteAll();
-
-	delete rootConfig;
 
 	return (0);
 }
