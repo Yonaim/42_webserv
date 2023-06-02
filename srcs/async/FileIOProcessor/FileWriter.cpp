@@ -27,7 +27,8 @@ int FileWriter::task(void)
 	{
 		if (openFdByPath("w"))
 			return (_status);
-		_processor = new SingleIOProcessor(_fd, SingleIOProcessor::IO_W);
+		_processor = ft::shared_ptr<SingleIOProcessor>(
+			new SingleIOProcessor(_fd, SingleIOProcessor::IO_W));
 		_processor->setWriteBuf(_content);
 		_status = status::OK_AGAIN;
 	}

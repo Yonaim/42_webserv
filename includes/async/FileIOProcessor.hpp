@@ -2,6 +2,7 @@
 #define ASYNC_FILEIOPROCESSOR_HPP
 
 #include "async/SingleIOProcessor.hpp"
+#include "utils/shared_ptr.hpp"
 #include <cstdio>
 #include <ctime>
 #include <string>
@@ -11,7 +12,7 @@ namespace async
 class FileIOProcessor
 {
   protected:
-	SingleIOProcessor *_processor;
+	ft::shared_ptr<SingleIOProcessor> _processor;
 	FILE *_stream;
 	int _fd;
 	const std::string _path;

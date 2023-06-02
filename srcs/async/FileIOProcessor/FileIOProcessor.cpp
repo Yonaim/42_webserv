@@ -53,7 +53,6 @@ FileIOProcessor::~FileIOProcessor()
 {
 	if (_should_close && _stream)
 		fclose(_stream);
-	delete _processor;
 }
 
 void FileIOProcessor::renewTimeout(void)
