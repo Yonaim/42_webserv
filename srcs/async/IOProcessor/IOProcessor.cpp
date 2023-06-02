@@ -86,13 +86,23 @@ void IOProcessor::initializeKQueue(void)
 void IOProcessor::flushKQueue(void)
 {
 	static const int size_eventbuf = 8;
+	struct kevent *newevents;
 	struct kevent events[size_eventbuf];
+	int n_events;
 	int n_newevents;
+
 	if (_watchlist.empty())
-		n_newevents = kevent(_kq, NULL, 0, events, size_eventbuf, &zerosec);
+	{
+		newevents = NULL;
+		n_events = 0;
+	}
 	else
-		n_newevents = kevent(_kq, &_watchlist[0], _watchlist.size(), events,
-							 size_eventbuf, &zerosec);
+	{
+		newevents = &_watchlist[0];
+		n_events = _watchlist.size();
+	}
+	n_newevents
+		= kevent(_kq, newevents, n_events, events, size_eventbuf, &zerosec);
 	_watchlist.clear();
 	if (n_newevents < 0)
 		throw(std::runtime_error(std::string("Error while running kevent: ")
