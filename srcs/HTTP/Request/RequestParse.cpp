@@ -106,6 +106,13 @@ int Request::parseHeader(std::string &buffer)
 	return (RETURN_TYPE_IN_PROCESS);
 }
 
+int Request::parseBody(std::string &buffer)
+{
+	int rc = consumeBody(buffer);
+	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	return (rc);
+}
+
 int Request::parse(std::string &buffer)
 {
 	while (true)
@@ -128,9 +135,10 @@ int Request::parse(std::string &buffer)
 			break;
 
 		case PARSE_STATE_BODY:
-			rc = consumeBody(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-			return (rc);
+			rc = parseBody(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
+			break;
 
 		case PARSE_STATE_CHUNK:
 			rc = consumeChunk(buffer);
