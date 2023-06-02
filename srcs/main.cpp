@@ -36,14 +36,8 @@ void parseLogLevel(const ConfigContext &root_context)
 									 << loglevel_directive.parameter(0);
 }
 
-void leaks(void)
-{
-	system("leaks webserv");
-}
-
 int main(int argc, char **argv)
 {
-	atexit(leaks);
 	const char *config_path;
 
 	if (argc == 1)
