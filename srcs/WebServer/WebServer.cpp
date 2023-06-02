@@ -6,12 +6,6 @@
 static const int _backlog_size_default = 8;
 bool WebServer::_terminate = false;
 
-WebServer::WebServer(void)
-	: _backlog_size(_backlog_size_default),
-	  _logger(async::Logger::getLogger("WebServer"))
-{
-}
-
 WebServer::WebServer(const ConfigContext &root_context)
 	: _backlog_size(_backlog_size_default),
 	  _logger(async::Logger::getLogger("WebServer"))
@@ -36,13 +30,6 @@ WebServer::WebServer(const ConfigContext &root_context)
 	}
 }
 
-WebServer::WebServer(const WebServer &orig)
-	: _tcp_procs(orig._tcp_procs), _servers(orig._servers),
-	  _timeout_ms(orig._timeout_ms), _backlog_size(orig._backlog_size),
-	  _logger(orig._logger)
-{
-}
-
 WebServer::~WebServer()
 {
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
@@ -56,13 +43,4 @@ WebServer::~WebServer()
 			 server_it != servers.end(); server_it++)
 			delete *server_it;
 	}
-}
-
-WebServer &WebServer::operator=(const WebServer &orig)
-{
-	_tcp_procs = orig._tcp_procs;
-	_servers = orig._servers;
-	_timeout_ms = orig._timeout_ms;
-	_backlog_size = orig._backlog_size;
-	return (*this);
 }

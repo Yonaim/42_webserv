@@ -31,8 +31,6 @@ class WebServer
 	int _backlog_size;
 	async::Logger &_logger;
 
-	WebServer(void);
-
 	void parseMaxBodySize(const ConfigContext &root_context);
 	void parseUploadStore(const ConfigContext &root_context);
 	void parseTimeout(const ConfigContext &root_context);
@@ -52,8 +50,6 @@ class WebServer
   public:
 	WebServer(const ConfigContext &root_context);
 	~WebServer();
-	WebServer(const WebServer &orig);
-	WebServer &operator=(const WebServer &orig);
 
 	int task(void);
 	static void setTerminationFlag(void);

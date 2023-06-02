@@ -69,8 +69,6 @@ class Server
 	Server(const ConfigContext &server_context, const size_t max_body_size,
 		   const unsigned int timeout_ms);
 	~Server();
-	Server(const Server &orig);
-	Server &operator=(const Server &orig);
 
 	// interfaces
 	void task(void);
