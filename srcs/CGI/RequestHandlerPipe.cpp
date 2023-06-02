@@ -26,6 +26,8 @@ RequestHandlerPipe::RequestHandlerPipe(const Request &request,
 									   const unsigned int timeout_ms)
 	: RequestHandler(request, exec_path)
 {
+	_read_pipe_fd[0] = -1, _read_pipe_fd[1] = -1;
+	_write_pipe_fd[0] = -1, _write_pipe_fd[1] = -1;
 	if (::pipe(_read_pipe_fd) < 0 || ::pipe(_write_pipe_fd) < 0)
 	{
 		closeAllPipes();
