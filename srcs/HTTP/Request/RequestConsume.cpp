@@ -7,9 +7,6 @@ using namespace HTTP;
 
 int Request::consumeStartLine(std::string &buffer)
 {
-	// [메소드][SP][URI][SP][HTTP-version][CRLF]
-
-	/* line 파싱 */
 	const size_t crlf_pos = buffer.find(CRLF);
 
 	if (crlf_pos == std::string::npos)
@@ -35,7 +32,6 @@ int Request::consumeStartLine(std::string &buffer)
 		throw(HTTP::InvalidFormat());
 	}
 
-	/* 공백 기준 split */
 	std::vector<std::string> tokens = split(start_line, ' ');
 	if (tokens.size() != 3)
 	{
@@ -43,31 +39,17 @@ int Request::consumeStartLine(std::string &buffer)
 		throw(HTTP::InvalidFormat());
 	}
 
+	try
 	{
-		_logger << async::verbose << __func__ << ": split into ";
-		for (size_t i = 0; i < tokens.size(); i++)
-			_logger << "\"" << tokens[i] << "\" ";
+		_method = METHOD[tokens[0]];
 	}
-
-	/* method index 구하기 */
-	for (BidiMap<std::string, int>::const_iterator it = METHOD.begin();
-		 it != METHOD.end(); it++)
-	{
-		if (tokens[0] == it->first)
-		{
-			_method = it->second;
-			break;
-		}
-	}
-
-	LOG_DEBUG(__func__ << ": method index is " << _method);
-	if (_method == METHOD_NONE)
+	catch (const std::runtime_error &e)
 	{
 		_logger << async::warning << __func__ << ": invalid method";
 		throw(HTTP::InvalidValue());
 	}
+	LOG_DEBUG(__func__ << ": method index is " << _method);
 
-	/* uri, version 파싱 */
 	_uri = tokens[1];
 	size_t question_mark_pos = _uri.find('?');
 	if (question_mark_pos != std::string::npos)
@@ -75,17 +57,14 @@ int Request::consumeStartLine(std::string &buffer)
 		_query_string = getbackstr(_uri, question_mark_pos + 1);
 		trimbackstr(_uri, question_mark_pos);
 	}
-
 	_version = tokens[2];
 
-	{
-		_logger << async::verbose << __func__ << ": URI: \"" << _uri << "\"";
-		_logger << async::verbose << __func__ << ": QUERY: \"" << _query_string
-				<< "\"";
-		_logger << async::verbose << __func__ << ": version: \"" << _version
-				<< "\"";
-		LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
-	}
+	_logger << async::verbose << __func__ << ": URI: \"" << _uri << "\"";
+	_logger << async::verbose << __func__ << ": QUERY: \"" << _query_string
+			<< "\"";
+	_logger << async::verbose << __func__ << ": version: \"" << _version
+			<< "\"";
+	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 	return (RETURN_TYPE_OK);
 }
 
