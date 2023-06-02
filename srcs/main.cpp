@@ -3,7 +3,14 @@
 #include "async/SingleIOProcessor.hpp"
 #include "parseConfig.hpp"
 #include <iostream>
+#include <signal.h>
 #include <unistd.h>
+
+void setWebServerTerminationFlag(int arg)
+{
+	(void)arg;
+	WebServer::setTerminationFlag();
+}
 
 void parseLogLevel(const ConfigContext &root_context)
 {
@@ -44,7 +51,7 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		async::IOProcessor::blockingWriteAll();
+		async::Logger::blockingWriteAll();
 		std::cerr << "\nError while parsing config file: " << e.what() << "\n";
 		return (2);
 	}
@@ -55,10 +62,13 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		async::IOProcessor::blockingWriteAll();
+		async::Logger::blockingWriteAll();
 		std::cerr << "\nError while parsing log level: " << e.what() << "\n";
 		return (2);
 	}
+
+	async::Logger &root_logger = async::Logger::getLogger("root");
+	signal(SIGINT, setWebServerTerminationFlag);
 
 	try
 	{
@@ -72,12 +82,12 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		async::IOProcessor::blockingWriteAll();
-		std::cerr << "\nError while running WebServer: " << e.what() << '\n';
+		root_logger << async::error
+					<< "Error while running WebServer: " << e.what();
 	}
 
-	async::IOProcessor::blockingWriteAll();
-	std::cout << "Server terminated" << std::endl;
+	root_logger << async::info << "Server terminated\n";
+	async::Logger::blockingWriteAll();
 
 	return (0);
 }

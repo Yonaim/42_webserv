@@ -14,11 +14,13 @@
 class WebServer
 {
   private:
-	typedef std::map<int, async::TCPIOProcessor> _TCPProcMap;
+	typedef std::map<int, async::TCPIOProcessor *> _TCPProcMap;
 	typedef std::vector<HTTP::Server> _Servers;
 	typedef std::map<int, _Servers> _ServerMap;
 	typedef std::map<int, HTTP::Request> _ReqBufFdMap;
 	typedef std::map<int, _ReqBufFdMap> _ReqBufPortMap;
+
+	static bool _terminate;
 
 	size_t _max_body_size;
 	std::string _upload_store;
@@ -45,6 +47,7 @@ class WebServer
 	void retrieveResponseForEachFd(int port, _Servers &servers);
 	HTTP::Response generateErrorResponse(const int code);
 	void disconnect(int port, int client_fd);
+	void terminate(void);
 
   public:
 	WebServer(const ConfigContext &root_context);
@@ -53,6 +56,7 @@ class WebServer
 	WebServer &operator=(const WebServer &orig);
 
 	int task(void);
+	static void setTerminationFlag(void);
 };
 
 #endif
