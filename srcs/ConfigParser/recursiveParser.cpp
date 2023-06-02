@@ -67,15 +67,25 @@ ConfigContext parseConfigContext(std::vector<std::string>::iterator &cursor,
 			break;
 		directives.push_back(parseAvailableConfigDirective(cursor_end, tokens));
 	}
-	if (cursor_end == tokens.end())
-		throw(ConfigDirective::InvalidDirective(
-			"Reached end of tokens without braces."));
-	if (*cursor_end != token_brace_close)
-		throw(ConfigDirective::InvalidDirective("Unexpected token \""
-												+ *cursor_end + "\"."));
+	if (cursor_end == tokens.end() || *cursor_end != token_brace_close)
+	{
+		for (std::vector<ConfigDirective *>::iterator it = directives.begin();
+			 it != directives.end(); it++)
+			delete *it;
+		if (cursor_end == tokens.end())
+			throw(ConfigDirective::InvalidDirective(
+				"Reached end of tokens without braces."));
+		if (*cursor_end != token_brace_close)
+			throw(ConfigDirective::InvalidDirective("Unexpected token \""
+													+ *cursor_end + "\"."));
+	}
 	cursor = cursor_end;
 	cursor++;
-	return (ConfigContext(name, parameters, directives));
+	ConfigContext result(name, parameters, directives);
+	for (std::vector<ConfigDirective *>::iterator it = directives.begin();
+		 it != directives.end(); it++)
+		delete *it;
+	return (result);
 }
 
 ConfigDirective *parseAvailableConfigDirective(

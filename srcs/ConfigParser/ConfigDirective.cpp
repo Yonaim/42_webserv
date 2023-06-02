@@ -60,24 +60,52 @@ ConfigContext::ConfigContext(const std::string name) : ConfigDirective(name)
 ConfigContext::ConfigContext(const std::string &name,
 							 const std::vector<std::string> &parameters,
 							 const std::vector<ConfigDirective *> &directives)
-	: ConfigDirective(name, parameters), _directives(directives)
+	: ConfigDirective(name, parameters)
 {
 	_is_context = true;
+	for (std::vector<ConfigDirective *>::const_iterator it = directives.begin();
+		 it != directives.end(); it++)
+	{
+		if ((*it)->is_context())
+			_directives.push_back(new ConfigContext(*((ConfigContext *)(*it))));
+		else
+			_directives.push_back(new ConfigDirective(**it));
+	}
 }
 
 ConfigContext::~ConfigContext()
 {
+	for (size_t i = 0; i < _directives.size(); ++i)
+		delete _directives[i];
 }
 
-ConfigContext::ConfigContext(const ConfigContext &orig)
-	: ConfigDirective(orig), _directives(orig._directives)
+ConfigContext::ConfigContext(const ConfigContext &orig) : ConfigDirective(orig)
 {
+	for (std::vector<ConfigDirective *>::const_iterator it
+		 = orig._directives.begin();
+		 it != orig._directives.end(); it++)
+	{
+		if ((*it)->is_context())
+			_directives.push_back(new ConfigContext(*((ConfigContext *)(*it))));
+		else
+			_directives.push_back(new ConfigDirective(**it));
+	}
 }
 
 ConfigContext &ConfigContext::operator=(const ConfigContext &orig)
 {
 	ConfigDirective::operator=(orig);
-	_directives = orig._directives;
+	for (size_t i = 0; i < _directives.size(); ++i)
+		delete _directives[i];
+	for (std::vector<ConfigDirective *>::const_iterator it
+		 = orig._directives.begin();
+		 it != orig._directives.end(); it++)
+	{
+		if ((*it)->is_context())
+			_directives.push_back(new ConfigContext(*((ConfigContext *)(*it))));
+		else
+			_directives.push_back(new ConfigDirective(**it));
+	}
 	return (*this);
 }
 

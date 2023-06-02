@@ -54,7 +54,7 @@ class ConfigDirective
 	ConfigDirective(const std::string name = "");
 	ConfigDirective(const std::string &name,
 					const std::vector<std::string> &parameters);
-	~ConfigDirective();
+	virtual ~ConfigDirective();
 	ConfigDirective(const ConfigDirective &orig);
 	ConfigDirective &operator=(const ConfigDirective &orig);
 
@@ -74,7 +74,7 @@ class ConfigContext : public ConfigDirective
 	ConfigContext(const std::string &name,
 				  const std::vector<std::string> &parameters,
 				  const std::vector<ConfigDirective *> &directives);
-	~ConfigContext();
+	virtual ~ConfigContext();
 	ConfigContext(const ConfigContext &orig);
 	ConfigContext &operator=(const ConfigContext &orig);
 
