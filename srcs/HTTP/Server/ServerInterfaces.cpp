@@ -83,28 +83,6 @@ void Server::iterateCGIHandlers(void)
 	}
 }
 
-bool Server::isForMe(const Request &request)
-{
-	if (request.countHeaderValue("Host") != 1)
-	{
-		throw(InvalidRequest("zero or more than one header "
-							 "field found with name \"Host\""));
-	}
-	const std::string &host = request.getHeaderValue("Host", 0);
-	_logger << async::verbose << "Request is for host \"" << host << "\"";
-	for (std::set<std::string>::iterator it = _server_name.begin();
-		 it != _server_name.end(); it++)
-	{
-		if (*it == host)
-		{
-			_logger << async::verbose << "Request host match with \"" << host
-					<< "\"";
-			return (true);
-		}
-	}
-	return (false);
-}
-
 void Server::registerHTTPRequest(int client_fd, const Request &request,
 								 const Server::Location &location,
 								 const std::string &resource_path)
@@ -242,27 +220,26 @@ Response Server::retrieveResponse(int client_fd)
 	return (res);
 }
 
-int Server::hasResponses(void)
+void Server::registerRedirectResponse(int fd, const Server::Location &location)
 {
-	for (std::map<int, std::queue<Response> >::iterator it
-		 = _output_queue.begin();
-		 it != _output_queue.end(); it++)
-	{
-		if (!it->second.empty())
-			return (it->first);
-	}
-	return (-1);
+	_output_queue[fd].push(location.generateRedirectResponse());
 }
 
-bool Server::hasResponses(int client_fd)
+Response Server::generateErrorResponse(const int code)
 {
-	ensureClientConnected(client_fd);
-	return (!_output_queue[client_fd].empty());
+	Response response;
+
+	std::string body = getErrorPage(code);
+	response.setStatus(code);
+	response.setBody(body);
+	response.setContentLength(body.length());
+	response.setContentType("text/html");
+	return (response);
 }
 
-bool Server::hasServerName(void) const
+void Server::registerErrorResponse(int fd, int code)
 {
-	return (_has_server_name);
+	_output_queue[fd].push(generateErrorResponse(code));
 }
 
 void Server::disconnect(int client_fd)

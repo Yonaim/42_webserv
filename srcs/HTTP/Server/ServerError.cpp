@@ -13,7 +13,7 @@ Server::LocationNotFound::LocationNotFound(const std::string &path)
 {
 }
 
-Server::ClientNotFound::ClientNotFound(const int client_fd)
+Server::ClientNotFound::ClientNotFound(int client_fd)
 	: Server::ServerError("Client fd " + toStr(client_fd)
 						  + " is not yet connected.")
 {

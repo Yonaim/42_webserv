@@ -71,7 +71,7 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 						<< " should have integer form parameter";
 				throw(ConfigDirective::UndefinedArgument(error_page_directive));
 			}
-			int code = toNum<int>(code_str);
+			const int code = toNum<int>(code_str);
 			if (!isValidStatusCode(code))
 			{
 				_logger << async::error << dir_name
