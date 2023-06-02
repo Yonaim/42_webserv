@@ -33,6 +33,8 @@ class Request
 	size_t _max_body_size;
 	async::Logger &_logger;
 
+	int parseStartLine(std::string &buffer);
+
 	int consumeStartLine(std::string &buffer);
 	int consumeHeader(std::string &buffer);
 	int consumeBody(std::string &buffer);

@@ -5,6 +5,21 @@
 
 using namespace HTTP;
 
+int Request::parseStartLine(std::string &buffer)
+{
+	int rc = consumeStartLine(buffer);
+	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	if (rc == RETURN_TYPE_OK)
+	{
+		_current_state = PARSE_STATE_HEADER;
+		return (RETURN_TYPE_IN_PROCESS);
+	}
+	else if (rc == RETURN_TYPE_AGAIN)
+		return (RETURN_TYPE_AGAIN);
+	else
+		return (RETURN_TYPE_IN_PROCESS);
+}
+
 int Request::parse(std::string &buffer)
 {
 	while (true)
@@ -15,13 +30,9 @@ int Request::parse(std::string &buffer)
 		switch (_current_state)
 		{
 		case PARSE_STATE_STARTLINE:
-			rc = consumeStartLine(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-
-			if (rc == RETURN_TYPE_OK)
-				_current_state = PARSE_STATE_HEADER;
-			else if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
+			rc = parseStartLine(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
 			break;
 
 		case PARSE_STATE_HEADER:
