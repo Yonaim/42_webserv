@@ -38,7 +38,13 @@ void parseLogLevel(const ConfigContext &root_context)
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+	const char *config_path;
+
+	if (argc == 1)
+		config_path = "example.conf";
+	else if (argc == 2)
+		config_path = argv[1];
+	if (argc > 2)
 	{
 		std::cout << "usage: " << argv[0] << " path/to/config/file\n";
 		return (2);
@@ -47,7 +53,7 @@ int main(int argc, char **argv)
 	ConfigContext rootConfig;
 	try
 	{
-		rootConfig = parseConfig(argv[1]);
+		rootConfig = parseConfig(config_path);
 	}
 	catch (const std::exception &e)
 	{
