@@ -36,8 +36,14 @@ void parseLogLevel(const ConfigContext &root_context)
 									 << loglevel_directive.parameter(0);
 }
 
+void leaks(void)
+{
+	system("leaks webserv");
+}
+
 int main(int argc, char **argv)
 {
+	atexit(leaks);
 	const char *config_path;
 
 	if (argc == 1)
@@ -50,7 +56,7 @@ int main(int argc, char **argv)
 		return (2);
 	}
 
-	ConfigContext rootConfig;
+	ConfigContext *rootConfig;
 	try
 	{
 		rootConfig = parseConfig(config_path);
@@ -64,12 +70,13 @@ int main(int argc, char **argv)
 
 	try
 	{
-		parseLogLevel(rootConfig);
+		parseLogLevel(*rootConfig);
 	}
 	catch (const std::exception &e)
 	{
 		async::Logger::blockingWriteAll();
 		std::cerr << "\nError while parsing log level: " << e.what() << "\n";
+		delete rootConfig;
 		return (2);
 	}
 
@@ -78,7 +85,7 @@ int main(int argc, char **argv)
 
 	try
 	{
-		WebServer webserver(rootConfig);
+		WebServer webserver(*rootConfig);
 		while (true)
 		{
 			int rc = webserver.task();
@@ -94,6 +101,8 @@ int main(int argc, char **argv)
 
 	root_logger << async::info << "Server terminated\n";
 	async::Logger::blockingWriteAll();
+
+	delete rootConfig;
 
 	return (0);
 }

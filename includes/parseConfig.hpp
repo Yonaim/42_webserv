@@ -4,6 +4,6 @@
 #include "ConfigDirective.hpp"
 #include <string>
 
-ConfigContext parseConfig(const std::string &path);
+ConfigContext *parseConfig(const std::string &path);
 
 #endif
