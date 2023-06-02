@@ -14,22 +14,23 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		if (tcp_proc.rdbuf(client_fd).empty())
 			continue;
 
-		if (_request_buffer[port].find(client_fd)
-			== _request_buffer[port].end())
-			_request_buffer[port][client_fd] = HTTP::Request();
+		std::map<int, HTTP::Request> &requests
+			= _request_buffer.find(port)->second;
+		if (requests.find(client_fd) == requests.end())
+			resetRequestBuffer(port, client_fd);
 
 		int rc;
 		try
 		{
-			rc = _request_buffer[port][client_fd].parse(
-				tcp_proc.rdbuf(client_fd), _max_body_size);
+			rc = getRequestBuffer(port, client_fd)
+					 .parse(tcp_proc.rdbuf(client_fd));
 		}
 		catch (const HTTP::ParsingFail &e)
 		{
 			// TODO: 오류 상황에 따라 에러 코드 세분화
 			// TODO: 에러 코드에 따라 연결 끊을 수도 있게 처리
 			_logger << async::warning << "Parsing failure: " << e.what();
-			_request_buffer[port][client_fd] = HTTP::Request();
+			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(400); // Bad Request
 			_tcp_procs[port].wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
@@ -41,9 +42,9 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		{
 		case HTTP::Request::RETURN_TYPE_OK:
 			_logger << async::info << "Inbound request "
-					<< _request_buffer[port][client_fd];
-			registerRequest(port, client_fd, _request_buffer[port][client_fd]);
-			_request_buffer[port][client_fd] = HTTP::Request();
+					<< getRequestBuffer(port, client_fd);
+			registerRequest(port, client_fd, getRequestBuffer(port, client_fd));
+			resetRequestBuffer(port, client_fd);
 			break;
 
 		case HTTP::Request::RETURN_TYPE_AGAIN:
@@ -52,7 +53,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 
 		default:
 			_logger << async::warning << "Unknown parsing error";
-			_request_buffer[port][client_fd] = HTTP::Request();
+			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(500);
 			_tcp_procs[port].wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()

@@ -5,7 +5,7 @@
 
 using namespace HTTP;
 
-int Request::parse(std::string &buffer, size_t client_max_body_size)
+int Request::parse(std::string &buffer)
 {
 	while (true)
 	{
@@ -87,10 +87,10 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 						throw(HTTP::InvalidValue());
 					}
 
-					if (_content_length > client_max_body_size)
+					if (_content_length > _max_body_size)
 					{
 						_logger << async::warning << __func__
-								<< ": exceeds the client_max_body_size";
+								<< ": exceeds the _max_body_size";
 						throw(HTTP::InvalidSize());
 					}
 					if (_content_length >= 0)
@@ -121,9 +121,8 @@ int Request::parse(std::string &buffer, size_t client_max_body_size)
 			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
 			ASYNC_LOG_DEBUG(_logger,
 							"total content length " << _content_length);
-			ASYNC_LOG_DEBUG(_logger,
-							"client max body size " << client_max_body_size);
-			if (_content_length > client_max_body_size)
+			ASYNC_LOG_DEBUG(_logger, "client max body size " << _max_body_size);
+			if (_content_length > _max_body_size)
 				throw(HTTP::InvalidSize());
 			if (rc == RETURN_TYPE_OK)
 			{

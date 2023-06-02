@@ -30,6 +30,7 @@ class Request
 	int _current_state; // enum parse_state_e
 	std::vector<std::string> _trailer_values;
 	size_t _content_length;
+	size_t _max_body_size;
 	async::Logger &_logger;
 
 	int consumeStartLine(std::string &buffer);
@@ -47,12 +48,12 @@ class Request
 		RETURN_TYPE_IN_PROCESS
 	};
 
-	Request(void);
+	Request(size_t max_body_size);
 	~Request();
 	Request(const Request &orig);
 	Request &operator=(const Request &orig);
 
-	int parse(std::string &buffer, size_t client_max_body_size);
+	int parse(std::string &buffer);
 
 	bool hasHeaderValue(const Header::const_iterator &name_iter,
 						const std::string &value) const;
