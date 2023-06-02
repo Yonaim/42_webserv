@@ -66,7 +66,7 @@ const std::string &Header::getValue(const std::string &name, int idx) const
 	if (name_iter == _values.end())
 		throw(std::runtime_error("Header name " + name + " not found."));
 
-	return (name_iter->second.at(idx));
+	return (name_iter->second[idx]);
 }
 
 const std::vector<std::string> &Header::getValues(const std::string &name) const
