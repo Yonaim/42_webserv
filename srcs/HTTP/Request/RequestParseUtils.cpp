@@ -75,11 +75,6 @@ void Request::parseHeaderHandlerContentLength(void)
 		throw(HTTP::InvalidValue());
 	}
 
-	if (_content_length > _max_body_size)
-	{
-		_logger << async::warning << __func__ << ": exceeds the _max_body_size";
-		throw(HTTP::InvalidSize());
-	}
 	if (_content_length >= 0)
 	{
 		LOG_DEBUG("header has Content-Length >= 0");

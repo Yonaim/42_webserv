@@ -67,10 +67,7 @@ int Request::parseChunk(std::string &buffer)
 {
 	int rc = consumeChunk(buffer);
 	LOG_DEBUG("Got return code " << rc);
-	LOG_DEBUG("total content length "
-			  << _content_length << "client max body size " << _max_body_size);
-	if (_content_length > _max_body_size)
-		throw(HTTP::InvalidSize());
+	LOG_DEBUG("total content length " << _content_length);
 
 	switch (rc)
 	{

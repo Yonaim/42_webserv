@@ -82,8 +82,8 @@ HTTP::Request &WebServer::getRequestBuffer(int port, int client_fd)
 void WebServer::resetRequestBuffer(int port, int client_fd)
 {
 	_request_buffer.find(port)->second.erase(client_fd);
-	_request_buffer.find(port)->second.insert(std::pair<int, HTTP::Request>(
-		client_fd, HTTP::Request(_max_body_size)));
+	_request_buffer.find(port)->second.insert(
+		std::pair<int, HTTP::Request>(client_fd, HTTP::Request()));
 }
 
 void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
