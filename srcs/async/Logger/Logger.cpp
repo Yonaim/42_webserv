@@ -119,12 +119,6 @@ void Logger::doAllTasks(void)
 
 void Logger::blockingWriteAll(void)
 {
-	for (std::map<std::string, Logger *>::iterator it = _loggers.begin();
-		 it != _loggers.end(); it++)
-	{
-		Logger &logger = *(it->second);
-		logger.log("\n");
-	}
 	IOProcessor::blockingWriteAll();
 }
 
