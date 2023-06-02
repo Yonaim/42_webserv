@@ -47,6 +47,10 @@ class Request
 
 	int consumeLine(std::string &buffer, std::string &line, size_t &crlf_pos);
 
+	void consumeHeaderGetNameValue(std::string &header_line, std::string &name,
+								   std::vector<std::string> &values,
+								   bool is_trailer);
+
 	int consumeStartLine(std::string &buffer);
 	int consumeHeader(std::string &buffer);
 	int consumeBody(std::string &buffer);

@@ -78,6 +78,56 @@ int Request::consumeStartLine(std::string &buffer)
 	return (RETURN_TYPE_OK);
 }
 
+void Request::consumeHeaderGetNameValue(std::string &header_line,
+										std::string &name,
+										std::vector<std::string> &values,
+										bool is_trailer)
+{
+	const size_t colon_pos = header_line.find(":");
+	if (colon_pos == std::string::npos)
+	{
+		_logger << async::warning << __func__ << ": header line has no colon";
+		throw(HTTP::InvalidField());
+	}
+
+	name = getfrontstr(header_line, colon_pos);
+	if (hasSpace(name))
+	{
+		_logger << async::warning << __func__ << ": header name has space";
+		throw(HTTP::InvalidField());
+	}
+
+	if (is_trailer)
+	{
+		bool found_name = false;
+		for (std::vector<std::string>::iterator it = _trailer_values.begin();
+			 it != _trailer_values.end(); it++)
+		{
+			if (*it == name)
+			{
+				found_name = true;
+				_trailer_values.erase(it);
+				break;
+			}
+		}
+		if (found_name == false)
+		{
+			_logger << async::warning << __func__
+					<< ": Trailer header doesn't have " << name;
+			throw(HTTP::InvalidField());
+		}
+	}
+
+	const std::string value_part = getbackstr(header_line, colon_pos + 1);
+	values = split(value_part, ",");
+	for (std::vector<std::string>::iterator it = values.begin();
+		 it != values.end(); it++)
+	{
+		strtrim(*it, LWS);
+		LOG_DEBUG(__func__ << ": new value \"" << *it << "\"");
+	}
+}
+
 int Request::consumeHeader(std::string &buffer)
 {
 	size_t crlf_pos;
@@ -96,40 +146,10 @@ int Request::consumeHeader(std::string &buffer)
 		return (RETURN_TYPE_OK);
 	}
 
-	const size_t colon_pos = header_line.find(":");
-	if (colon_pos == std::string::npos)
-	{
-		_logger << async::warning << __func__ << ": header line has no colon";
-		throw(HTTP::InvalidField());
-	}
-
-	const std::string name = getfrontstr(header_line, colon_pos);
-	if (hasSpace(name))
-	{
-		_logger << async::warning << __func__ << ": header name has space";
-		throw(HTTP::InvalidField());
-	}
-
-	const std::string value_part = getbackstr(header_line, colon_pos + 1);
-	std::vector<std::string> values = split(value_part, ",");
-	for (std::vector<std::string>::iterator it = values.begin();
-		 it != values.end(); it++)
-	{
-		strtrim(*it, LWS);
-		LOG_DEBUG(__func__ << ": new value \"" << *it << "\"");
-	}
-
-	/* key가 있다면, 붙여넣기 */
-	if (!_header.hasValue(name))
-	{
-		LOG_DEBUG(__func__ << ": assign to new header");
-		_header.assign(name, values);
-	}
-	else
-	{
-		LOG_DEBUG(__func__ << ": insert to existing header");
-		_header.insert(name, values);
-	}
+	std::string name;
+	std::vector<std::string> values;
+	consumeHeaderGetNameValue(header_line, name, values, false);
+	_header.append(name, values);
 
 	return (RETURN_TYPE_IN_PROCESS);
 }
@@ -207,58 +227,11 @@ int Request::consumeTrailer(std::string &buffer)
 		return (RETURN_TYPE_OK);
 	}
 
-	const size_t colon_pos = header_line.find(":");
-	if (colon_pos == std::string::npos)
-	{
-		_logger << async::warning << __func__ << ": header line has no colon";
-		throw(HTTP::InvalidField());
-	}
+	std::string name;
+	std::vector<std::string> values;
+	consumeHeaderGetNameValue(header_line, name, values, true);
 
-	const std::string name = getfrontstr(header_line, colon_pos);
-	if (hasSpace(name))
-	{
-		_logger << async::warning << __func__ << ": header name has space";
-		throw(HTTP::InvalidField());
-	}
-
-	bool found_name = false;
-	for (std::vector<std::string>::iterator it = _trailer_values.begin();
-		 it != _trailer_values.end(); it++)
-	{
-		if (*it == name)
-		{
-			found_name = true;
-			_trailer_values.erase(it);
-			break;
-		}
-	}
-	if (found_name == false)
-	{
-		_logger << async::warning << __func__
-				<< ": Trailer header doesn't have " << name;
-		throw(HTTP::InvalidField());
-	}
-
-	const std::string value_part = getbackstr(header_line, colon_pos + 1);
-	std::vector<std::string> values = split(value_part, ",");
-	for (std::vector<std::string>::iterator it = values.begin();
-		 it != values.end(); it++)
-	{
-		strtrim(*it, LWS);
-		LOG_DEBUG(__func__ << ": new value \"" << *it << "\"");
-	}
-
-	/** key가 있다면, 붙여넣기 **/
-	if (!_header.hasValue(name))
-	{
-		_logger << async::verbose << __func__ << ": assign to new header";
-		_header.assign(name, values);
-	}
-	else
-	{
-		_logger << async::verbose << __func__ << ": insert to existing header";
-		_header.insert(name, values);
-	}
+	_header.append(name, values);
 
 	if (_trailer_values.size() == 0)
 		return (RETURN_TYPE_OK);
