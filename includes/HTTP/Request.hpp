@@ -37,6 +37,7 @@ class Request
 	int parseHeader(std::string &buffer);
 	int parseBody(std::string &buffer);
 	int parseChunk(std::string &buffer);
+	int parseTrailer(std::string &buffer);
 
 	int consumeStartLine(std::string &buffer);
 	int consumeHeader(std::string &buffer);

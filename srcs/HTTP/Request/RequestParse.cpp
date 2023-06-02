@@ -138,6 +138,13 @@ int Request::parseChunk(std::string &buffer)
 	return (RETURN_TYPE_IN_PROCESS);
 }
 
+int Request::parseTrailer(std::string &buffer)
+{
+	int rc = consumeTrailer(buffer);
+	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	return (rc);
+}
+
 int Request::parse(std::string &buffer)
 {
 	while (true)
@@ -172,9 +179,10 @@ int Request::parse(std::string &buffer)
 			break;
 
 		case PARSE_STATE_TRAILER:
-			rc = consumeTrailer(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-			return (rc);
+			rc = parseTrailer(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
+			break;
 		}
 	}
 }
