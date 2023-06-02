@@ -50,14 +50,14 @@ template <typename T> class shared_ptr
 		}
 	}
 
-	T *operator*(void)
-	{
-		return (_ptr);
-	}
-
-	T &operator->(void)
+	T &operator*(void)
 	{
 		return (*_ptr);
+	}
+
+	T *operator->(void)
+	{
+		return (_ptr);
 	}
 };
 } // namespace ft
