@@ -28,20 +28,6 @@ SingleIOProcessor::~SingleIOProcessor()
 {
 }
 
-SingleIOProcessor::SingleIOProcessor(const SingleIOProcessor &orig)
-	: _fd(orig._fd), _event_option(orig._event_option)
-{
-	initialize();
-}
-
-SingleIOProcessor &SingleIOProcessor::operator=(const SingleIOProcessor &orig)
-{
-	_fd = orig._fd;
-	_event_option = orig._event_option;
-	initialize();
-	return (*this);
-}
-
 void SingleIOProcessor::task(void)
 {
 	flushKQueue();

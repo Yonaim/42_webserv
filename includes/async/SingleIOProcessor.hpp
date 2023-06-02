@@ -27,8 +27,6 @@ class SingleIOProcessor : public IOProcessor
 	SingleIOProcessor(const int fd);
 	SingleIOProcessor(const int fd, const int event_option);
 	virtual ~SingleIOProcessor();
-	SingleIOProcessor(const SingleIOProcessor &orig);
-	SingleIOProcessor &operator=(const SingleIOProcessor &orig);
 
 	void setWriteBuf(const std::string &str);
 	void getReadBuf(std::string &str);

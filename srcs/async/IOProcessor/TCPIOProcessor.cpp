@@ -20,20 +20,6 @@ TCPIOProcessor::~TCPIOProcessor()
 	finalize(NULL);
 }
 
-TCPIOProcessor::TCPIOProcessor(const TCPIOProcessor &orig)
-	: _port(orig._port), _backlog_size(orig._backlog_size),
-	  _listening_socket(orig._listening_socket), _logger(orig._logger)
-{
-}
-
-TCPIOProcessor &TCPIOProcessor::operator=(const TCPIOProcessor &orig)
-{
-	_port = orig._port;
-	_backlog_size = orig._backlog_size;
-	_listening_socket = orig._listening_socket;
-	return (*this);
-}
-
 void TCPIOProcessor::task(void)
 {
 	flushKQueue();

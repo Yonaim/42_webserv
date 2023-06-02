@@ -39,8 +39,6 @@ class IOProcessor
   public:
 	IOProcessor(void);
 	virtual ~IOProcessor();
-	IOProcessor(const IOProcessor &orig);
-	IOProcessor &operator=(const IOProcessor &orig);
 
 	const int &stat(void) const;
 	const std::string &errorMsg(void) const;

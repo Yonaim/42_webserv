@@ -43,8 +43,6 @@ class TCPIOProcessor : public IOProcessor
 
 	TCPIOProcessor(const int port = 80, const int backlog = 8);
 	virtual ~TCPIOProcessor();
-	TCPIOProcessor(const TCPIOProcessor &orig);
-	TCPIOProcessor &operator=(const TCPIOProcessor &orig);
 
 	void initialize(void);
 	void finalize(const char *with_error);

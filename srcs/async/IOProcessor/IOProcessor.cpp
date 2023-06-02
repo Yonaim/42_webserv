@@ -22,28 +22,6 @@ IOProcessor::~IOProcessor()
 	unregisterObject(this);
 }
 
-IOProcessor::IOProcessor(const IOProcessor &orig)
-	: _watchlist(orig._watchlist), _eventlist(orig._eventlist),
-	  _rdbuf(orig._rdbuf), _wrbuf(orig._wrbuf)
-{
-	initializeKQueue();
-	flushKQueue();
-}
-
-IOProcessor &IOProcessor::operator=(const IOProcessor &orig)
-{
-	if (this == &orig)
-		return (*this);
-	close(_kq);
-	_watchlist = orig._watchlist;
-	_eventlist = orig._eventlist;
-	_rdbuf = orig._rdbuf;
-	_wrbuf = orig._wrbuf;
-	initializeKQueue();
-	flushKQueue();
-	return (*this);
-}
-
 void IOProcessor::registerObject(IOProcessor *obj)
 {
 	std::vector<IOProcessor *>::iterator it
