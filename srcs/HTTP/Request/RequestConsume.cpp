@@ -5,18 +5,28 @@
 
 using namespace HTTP;
 
-int Request::consumeStartLine(std::string &buffer)
+int Request::consumeLine(std::string &buffer, std::string &line,
+						 size_t &crlf_pos)
 {
-	const size_t crlf_pos = buffer.find(CRLF);
-
+	crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
 		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
 		return (RETURN_TYPE_AGAIN);
 	}
-
-	const std::string start_line = consumestr(buffer, crlf_pos);
+	line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
+	return (RETURN_TYPE_OK);
+}
+
+int Request::consumeStartLine(std::string &buffer)
+{
+	size_t crlf_pos;
+	std::string start_line;
+
+	if (consumeLine(buffer, start_line, crlf_pos) == RETURN_TYPE_AGAIN)
+		return (RETURN_TYPE_AGAIN);
+
 	LOG_DEBUG(__func__ << ": start line is \"" << start_line << "\"");
 
 	if (crlf_pos == 0)
@@ -70,15 +80,12 @@ int Request::consumeStartLine(std::string &buffer)
 
 int Request::consumeHeader(std::string &buffer)
 {
-	const size_t crlf_pos = buffer.find(CRLF);
-	if (crlf_pos == std::string::npos)
-	{
-		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
-		return (RETURN_TYPE_AGAIN);
-	}
+	size_t crlf_pos;
+	std::string header_line;
 
-	const std::string header_line = consumestr(buffer, crlf_pos);
-	consumestr(buffer, CRLF_LEN);
+	if (consumeLine(buffer, header_line, crlf_pos) == RETURN_TYPE_AGAIN)
+		return (RETURN_TYPE_AGAIN);
+
 	LOG_DEBUG(__func__ << ": header line: " << header_line);
 	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 
@@ -185,16 +192,12 @@ int Request::consumeChunk(std::string &buffer)
 
 int Request::consumeTrailer(std::string &buffer)
 {
-	/**  헤더라인 파싱하기  **/
-	const size_t crlf_pos = buffer.find(CRLF);
-	if (crlf_pos == std::string::npos)
-	{
-		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
-		return (RETURN_TYPE_AGAIN);
-	}
+	size_t crlf_pos;
+	std::string header_line;
 
-	const std::string header_line = consumestr(buffer, crlf_pos);
-	consumestr(buffer, CRLF_LEN);
+	if (consumeLine(buffer, header_line, crlf_pos) == RETURN_TYPE_AGAIN)
+		return (RETURN_TYPE_AGAIN);
+
 	LOG_DEBUG(__func__ << ": header line: " << header_line);
 	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 
