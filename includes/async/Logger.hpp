@@ -2,6 +2,7 @@
 #define ASYNC_LOGGER_HPP
 
 #include "async/SingleIOProcessor.hpp"
+#include "utils/shared_ptr.hpp"
 #include <map>
 #include <sstream>
 #include <string>
@@ -12,9 +13,10 @@ namespace async
 class Logger
 {
   private:
-	typedef std::map<int, SingleIOProcessor *> _Procs;
+	typedef ft::shared_ptr<SingleIOProcessor> _SingleIOPtr;
+	typedef std::map<int, _SingleIOPtr> _Procs;
 
-	static std::map<std::string, Logger *> _loggers;
+	static std::map<std::string, ft::shared_ptr<Logger> > _loggers;
 	static _Procs _target;
 	static const std::string _name_default;
 	static int _log_level;

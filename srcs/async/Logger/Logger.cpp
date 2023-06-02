@@ -4,8 +4,8 @@
 
 using namespace async;
 
-std::map<std::string, Logger *> Logger::_loggers;
-std::map<int, SingleIOProcessor *> Logger::_target;
+std::map<std::string, ft::shared_ptr<Logger> > Logger::_loggers;
+std::map<int, ft::shared_ptr<SingleIOProcessor> > Logger::_target;
 const std::string Logger::_name_default = "root";
 int Logger::_log_level = INFO;
 const char *Logger::_level_names[]
@@ -53,8 +53,11 @@ void Logger::log(const std::string &content)
 {
 	if (!_active)
 		return;
-	for (_Procs::const_iterator it = _target.begin(); it != _target.end(); it++)
-		it->second->setWriteBuf(content);
+	for (_Procs::iterator it = _target.begin(); it != _target.end(); it++)
+	{
+		_SingleIOPtr &logger = it->second;
+		logger->setWriteBuf(content);
+	}
 }
 
 bool Logger::isActive(void)
@@ -99,16 +102,13 @@ int Logger::getLogLevel(void)
 void Logger::registerFd(int fd)
 {
 	if (_target.find(fd) == _target.end())
-		_target[fd] = new SingleIOProcessor(fd);
+		_target[fd] = _SingleIOPtr(new SingleIOProcessor(fd));
 }
 
 Logger &Logger::getLogger(const std::string &name)
 {
 	if (_loggers.find(name) == _loggers.end())
-	{
-		Logger *new_logger = new Logger(name);
-		_loggers[name] = new_logger;
-	}
+		_loggers[name] = ft::shared_ptr<Logger>(new Logger(name));
 	return (*(_loggers[name]));
 }
 
