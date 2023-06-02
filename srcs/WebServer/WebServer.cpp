@@ -48,6 +48,14 @@ WebServer::~WebServer()
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
 		 it++)
 		delete it->second;
+	for (_ServerMap::iterator servermap_it = _servers.begin();
+		 servermap_it != _servers.end(); servermap_it++)
+	{
+		_Servers &servers = servermap_it->second;
+		for (_Servers::iterator server_it = servers.begin();
+			 server_it != servers.end(); server_it++)
+			delete *server_it;
+	}
 }
 
 WebServer &WebServer::operator=(const WebServer &orig)

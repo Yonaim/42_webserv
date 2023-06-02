@@ -15,7 +15,7 @@ class WebServer
 {
   private:
 	typedef std::map<int, async::TCPIOProcessor *> _TCPProcMap;
-	typedef std::vector<HTTP::Server> _Servers;
+	typedef std::vector<HTTP::Server *> _Servers;
 	typedef std::map<int, _Servers> _ServerMap;
 	typedef std::map<int, HTTP::Request> _ReqBufFdMap;
 	typedef std::map<int, _ReqBufFdMap> _ReqBufPortMap;

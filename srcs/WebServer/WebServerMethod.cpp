@@ -73,7 +73,7 @@ WebServer::_Servers::iterator WebServer::findNoneNameServer(int port)
 	for (_Servers::iterator it = _servers[port].begin();
 		 it != _servers[port].end(); it++)
 	{
-		if (it->hasServerName() == false)
+		if ((*it)->hasServerName() == false)
 			return (it);
 	}
 	return (_servers[port].end());
@@ -98,9 +98,9 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 		for (_Servers::iterator it = _servers[port].begin();
 			 it != _servers[port].end(); it++)
 		{
-			if (it->isForMe(request))
+			if ((*it)->isForMe(request))
 			{
-				it->registerRequest(client_fd, request);
+				(*it)->registerRequest(client_fd, request);
 				return;
 			}
 		}
@@ -114,9 +114,9 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 	// 일치하는 Host가 없을 시, 해당 포트의 server_name이 없는 서버를 찾아보고
 	// 그러한 서버가 없다면 해당 포트의 첫 서버에 등록
 	if (findNoneNameServer(port) != _servers[port].end())
-		findNoneNameServer(port)->registerRequest(client_fd, request);
+		(*findNoneNameServer(port))->registerRequest(client_fd, request);
 	else
-		_servers[port].front().registerRequest(client_fd, request);
+		_servers[port].front()->registerRequest(client_fd, request);
 }
 
 void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
@@ -124,15 +124,16 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 	for (_Servers::iterator server_it = servers.begin();
 		 server_it != servers.end(); server_it++)
 	{
-		server_it->task();
+		HTTP::Server *server = *server_it;
+		server->task();
 		while (true)
 		{
-			int client_fd = server_it->hasResponses();
+			int client_fd = server->hasResponses();
 			if (client_fd < 0)
 				break;
 			_logger << async::verbose << "Response for client " << client_fd
 					<< " has been found";
-			HTTP::Response res = server_it->retrieveResponse(client_fd);
+			HTTP::Response res = server->retrieveResponse(client_fd);
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
 			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
 					<< "\"";
@@ -161,7 +162,7 @@ void WebServer::disconnect(int port, int client_fd)
 	{
 		try
 		{
-			it->disconnect(client_fd);
+			(*it)->disconnect(client_fd);
 		}
 		catch (const HTTP::Server::ClientNotFound &e)
 		{

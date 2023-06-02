@@ -23,6 +23,9 @@ Server::Server(const ConfigContext &server_context, const size_t max_body_size,
 
 Server::~Server()
 {
+	for (std::map<int, async::FileReader *>::iterator it = _error_pages.begin();
+		 it != _error_pages.end(); it++)
+		delete it->second;
 }
 
 Server::Server(const Server &orig)
