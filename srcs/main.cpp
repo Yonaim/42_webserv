@@ -64,13 +64,20 @@ int main(int argc, char **argv)
 	{
 		WebServer webserver(rootConfig);
 		while (true)
-			webserver.task();
+		{
+			int rc = webserver.task();
+			if (rc != async::status::OK_AGAIN)
+				break;
+		}
 	}
 	catch (const std::exception &e)
 	{
 		async::IOProcessor::blockingWriteAll();
 		std::cerr << "\nError while running WebServer: " << e.what() << '\n';
 	}
+
+	async::IOProcessor::blockingWriteAll();
+	std::cout << "Server terminated" << std::endl;
 
 	return (0);
 }

@@ -167,7 +167,7 @@ void WebServer::disconnect(int port, int client_fd)
 			<< " from port " << port;
 }
 
-void WebServer::task(void)
+int WebServer::task(void)
 {
 	async::IOProcessor::doAllTasks();
 	for (_TCPProcMap::iterator it = _tcp_procs.begin(); it != _tcp_procs.end();
@@ -186,4 +186,5 @@ void WebServer::task(void)
 	}
 	for (_ServerMap::iterator it = _servers.begin(); it != _servers.end(); it++)
 		retrieveResponseForEachFd(it->first, it->second);
+	return (async::status::OK_AGAIN);
 }

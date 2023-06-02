@@ -52,7 +52,7 @@ class WebServer
 	WebServer(const WebServer &orig);
 	WebServer &operator=(const WebServer &orig);
 
-	void task(void);
+	int task(void);
 };
 
 #endif
