@@ -82,7 +82,7 @@ void Request::parseHeaderHandlerContentLength(void)
 	}
 	if (_content_length >= 0)
 	{
-		ASYNC_LOG_DEBUG(_logger, "header has Content-Length >= 0");
+		LOG_DEBUG("header has Content-Length >= 0");
 		_current_state = PARSE_STATE_BODY;
 	}
 }

@@ -8,7 +8,7 @@ using namespace HTTP;
 int Request::parseStartLine(std::string &buffer)
 {
 	int rc = consumeStartLine(buffer);
-	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	LOG_DEBUG("Got return code " << rc);
 
 	switch (rc)
 	{
@@ -27,7 +27,7 @@ int Request::parseStartLine(std::string &buffer)
 int Request::parseHeader(std::string &buffer)
 {
 	int rc = consumeHeader(buffer);
-	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	LOG_DEBUG("Got return code " << rc);
 
 	switch (rc)
 	{
@@ -52,24 +52,23 @@ int Request::parseHeader(std::string &buffer)
 	case RETURN_TYPE_AGAIN:
 		return (RETURN_TYPE_AGAIN);
 	}
-	ASYNC_LOG_DEBUG(_logger, "parsing in progress...");
+	LOG_DEBUG("parsing in progress...");
 	return (RETURN_TYPE_IN_PROCESS);
 }
 
 int Request::parseBody(std::string &buffer)
 {
 	int rc = consumeBody(buffer);
-	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	LOG_DEBUG("Got return code " << rc);
 	return (rc);
 }
 
 int Request::parseChunk(std::string &buffer)
 {
 	int rc = consumeChunk(buffer);
-	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-	ASYNC_LOG_DEBUG(_logger, "total content length " << _content_length
-													 << "client max body size "
-													 << _max_body_size);
+	LOG_DEBUG("Got return code " << rc);
+	LOG_DEBUG("total content length "
+			  << _content_length << "client max body size " << _max_body_size);
 	if (_content_length > _max_body_size)
 		throw(HTTP::InvalidSize());
 
@@ -95,7 +94,7 @@ int Request::parseChunk(std::string &buffer)
 int Request::parseTrailer(std::string &buffer)
 {
 	int rc = consumeTrailer(buffer);
-	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	LOG_DEBUG("Got return code " << rc);
 	return (rc);
 }
 
@@ -104,8 +103,7 @@ int Request::parse(std::string &buffer)
 	while (true)
 	{
 		int rc;
-		ASYNC_LOG_DEBUG(_logger,
-						__func__ << ": current state is " << _current_state);
+		LOG_DEBUG(__func__ << ": current state is " << _current_state);
 		switch (_current_state)
 		{
 		case PARSE_STATE_STARTLINE:

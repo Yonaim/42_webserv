@@ -32,10 +32,10 @@ RequestHandlerPipe::RequestHandlerPipe(const Request &request,
 		throw(std::runtime_error("Constructor: Failed to create pipe."));
 	}
 
-	ASYNC_LOG_DEBUG(_logger, "read_pipe[0]: " << _read_pipe_fd[0]);
-	ASYNC_LOG_DEBUG(_logger, "read_pipe[1]: " << _read_pipe_fd[1]);
-	ASYNC_LOG_DEBUG(_logger, "write_pipe[0]: " << _write_pipe_fd[0]);
-	ASYNC_LOG_DEBUG(_logger, "write_pipe[1]: " << _write_pipe_fd[1]);
+	LOG_DEBUG("read_pipe[0]: " << _read_pipe_fd[0]);
+	LOG_DEBUG("read_pipe[1]: " << _read_pipe_fd[1]);
+	LOG_DEBUG("write_pipe[0]: " << _write_pipe_fd[0]);
+	LOG_DEBUG("write_pipe[1]: " << _write_pipe_fd[1]);
 
 	if (_request.getMessageBody().length() > 0)
 		_writer = new async::FileWriter(timeout_ms, _write_pipe_fd[1],
@@ -62,21 +62,20 @@ int RequestHandlerPipe::fork()
 		if (::dup2(_write_pipe_fd[0], STDIN_FILENO) < 0
 			|| ::dup2(_read_pipe_fd[1], STDOUT_FILENO) < 0)
 		{
-			ASYNC_LOG_DEBUG(_logger, "failed to dup2");
+			LOG_DEBUG("failed to dup2");
 			std::exit(2);
 		}
 		closePipe(_write_pipe_fd[0]);
 		closePipe(_write_pipe_fd[1]);
 		closePipe(_read_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
-		ASYNC_LOG_DEBUG(_logger, "calling execve(" << _exec_path.c_str()
-												   << "), good bye!");
+		LOG_DEBUG("calling execve(" << _exec_path.c_str() << "), good bye!");
 		execve(_exec_path.c_str(), getArgv(), _request.getEnv());
 		std::exit(2);
 	}
 	else
 	{
-		ASYNC_LOG_DEBUG(_logger, "successed to fork.");
+		LOG_DEBUG("successed to fork.");
 		closePipe(_write_pipe_fd[0]);
 		closePipe(_read_pipe_fd[1]);
 
@@ -93,13 +92,13 @@ int RequestHandlerPipe::waitRWOperation()
 		switch (_writer->task())
 		{
 		case async::status::OK_DONE:
-			ASYNC_LOG_DEBUG(_logger, "successed to send CGI request");
+			LOG_DEBUG("successed to send CGI request");
 			closePipe(_write_pipe_fd[1]);
 			delete _writer;
 			_writer = NULL;
 			break;
 		case async::status::OK_AGAIN:
-			ASYNC_LOG_DEBUG(_logger, "writing CGI request");
+			LOG_DEBUG("writing CGI request");
 			break;
 		case async::status::ERROR_TIMEOUT:
 			throw(std::runtime_error(
@@ -114,8 +113,8 @@ int RequestHandlerPipe::waitRWOperation()
 		switch (_reader->task())
 		{
 		case async::status::OK_DONE: {
-			ASYNC_LOG_DEBUG(_logger, "read status is ok");
-			ASYNC_LOG_DEBUG(_logger, "buffer: " << _reader->retrieve());
+			LOG_DEBUG("read status is ok");
+			LOG_DEBUG("buffer: " << _reader->retrieve());
 
 			std::string cgi_output = _reader->retrieve();
 			closePipe(_read_pipe_fd[0]);
@@ -125,7 +124,7 @@ int RequestHandlerPipe::waitRWOperation()
 			break;
 		}
 		case async::status::OK_AGAIN: {
-			ASYNC_LOG_DEBUG(_logger, "read status is again");
+			LOG_DEBUG("read status is again");
 			break;
 		}
 		case async::status::ERROR_TIMEOUT:
@@ -152,7 +151,7 @@ int RequestHandlerPipe::waitExecution()
 	}
 	else if (rc == 0)
 	{
-		ASYNC_LOG_DEBUG(_logger, "waiting child");
+		LOG_DEBUG("waiting child");
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
@@ -161,8 +160,8 @@ int RequestHandlerPipe::waitExecution()
 		if ((WIFEXITED(_waitpid_status) && (WEXITSTATUS(_waitpid_status) == 2))
 			|| WIFSIGNALED(_waitpid_status))
 			throw(std::runtime_error("CGI execution failed"));
-		ASYNC_LOG_DEBUG(_logger, "child process done");
-		ASYNC_LOG_DEBUG(_logger, "successed CGI execution");
+		LOG_DEBUG("child process done");
+		LOG_DEBUG("successed CGI execution");
 		_status = CGI_RESPONSE_INNER_STATUS_OK;
 		return (CGI_RESPONSE_STATUS_OK);
 	}
@@ -170,7 +169,7 @@ int RequestHandlerPipe::waitExecution()
 
 int RequestHandlerPipe::task(void)
 {
-	ASYNC_LOG_DEBUG(_logger, "status : " << _status);
+	LOG_DEBUG("status : " << _status);
 	switch (_status)
 	{
 	case CGI_RESPONSE_INNER_STATUS_BEGIN:

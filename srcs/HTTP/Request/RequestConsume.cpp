@@ -14,14 +14,13 @@ int Request::consumeStartLine(std::string &buffer)
 
 	if (crlf_pos == std::string::npos)
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": buffer doesn't have CRLF");
+		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const std::string start_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": start line is \"" << start_line << "\"");
+	LOG_DEBUG(__func__ << ": start line is \"" << start_line << "\"");
 
 	if (crlf_pos == 0)
 	{
@@ -61,7 +60,7 @@ int Request::consumeStartLine(std::string &buffer)
 		}
 	}
 
-	ASYNC_LOG_DEBUG(_logger, __func__ << ": method index is " << _method);
+	LOG_DEBUG(__func__ << ": method index is " << _method);
 	if (_method == METHOD_NONE)
 	{
 		_logger << async::warning << __func__ << ": invalid method";
@@ -85,8 +84,7 @@ int Request::consumeStartLine(std::string &buffer)
 				<< "\"";
 		_logger << async::verbose << __func__ << ": version: \"" << _version
 				<< "\"";
-		ASYNC_LOG_DEBUG(_logger,
-						__func__ << ": buffer result in :\"" << buffer << "\"");
+		LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 	}
 	return (RETURN_TYPE_OK);
 }
@@ -96,22 +94,19 @@ int Request::consumeHeader(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": buffer doesn't have CRLF");
+		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const std::string header_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
-	ASYNC_LOG_DEBUG(_logger, __func__ << ": header line: " << header_line);
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": buffer result in :\"" << buffer << "\"");
+	LOG_DEBUG(__func__ << ": header line: " << header_line);
+	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
-		ASYNC_LOG_DEBUG(
-			_logger, __func__ << ": header line only has CRLF (end of header)");
-		ASYNC_LOG_DEBUG(_logger,
-						__func__ << ": buffer result in :\"" << buffer << "\"");
+		LOG_DEBUG(__func__ << ": header line only has CRLF (end of header)");
+		LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 		return (RETURN_TYPE_OK);
 	}
 
@@ -135,18 +130,18 @@ int Request::consumeHeader(std::string &buffer)
 		 it != values.end(); it++)
 	{
 		strtrim(*it, LWS);
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": new value \"" << *it << "\"");
+		LOG_DEBUG(__func__ << ": new value \"" << *it << "\"");
 	}
 
 	/* key가 있다면, 붙여넣기 */
 	if (!_header.hasValue(name))
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": assign to new header");
+		LOG_DEBUG(__func__ << ": assign to new header");
 		_header.assign(name, values);
 	}
 	else
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": insert to existing header");
+		LOG_DEBUG(__func__ << ": insert to existing header");
 		_header.insert(name, values);
 	}
 
@@ -157,15 +152,13 @@ int Request::consumeBody(std::string &buffer)
 {
 	if (buffer.size() < static_cast<size_t>(_content_length))
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": not enough buffer size");
+		LOG_DEBUG(__func__ << ": not enough buffer size");
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	_body = consumestr(buffer, _content_length);
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": body result in :\"" << _body << "\"");
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": buffer result in :\"" << buffer << "\"");
+	LOG_DEBUG(__func__ << ": body result in :\"" << _body << "\"");
+	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 	return (RETURN_TYPE_OK);
 }
 
@@ -174,12 +167,12 @@ int Request::consumeChunk(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": buffer doesn't have CRLF");
+		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
-	ASYNC_LOG_DEBUG(_logger, __func__ << ": content length " << content_length);
+	LOG_DEBUG(__func__ << ": content length " << content_length);
 	if (content_length < 0)
 	{
 		_logger << async::warning << __func__
@@ -190,22 +183,20 @@ int Request::consumeChunk(std::string &buffer)
 	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
 	if (buffer.size() < crlf_pos + CRLF_LEN + content_length + CRLF_LEN)
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": not enough buffer size");
+		LOG_DEBUG(__func__ << ": not enough buffer size");
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	consumestr(buffer, crlf_pos + CRLF_LEN);
 	_content_length += content_length;
 	_body.append(consumestr(buffer, content_length));
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": body result in :\"" << _body << "\"");
+	LOG_DEBUG(__func__ << ": body result in :\"" << _body << "\"");
 	if (consumestr(buffer, CRLF_LEN) != CRLF)
 	{
 		_logger << async::warning << __func__ << ": chunk must end with CRLF";
 		throw(HTTP::InvalidFormat());
 	}
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": buffer result in :\"" << buffer << "\"");
+	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 
 	if (content_length == 0)
 		return (RETURN_TYPE_OK);
@@ -219,20 +210,18 @@ int Request::consumeTrailer(std::string &buffer)
 	const size_t crlf_pos = buffer.find(CRLF);
 	if (crlf_pos == std::string::npos)
 	{
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": buffer doesn't have CRLF");
+		LOG_DEBUG(__func__ << ": buffer doesn't have CRLF");
 		return (RETURN_TYPE_AGAIN);
 	}
 
 	const std::string header_line = consumestr(buffer, crlf_pos);
 	consumestr(buffer, CRLF_LEN);
-	ASYNC_LOG_DEBUG(_logger, __func__ << ": header line: " << header_line);
-	ASYNC_LOG_DEBUG(_logger,
-					__func__ << ": buffer result in :\"" << buffer << "\"");
+	LOG_DEBUG(__func__ << ": header line: " << header_line);
+	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 
 	if (crlf_pos == 0) // CRLF만 있는 줄: 헤더의 끝을 의미
 	{
-		ASYNC_LOG_DEBUG(
-			_logger, __func__ << ": header line only has CRLF (end of header)");
+		LOG_DEBUG(__func__ << ": header line only has CRLF (end of header)");
 		return (RETURN_TYPE_OK);
 	}
 
@@ -274,7 +263,7 @@ int Request::consumeTrailer(std::string &buffer)
 		 it != values.end(); it++)
 	{
 		strtrim(*it, LWS);
-		ASYNC_LOG_DEBUG(_logger, __func__ << ": new value \"" << *it << "\"");
+		LOG_DEBUG(__func__ << ": new value \"" << *it << "\"");
 	}
 
 	/** key가 있다면, 붙여넣기 **/
