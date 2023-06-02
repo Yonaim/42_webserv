@@ -28,8 +28,8 @@ Server::~Server()
 Server::Server(const Server &orig)
 	: _port(orig._port), _cgi_enabled(orig._cgi_enabled),
 	  _server_name(orig._server_name), _error_pages(orig._error_pages),
-	  _locations(orig._locations), _cgi_extension(orig._cgi_extension),
-	  _cgi_exec_path(orig._cgi_exec_path), _temp_dir_path(orig._temp_dir_path),
+	  _locations(orig._locations), _cgi_ext_to_path(orig._cgi_ext_to_path),
+	  _temp_dir_path(orig._temp_dir_path),
 	  _allowed_cgi_methods(orig._allowed_cgi_methods),
 	  _max_body_size(orig._max_body_size), _timeout_ms(orig._timeout_ms),
 	  _logger(async::Logger::getLogger("Server"))
@@ -43,8 +43,7 @@ Server &Server::operator=(const Server &orig)
 	_server_name = orig._server_name;
 	_error_pages = orig._error_pages;
 	_locations = orig._locations;
-	_cgi_extension = orig._cgi_extension;
-	_cgi_exec_path = orig._cgi_exec_path;
+	_cgi_ext_to_path = orig._cgi_ext_to_path;
 	_temp_dir_path = orig._temp_dir_path;
 	_allowed_cgi_methods = orig._allowed_cgi_methods;
 	_max_body_size = orig._max_body_size;
@@ -85,5 +84,15 @@ const Server::Location &Server::getLocation(const std::string &path) const
 
 bool Server::isCGIextension(const std::string &path) const
 {
-	return (_cgi_enabled && getExtension(path) == _cgi_extension);
+	if (!_cgi_enabled)
+		return (false);
+	const std::string ext = getExtension(path);
+	for (std::map<std::string, std::string>::const_iterator it
+		 = _cgi_ext_to_path.begin();
+		 it != _cgi_ext_to_path.end(); it++)
+	{
+		if (it->first == ext)
+			return (true);
+	}
+	return (false);
 }

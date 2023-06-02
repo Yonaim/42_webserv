@@ -152,6 +152,7 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 }
 
 void Server::registerCGIRequest(int client_fd, const Request &request,
+								const std::string &exec_path,
 								const std::string &resource_path)
 {
 	CGI::Request cgi_request(request, resource_path);
@@ -163,7 +164,7 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 			_logger << async::verbose
 					<< "Create CGI::RequestHandlerVnode for body size "
 					<< request.getBody().size();
-			handler = new CGI::RequestHandlerVnode(cgi_request, _cgi_exec_path,
+			handler = new CGI::RequestHandlerVnode(cgi_request, exec_path,
 												   _timeout_ms, _temp_dir_path);
 		}
 		else
@@ -171,7 +172,7 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 			_logger << async::verbose
 					<< "Create CGI::RequestHandlerPipe for body size "
 					<< request.getBody().size();
-			handler = new CGI::RequestHandlerPipe(cgi_request, _cgi_exec_path,
+			handler = new CGI::RequestHandlerPipe(cgi_request, exec_path,
 												  _timeout_ms);
 		}
 	}
@@ -206,7 +207,9 @@ void Server::registerRequest(int client_fd, const Request &request)
 	}
 	if (cgiAllowed(method) && isCGIextension(request.getURIPath()))
 	{
-		registerCGIRequest(client_fd, request, resource_path);
+		const std::string &exec_path
+			= _cgi_ext_to_path[getExtension(request.getURIPath())];
+		registerCGIRequest(client_fd, request, exec_path, resource_path);
 		return;
 	}
 

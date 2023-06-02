@@ -147,29 +147,28 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 	const size_t n_indexs = server_context.countDirectivesByName(dir_name);
 	if (n_indexs == 0)
 		return;
-	if (n_indexs > 1) // 맨대토리 버젼, 1개의 확장자만 허용
+	for (size_t i = 0; i < n_indexs; i++)
 	{
-		_logger << async::error << server_context.name()
-				<< " should have 0 or 1 " << dir_name;
-		throw(ConfigDirective::InvalidNumberOfArgument(server_context));
+		const ConfigDirective &cgi_directive
+			= server_context.getNthDirectiveByName(dir_name, i);
+		if (cgi_directive.is_context())
+		{
+			_logger << async::error << dir_name << " should not be context";
+			throw(ConfigDirective::UndefinedDirective(cgi_directive));
+		}
+		if (cgi_directive.nParameters() != 2)
+		{
+			_logger << async::error << dir_name
+					<< " should have 2 parameter(s)";
+			throw(ConfigDirective::InvalidNumberOfArgument(cgi_directive));
+		}
+		_cgi_ext_to_path[cgi_directive.parameter(0)]
+			= cgi_directive.parameter(1);
+		_logger << async::verbose << "CGI pass from URI *."
+				<< cgi_directive.parameter(0) << " to exec "
+				<< cgi_directive.parameter(1) << " enabled";
 	}
 	_cgi_enabled = true;
-	const ConfigDirective &cgi_directive
-		= server_context.getNthDirectiveByName(dir_name, 0);
-	if (cgi_directive.is_context())
-	{
-		_logger << async::error << dir_name << " should not be context";
-		throw(ConfigDirective::UndefinedDirective(cgi_directive));
-	}
-	if (cgi_directive.nParameters() != 2)
-	{
-		_logger << async::error << dir_name << " should have 2 parameter(s)";
-		throw(ConfigDirective::InvalidNumberOfArgument(cgi_directive));
-	}
-	_cgi_extension = cgi_directive.parameter(0);
-	_cgi_exec_path = cgi_directive.parameter(1);
-	_logger << async::verbose << "CGI pass from URI *." << _cgi_extension
-			<< " to exec " << _cgi_exec_path << " enabled";
 }
 
 void Server::parseDirectiveCGILimitExcept(const ConfigContext &server_context)

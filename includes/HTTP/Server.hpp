@@ -34,8 +34,7 @@ class Server
 	std::set<std::string> _server_name;
 	std::map<int, async::FileReader *> _error_pages;
 	std::map<std::string, Location> _locations;
-	std::string _cgi_extension;
-	std::string _cgi_exec_path;
+	std::map<std::string, std::string> _cgi_ext_to_path;
 	std::string _temp_dir_path;
 	std::set<int> _allowed_cgi_methods;
 	std::map<int, std::queue<RequestHandler *> > _request_handlers;
@@ -75,6 +74,7 @@ class Server
 	void task(void);
 	bool isForMe(const Request &request);
 	void registerCGIRequest(int client_fd, const Request &request,
+							const std::string &exec_path,
 							const std::string &resource_path);
 	void registerHTTPRequest(int client_fd, const Request &request,
 							 const Location &location,
