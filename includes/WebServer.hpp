@@ -39,6 +39,8 @@ class WebServer
 
 	void parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc);
 	_Servers::iterator findNoneNameServer(int port);
+	HTTP::Request &getRequestBuffer(int port, int client_fd);
+	void resetRequestBuffer(int port, int client_fd);
 	void registerRequest(int port, int client_fd, HTTP::Request &request);
 	void retrieveResponseForEachFd(int port, _Servers &servers);
 	HTTP::Response generateErrorResponse(const int code);

@@ -73,6 +73,18 @@ WebServer::_Servers::iterator WebServer::findNoneNameServer(int port)
 	return (_servers[port].end());
 }
 
+HTTP::Request &WebServer::getRequestBuffer(int port, int client_fd)
+{
+	return (_request_buffer.find(port)->second.find(client_fd)->second);
+}
+
+void WebServer::resetRequestBuffer(int port, int client_fd)
+{
+	_request_buffer.find(port)->second.erase(client_fd);
+	_request_buffer.find(port)->second.insert(std::pair<int, HTTP::Request>(
+		client_fd, HTTP::Request(_max_body_size)));
+}
+
 void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 {
 	try
