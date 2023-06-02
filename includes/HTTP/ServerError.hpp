@@ -18,7 +18,7 @@ class Server::LocationNotFound : public Server::ServerError
 class Server::ClientNotFound : public Server::ServerError
 {
   public:
-	ClientNotFound(const int client_fd);
+	ClientNotFound(int client_fd);
 };
 class Server::InvalidRequest : public Server::ServerError
 {

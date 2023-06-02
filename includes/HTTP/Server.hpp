@@ -34,7 +34,7 @@ class Server
 	std::set<std::string> _server_name;
 	std::map<int, async::FileReader *> _error_pages;
 	std::map<std::string, Location> _locations;
-	std::string _cgi_extension;
+	std::string _cgi_extension; // TODO: std::set에 넣기
 	std::string _cgi_exec_path;
 	std::string _temp_dir_path;
 	std::set<int> _allowed_cgi_methods;
@@ -45,6 +45,9 @@ class Server
 	const unsigned int _timeout_ms;
 	async::Logger &_logger;
 
+	static bool isValidStatusCode(const int &status_code);
+
+	// parse directive
 	void parseDirectiveListen(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);
@@ -52,13 +55,11 @@ class Server
 	void parseDirectiveCGI(const ConfigContext &server_context);
 	void parseDirectiveCGILimitExcept(const ConfigContext &server_context);
 	void parseDirectiveTmpDirPath(const ConfigContext &server_context);
-	void ensureClientConnected(int client_fd);
-	static bool isValidStatusCode(const int &status_code);
-	std::string getErrorPage(const int code);
+
+	// utils of interfaces
 	Response generateErrorResponse(const int code);
-	void registerErrorResponse(const int fd, const int code);
-	void registerRedirectResponse(const int fd,
-								  const Server::Location &location);
+	void iterateRequestHandlers(void);
+	void iterateCGIHandlers(void);
 
   public:
 	class ServerError;
@@ -72,28 +73,31 @@ class Server
 	Server(const Server &orig);
 	Server &operator=(const Server &orig);
 
+	// interfaces
 	void task(void);
-	bool isForMe(const Request &request);
-	void registerCGIRequest(int client_fd, const Request &request,
-							const std::string &resource_path);
+	void registerRequest(int client_fd, const Request &request);
 	void registerHTTPRequest(int client_fd, const Request &request,
 							 const Location &location,
 							 const std::string &resource_path);
-	void registerRequest(int client_fd, const Request &request);
+	void registerCGIRequest(int client_fd, const Request &request,
+							const std::string &resource_path);
 	Response retrieveResponse(int client_fd);
-	int hasResponses(void);
-	bool hasResponses(int client_fd);
-	bool hasServerName(void) const;
+	void registerRedirectResponse(int fd, const Server::Location &location);
+	void registerErrorResponse(int fd, int code);
 	void disconnect(int client_fd);
 
+	// methods
+	void ensureClientConnected(int client_fd) const;
+	bool isForMe(const Request &request) const;
+	bool hasServerName(void) const;
+	bool cgiAllowed(int method) const;
+	bool hasResponses(int client_fd) const;
+	int hasResponses(void) const;
+	bool isCGIextension(const std::string &path) const;
 	int getPort(void) const;
 	unsigned int getTimeout(void) const;
-	bool cgiAllowed(const int method) const;
+	std::string getErrorPage(int code);
 	const Location &getLocation(const std::string &location) const;
-	bool isCGIextension(const std::string &path) const;
-
-	void iterateRequestHandlers(void);
-	void iterateCGIHandlers(void);
 };
 } // namespace HTTP
 
