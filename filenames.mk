@@ -67,6 +67,7 @@ FILENAMES			= \
 					$(DIR_HTTP)ParsingFail \
 					$(DIR_HTTP)Request/Request \
 					$(DIR_HTTP)Request/RequestParse \
+					$(DIR_HTTP)Request/RequestParseUtils \
 					$(DIR_HTTP)Request/RequestConsume \
 					$(DIR_HTTP)Response/Response \
 					$(DIR_HTTP)Response/ResponseInit \

@@ -33,6 +33,12 @@ class Request
 	size_t _max_body_size;
 	async::Logger &_logger;
 
+	void parseHeaderEnsureHostHeaderField(void);
+	void parseHeaderEnsureTrailerHeaderField(void);
+	void parseHeaderEnsureCorrectHeadersForPostPutMethod(void);
+	void parseHeaderHandleTransferEncodingChunked(void);
+	void parseHeaderHandlerContentLength(void);
+
 	int parseStartLine(std::string &buffer);
 	int parseHeader(std::string &buffer);
 	int parseBody(std::string &buffer);
