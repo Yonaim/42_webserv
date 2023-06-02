@@ -27,10 +27,10 @@ RequestHandlerVnode::RequestHandlerVnode(const Request &request,
 RequestHandlerVnode::~RequestHandlerVnode()
 {
 	if (unlink(_input_file_path.c_str()) == -1)
-		_logger << async::error
+		_logger << async::warning
 				<< "Failed to delete file: " << _input_file_path;
 	if (unlink(_output_file_path.c_str()) == -1)
-		_logger << async::error
+		_logger << async::warning
 				<< "Failed to delete file: " << _output_file_path;
 	delete _writer;
 	delete _reader;

@@ -166,7 +166,7 @@ void WebServer::disconnect(int port, int client_fd)
 		}
 		catch (const HTTP::Server::ClientNotFound &e)
 		{
-			_logger << async::error << e.what();
+			_logger << async::warning << e.what();
 		}
 	}
 	_logger << async::info << "Disconnected client fd " << client_fd
