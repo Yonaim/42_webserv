@@ -28,9 +28,10 @@ class Header
 	const std::vector<std::string> &getValues(const std::string &name) const;
 	const std::string &getValue(const std::string &name, int idx) const;
 
-	void assign(const std::string &name, const std::vector<std::string> values);
-	void insert(const std::string &name, const std::vector<std::string> values);
-	void insert(const std::string &name, const std::string value);
+	void assign(const std::string &name, const std::vector<std::string> &val);
+	void insert(const std::string &name, const std::vector<std::string> &val);
+	void insert(const std::string &name, const std::string &val);
+	void append(const std::string &name, const std::vector<std::string> &val);
 
 	iterator begin(void);
 	iterator end(void);
