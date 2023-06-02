@@ -13,7 +13,7 @@ RequestHandlerVnode::RequestHandlerVnode(const Request &request,
 										 const std::string &exec_path,
 										 const unsigned int timeout_ms,
 										 const std::string &temp_dir_path)
-	: RequestHandler(request, exec_path),
+	: RequestHandler(request, exec_path, timeout_ms),
 	  _input_file_path(temp_dir_path + "/" + generateHash(toStr(clock()))),
 	  _output_file_path(temp_dir_path + "/" + generateHash(toStr(clock()))),
 	  _timeout_ms(timeout_ms)
@@ -92,6 +92,7 @@ int RequestHandlerVnode::fork()
 	else
 	{
 		LOG_DEBUG("successed to fork.");
+		setTimeout();
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
@@ -109,6 +110,7 @@ int RequestHandlerVnode::waitExecution()
 	else if (rc == 0)
 	{
 		LOG_DEBUG("waiting child");
+		checkTimeout();
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
 	else

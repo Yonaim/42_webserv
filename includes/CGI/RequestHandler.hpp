@@ -32,9 +32,13 @@ class RequestHandler
 	pid_t _pid;
 	int _waitpid_status;
 	int _status;
+	unsigned int _timeout_ms;
+	clock_t _timeout;
 	async::Logger &_logger;
 
 	char **getArgv(void);
+	void setTimeout(void);
+	bool checkTimeout(void);
 
   public:
 	enum cgi_response_status_e
@@ -44,7 +48,8 @@ class RequestHandler
 	};
 	static const size_t pipeThreshold;
 
-	RequestHandler(const Request &request, const std::string &exec_path);
+	RequestHandler(const Request &request, const std::string &exec_path,
+				   unsigned int timeout_ms);
 	virtual ~RequestHandler();
 
 	virtual int task(void) = 0;

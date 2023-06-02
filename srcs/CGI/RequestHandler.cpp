@@ -5,13 +5,16 @@
 #include <unistd.h>
 
 using namespace CGI;
+typedef unsigned long long ull_t;
 
 const size_t RequestHandler::pipeThreshold = 1024;
 
 RequestHandler::RequestHandler(const Request &request,
-							   const std::string &exec_path)
+							   const std::string &exec_path,
+							   unsigned int timeout_ms)
 	: _request(request), _reader(NULL), _writer(NULL), _exec_path(exec_path),
 	  _pid(-1), _waitpid_status(-1), _status(CGI_RESPONSE_INNER_STATUS_BEGIN),
+	  _timeout_ms(timeout_ms), _timeout(0),
 	  _logger(async::Logger::getLogger("CGIRequestHandler"))
 {
 }
@@ -27,6 +30,26 @@ char **RequestHandler::getArgv(void)
 	output[1] = duplicateStr(_request.getPath());
 	output[2] = NULL;
 	return (output);
+}
+
+void RequestHandler::setTimeout(void)
+{
+	if (_timeout_ms == 0)
+	{
+		_timeout = 0;
+		return;
+	}
+	_timeout = clock() + ((ull_t)_timeout_ms * (ull_t)(CLOCKS_PER_SEC / 1000));
+}
+
+bool RequestHandler::checkTimeout(void)
+{
+	if (_timeout == 0)
+		return (false);
+	if (clock() > _timeout)
+		throw(std::runtime_error("Timeout occured while executing CGI "
+								 + _exec_path));
+	return (false);
 }
 
 const CGI::Response &RequestHandler::retrieve(void)

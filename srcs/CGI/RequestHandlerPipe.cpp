@@ -24,7 +24,7 @@ void RequestHandlerPipe::closeAllPipes(void)
 RequestHandlerPipe::RequestHandlerPipe(const Request &request,
 									   const std::string &exec_path,
 									   const unsigned int timeout_ms)
-	: RequestHandler(request, exec_path)
+	: RequestHandler(request, exec_path, timeout_ms)
 {
 	_read_pipe_fd[0] = -1, _read_pipe_fd[1] = -1;
 	_write_pipe_fd[0] = -1, _write_pipe_fd[1] = -1;
@@ -138,7 +138,10 @@ int RequestHandlerPipe::waitRWOperation()
 	}
 
 	if (!_writer && !_reader)
+	{
+		setTimeout();
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
+	}
 
 	return (CGI_RESPONSE_STATUS_AGAIN);
 }
@@ -154,6 +157,7 @@ int RequestHandlerPipe::waitExecution()
 	else if (rc == 0)
 	{
 		LOG_DEBUG("waiting child");
+		checkTimeout();
 		_status = CGI_RESPONSE_INNER_STATUS_WAITPID_AGAIN;
 		return (CGI_RESPONSE_STATUS_AGAIN);
 	}
