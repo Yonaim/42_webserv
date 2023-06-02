@@ -113,6 +113,31 @@ int Request::parseBody(std::string &buffer)
 	return (rc);
 }
 
+int Request::parseChunk(std::string &buffer)
+{
+	int rc = consumeChunk(buffer);
+	ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
+	ASYNC_LOG_DEBUG(_logger, "total content length " << _content_length);
+	ASYNC_LOG_DEBUG(_logger, "client max body size " << _max_body_size);
+	if (_content_length > _max_body_size)
+		throw(HTTP::InvalidSize());
+	if (rc == RETURN_TYPE_OK)
+	{
+		if (_header.hasValue("Trailer"))
+		{
+			_logger << async::verbose << "header has Trailer";
+			_current_state = PARSE_STATE_TRAILER;
+			return (RETURN_TYPE_IN_PROCESS);
+		}
+		else
+			return (RETURN_TYPE_OK);
+	}
+	else if (rc == RETURN_TYPE_AGAIN)
+		return (RETURN_TYPE_AGAIN);
+
+	return (RETURN_TYPE_IN_PROCESS);
+}
+
 int Request::parse(std::string &buffer)
 {
 	while (true)
@@ -141,27 +166,9 @@ int Request::parse(std::string &buffer)
 			break;
 
 		case PARSE_STATE_CHUNK:
-			rc = consumeChunk(buffer);
-			ASYNC_LOG_DEBUG(_logger, "Got return code " << rc);
-			ASYNC_LOG_DEBUG(_logger,
-							"total content length " << _content_length);
-			ASYNC_LOG_DEBUG(_logger, "client max body size " << _max_body_size);
-			if (_content_length > _max_body_size)
-				throw(HTTP::InvalidSize());
-			if (rc == RETURN_TYPE_OK)
-			{
-				if (_header.hasValue("Trailer"))
-				{
-					_logger << async::verbose << "header has Trailer";
-					_current_state = PARSE_STATE_TRAILER;
-				}
-				else
-					return (RETURN_TYPE_OK);
-			}
-			else if (rc == RETURN_TYPE_AGAIN)
-				return (RETURN_TYPE_AGAIN);
-			else
-				;
+			rc = parseChunk(buffer);
+			if (rc != RETURN_TYPE_IN_PROCESS)
+				return (rc);
 			break;
 
 		case PARSE_STATE_TRAILER:
