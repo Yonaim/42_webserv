@@ -65,6 +65,9 @@ test_cgirequesthandler: $(OBJS) $(DIR_TESTOBJS)test_cgirequesthandler.o
 test_cgi_script: $(OBJS) $(DIR_TESTOBJS)test_cgi_script.o
 	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_cgi_script.o -o $@ $(LDFLAGS)
 
+test_shared_ptr: $(OBJS) $(DIR_TESTOBJS)test_shared_ptr.o
+	$(CXX) $(CXXFLAGS) $(OBJS) $(DIR_TESTOBJS)test_shared_ptr.o -o $@ $(LDFLAGS)
+
 -include $(DEPS) $(TESTDRIVERDEPS)
 
 clean:

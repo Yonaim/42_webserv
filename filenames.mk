@@ -35,6 +35,7 @@ TESTDRIVERNAMES		=	\
 					test_http_response \
 					test_http_server_constructor \
 					test_bidimap \
+					test_shared_ptr \
 
 TESTDRIVERSRCS		= $(addprefix $(DIR_TESTSRCS), $(addsuffix .cpp, $(TESTDRIVERNAMES)))
 TESTDRIVEROBJS		= $(addprefix $(DIR_TESTOBJS), $(addsuffix .o, $(TESTDRIVERNAMES)))
