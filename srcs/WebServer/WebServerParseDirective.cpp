@@ -132,13 +132,14 @@ void WebServer::parseBacklogSize(const ConfigContext &root_context)
 
 void WebServer::parseServer(const ConfigContext &server_context)
 {
-	HTTP::Server *server
-		= new HTTP::Server(server_context, _max_body_size, _timeout_ms);
+	_ServerPtr server = _ServerPtr(
+		new HTTP::Server(server_context, _max_body_size, _timeout_ms));
 	int port = server->getPort();
 	_logger << async::info << "Created Server at port " << port;
 	if (_tcp_procs.find(port) == _tcp_procs.end())
 	{
-		_tcp_procs[port] = new async::TCPIOProcessor(port, _backlog_size);
+		_tcp_procs[port]
+			= _TCPPtr(new async::TCPIOProcessor(port, _backlog_size));
 		_tcp_procs[port]->initialize();
 		_logger << async::verbose << "Created TCP IO Processor at port "
 				<< port;

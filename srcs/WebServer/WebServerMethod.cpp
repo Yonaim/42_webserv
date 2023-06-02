@@ -124,7 +124,7 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 	for (_Servers::iterator server_it = servers.begin();
 		 server_it != servers.end(); server_it++)
 	{
-		HTTP::Server *server = *server_it;
+		_ServerPtr server = *server_it;
 		server->task();
 		while (true)
 		{
@@ -178,7 +178,7 @@ void WebServer::terminate(void)
 	while (!_tcp_procs.empty())
 	{
 		int port = _tcp_procs.begin()->first;
-		async::TCPIOProcessor *tcp = _tcp_procs.begin()->second;
+		_TCPPtr tcp = _tcp_procs.begin()->second;
 
 		tcp->finalize(NULL);
 		while (!tcp->disconnected_clients.empty())
@@ -187,7 +187,6 @@ void WebServer::terminate(void)
 			tcp->disconnected_clients.pop();
 			disconnect(port, disconnected_fd);
 		}
-		delete tcp;
 		_tcp_procs.erase(_tcp_procs.begin());
 	}
 }

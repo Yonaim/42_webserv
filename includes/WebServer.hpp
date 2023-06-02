@@ -7,6 +7,7 @@
 #include "HTTP/Server.hpp"
 #include "async/Logger.hpp"
 #include "async/TCPIOProcessor.hpp"
+#include "utils/shared_ptr.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -14,8 +15,11 @@
 class WebServer
 {
   private:
-	typedef std::map<int, async::TCPIOProcessor *> _TCPProcMap;
-	typedef std::vector<HTTP::Server *> _Servers;
+	typedef ft::shared_ptr<async::TCPIOProcessor> _TCPPtr;
+	typedef ft::shared_ptr<HTTP::Server> _ServerPtr;
+
+	typedef std::map<int, _TCPPtr> _TCPProcMap;
+	typedef std::vector<_ServerPtr> _Servers;
 	typedef std::map<int, _Servers> _ServerMap;
 	typedef std::map<int, HTTP::Request> _ReqBufFdMap;
 	typedef std::map<int, _ReqBufFdMap> _ReqBufPortMap;
