@@ -8,6 +8,7 @@
 #include "async/FileIOProcessor.hpp"
 #include "async/Logger.hpp"
 #include "async/TCPIOProcessor.hpp"
+#include "utils/shared_ptr.hpp"
 #include <queue>
 #include <set>
 #include <string>
@@ -28,17 +29,21 @@ class Server
   private:
 	class Location;
 
+	typedef ft::shared_ptr<async::FileReader> _FileReaderPtr;
+	typedef ft::shared_ptr<RequestHandler> _RequestHandlerPtr;
+	typedef ft::shared_ptr<CGI::RequestHandler> _CGIRequestHandlerPtr;
+
 	int _port;
 	bool _has_server_name;
 	bool _cgi_enabled;
 	std::set<std::string> _server_name;
-	std::map<int, async::FileReader *> _error_pages;
+	std::map<int, _FileReaderPtr> _error_pages;
 	std::map<std::string, Location> _locations;
 	std::map<std::string, std::string> _cgi_ext_to_path;
 	std::string _temp_dir_path;
 	std::set<int> _allowed_cgi_methods;
-	std::map<int, std::queue<RequestHandler *> > _request_handlers;
-	std::map<int, std::queue<CGI::RequestHandler *> > _cgi_handlers;
+	std::map<int, std::queue<_RequestHandlerPtr> > _request_handlers;
+	std::map<int, std::queue<_CGIRequestHandlerPtr> > _cgi_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
 	size_t _max_body_size;
 	const unsigned int _timeout_ms;

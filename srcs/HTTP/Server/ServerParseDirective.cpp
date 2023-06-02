@@ -78,7 +78,8 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 						<< " has invalid status code";
 				throw(ConfigDirective::UndefinedArgument(error_page_directive));
 			}
-			_error_pages[code] = new async::FileReader(_timeout_ms, file_path);
+			_error_pages[code]
+				= _FileReaderPtr(new async::FileReader(_timeout_ms, file_path));
 			_logger << async::verbose << "parsed error page " << file_path
 					<< " for code " << code;
 		}

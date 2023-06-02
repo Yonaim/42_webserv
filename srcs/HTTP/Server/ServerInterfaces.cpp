@@ -15,19 +15,18 @@ void Server::task(void)
 
 void Server::iterateRequestHandlers(void)
 {
-	for (std::map<int, std::queue<RequestHandler *> >::iterator it
+	for (std::map<int, std::queue<_RequestHandlerPtr> >::iterator it
 		 = _request_handlers.begin();
 		 it != _request_handlers.end(); it++)
 	{
 		int client_fd = it->first;
-		std::queue<RequestHandler *> &handlers = it->second;
+		std::queue<_RequestHandlerPtr> &handlers = it->second;
 		if (handlers.empty())
 			continue;
 		int rc = handlers.front()->task();
 		if (rc == RequestHandler::RESPONSE_STATUS_OK)
 		{
 			_output_queue[client_fd].push(handlers.front()->retrieve());
-			delete handlers.front();
 			handlers.pop();
 			_logger << async::verbose << "Response for client " << client_fd
 					<< " has been retrieved";
@@ -36,7 +35,6 @@ void Server::iterateRequestHandlers(void)
 			continue;
 		else
 		{
-			delete handlers.front();
 			handlers.pop();
 			_logger << async::error << "RequestHandler return code " << rc
 					<< ", causing code 500";
@@ -47,12 +45,12 @@ void Server::iterateRequestHandlers(void)
 
 void Server::iterateCGIHandlers(void)
 {
-	for (std::map<int, std::queue<CGI::RequestHandler *> >::iterator it
+	for (std::map<int, std::queue<_CGIRequestHandlerPtr> >::iterator it
 		 = _cgi_handlers.begin();
 		 it != _cgi_handlers.end(); it++)
 	{
 		int client_fd = it->first;
-		std::queue<CGI::RequestHandler *> &handlers = it->second;
+		std::queue<_CGIRequestHandlerPtr> &handlers = it->second;
 		if (handlers.empty())
 			continue;
 
@@ -64,7 +62,6 @@ void Server::iterateCGIHandlers(void)
 				const CGI::Response &cgi_response
 					= handlers.front()->retrieve();
 				_output_queue[client_fd].push(cgi_response.toHTTPResponse());
-				delete handlers.front();
 				handlers.pop();
 				_logger << async::verbose << "Response for client " << client_fd
 						<< " has been retrieved";
@@ -74,7 +71,6 @@ void Server::iterateCGIHandlers(void)
 		}
 		catch (std::exception &e)
 		{
-			delete handlers.front();
 			handlers.pop();
 			_logger << async::error << e.what();
 			_logger << async::error << "CGI failed, causing code 500";
@@ -88,25 +84,30 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 								 const std::string &resource_path)
 {
 	const std::string &path = resource_path; // code shortener
-	RequestHandler *handler;
+	_RequestHandlerPtr handler;
 	try
 	{
 		switch (request.getMethod())
 		{
 		case METHOD_GET:
-			handler = new RequestGetHandler(this, request, location, path);
+			handler = _RequestHandlerPtr(
+				new RequestGetHandler(this, request, location, path));
 			break;
 		case METHOD_HEAD:
-			handler = new RequestHeadHandler(this, request, location, path);
+			handler = _RequestHandlerPtr(
+				new RequestHeadHandler(this, request, location, path));
 			break;
 		case METHOD_POST:
-			handler = new RequestPostHandler(this, request, location, path);
+			handler = _RequestHandlerPtr(
+				new RequestPostHandler(this, request, location, path));
 			break;
 		case METHOD_PUT:
-			handler = new RequestPutHandler(this, request, location, path);
+			handler = _RequestHandlerPtr(
+				new RequestPutHandler(this, request, location, path));
 			break;
 		case METHOD_DELETE:
-			handler = new RequestDeleteHandler(this, request, location, path);
+			handler = _RequestHandlerPtr(
+				new RequestDeleteHandler(this, request, location, path));
 			break;
 		default:
 			registerErrorResponse(client_fd, 501); // Not Implemented
@@ -121,7 +122,7 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 	}
 
 	if (_request_handlers.find(client_fd) == _request_handlers.end())
-		_request_handlers[client_fd] = std::queue<RequestHandler *>();
+		_request_handlers[client_fd] = std::queue<_RequestHandlerPtr>();
 	if (_output_queue.find(client_fd) == _output_queue.end())
 		_output_queue[client_fd] = std::queue<Response>();
 	_request_handlers[client_fd].push(handler);
@@ -134,7 +135,7 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 								const std::string &resource_path)
 {
 	CGI::Request cgi_request(request, resource_path);
-	CGI::RequestHandler *handler;
+	_CGIRequestHandlerPtr handler;
 	try
 	{
 		if (request.getBody().size() > CGI::RequestHandler::pipeThreshold)
@@ -142,16 +143,16 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 			_logger << async::verbose
 					<< "Create CGI::RequestHandlerVnode for body size "
 					<< request.getBody().size();
-			handler = new CGI::RequestHandlerVnode(cgi_request, exec_path,
-												   _timeout_ms, _temp_dir_path);
+			handler = _CGIRequestHandlerPtr(new CGI::RequestHandlerVnode(
+				cgi_request, exec_path, _timeout_ms, _temp_dir_path));
 		}
 		else
 		{
 			_logger << async::verbose
 					<< "Create CGI::RequestHandlerPipe for body size "
 					<< request.getBody().size();
-			handler = new CGI::RequestHandlerPipe(cgi_request, exec_path,
-												  _timeout_ms);
+			handler = _CGIRequestHandlerPtr(new CGI::RequestHandlerPipe(
+				cgi_request, exec_path, _timeout_ms));
 		}
 	}
 	catch (const std::runtime_error &e)
@@ -162,7 +163,7 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 	}
 
 	if (_cgi_handlers.find(client_fd) == _cgi_handlers.end())
-		_cgi_handlers[client_fd] = std::queue<CGI::RequestHandler *>();
+		_cgi_handlers[client_fd] = std::queue<_CGIRequestHandlerPtr>();
 	if (_output_queue.find(client_fd) == _output_queue.end())
 		_output_queue[client_fd] = std::queue<Response>();
 	_cgi_handlers[client_fd].push(handler);
@@ -248,18 +249,12 @@ void Server::disconnect(int client_fd)
 	if (_request_handlers.find(client_fd) != _request_handlers.end())
 	{
 		while (!_request_handlers[client_fd].empty())
-		{
-			delete _request_handlers[client_fd].front();
 			_request_handlers[client_fd].pop();
-		}
 	}
 	if (_cgi_handlers.find(client_fd) != _cgi_handlers.end())
 	{
 		while (!_cgi_handlers[client_fd].empty())
-		{
-			delete _cgi_handlers[client_fd].front();
 			_cgi_handlers[client_fd].pop();
-		}
 	}
 	_request_handlers.erase(client_fd);
 	_cgi_handlers.erase(client_fd);
