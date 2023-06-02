@@ -90,8 +90,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 	const int method = request.getMethod();
 	size_t location_body_size = location.getMaxBodySize();
 
-	if (location_body_size != _max_body_size
-		&& location_body_size < request.getBody().length())
+	if (location_body_size < request.getBody().length())
 	{
 		registerErrorResponse(client_fd, 413);
 		return;
