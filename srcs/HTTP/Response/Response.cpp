@@ -119,8 +119,6 @@ void Response::makeDirectoryListing(const std::string &path,
 	std::string file_size;
 
 	dir_stream = ::opendir(path.c_str());
-	if (dir_stream == NULL)
-		perror("opendir error");
 
 	for (int i = 0; i < 2; ++i)
 		dir_info = ::readdir(dir_stream);
