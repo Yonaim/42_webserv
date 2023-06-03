@@ -2,8 +2,8 @@
 #include "WebServer.hpp"
 #include "async/SingleIOProcessor.hpp"
 #include "parseConfig.hpp"
+#include <csignal>
 #include <iostream>
-#include <signal.h>
 #include <unistd.h>
 
 void setWebServerTerminationFlag(int arg)
