@@ -1,8 +1,9 @@
 #include <map>
 
-/*
- * Bidirectional map with key and value access.
- * The KeyType and valueType must be different
+/**
+ * @brief 양방향(bidirection)으로 접근 가능한 map.
+ * 인자의 타입이 KeyType인지 ValueType인지에 따라 접근 방향이 달라진다.
+ * 이러한 특성상, KeyType과 ValueType은 반드시 달라야한다.
  */
 template <typename KeyType, typename ValueType> class BidiMap
 {

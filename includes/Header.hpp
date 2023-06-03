@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief name-value의 쌍으로 이루어진 field의 집합.
+ * 하나의 field에는 여러 개의 value가 있을 수 있다.
+ */
 class Header
 {
   private:

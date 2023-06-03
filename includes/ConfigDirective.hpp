@@ -6,6 +6,14 @@
 #include <string>
 #include <vector>
 
+
+/**
+ * @brief 
+ * Configuration(.conf) 파일의 각 directive를 파싱한 결과를 담는 클래스.
+ * directive에는 simple directive와 block directive(=context)가 있으며,
+ * 후자가 전자의 특성을 그대로 가지면서 전자의 집합을 보유하고 있으므로 상속을 통해 구현하였다.
+ */
+// simple directive
 class ConfigDirective
 {
   protected:
@@ -64,6 +72,7 @@ class ConfigDirective
 	size_t nParameters(void) const;
 };
 
+// block directive (context)
 class ConfigContext : public ConfigDirective
 {
   private:

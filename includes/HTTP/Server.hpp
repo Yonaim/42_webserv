@@ -47,7 +47,7 @@ class Server
 
 	static bool isValidStatusCode(const int &status_code);
 
-	// parse directive
+	// parse configuration file
 	void parseDirectiveListen(const ConfigContext &server_context);
 	void parseDirectiveErrorPage(const ConfigContext &server_context);
 	void parseDirectiveServerName(const ConfigContext &server_context);

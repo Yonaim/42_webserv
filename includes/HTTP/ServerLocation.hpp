@@ -21,6 +21,7 @@ class Server::Location
 	size_t _max_body_size;
 	async::Logger &_logger;
 
+	// parse configuration file
 	void parseDirectiveAlias(const ConfigContext &location_context);
 	void parseDirectiveLimitExcept(const ConfigContext &location_context);
 	void parseDirectiveReturn(const ConfigContext &location_context);
