@@ -1,3 +1,6 @@
+#ifndef BIDIMAP_HPP
+#define BIDIMAP_HPP
+
 #include <map>
 #include <stdexcept>
 
@@ -134,3 +137,5 @@ template <typename KeyType, typename ValueType> class BidiMap
 		return (getKeyByValue(value));
 	}
 };
+
+#endif
