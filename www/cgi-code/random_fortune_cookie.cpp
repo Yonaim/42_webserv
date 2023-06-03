@@ -64,7 +64,7 @@ void printResult(const std::string &name, const std::string &result)
 
 std::string getRandomFortune(void)
 {
-	static const std::string fortunes[] = {"fine", "good", "", "awesome"};
+	static const std::string fortunes[] = {"fine", "good", "hello", "awesome"};
 	const int n_fortunes = sizeof(fortunes) / sizeof(fortunes[0]);
 
 	std::srand(std::time(NULL));
@@ -103,9 +103,6 @@ int main(void)
 	std::string query = getEnv("QUERY_STRING");
 	std::string method = getEnv("REQUEST_METHOD");
 
-	// getenv에서 NULL 주면 어떻게 처리해요?
-	// QUERY_STRING이 없을 때 -> getEnv 함수 만들어서 사용했는데 괜찮을까요..?
-	// 테이팍님 뭐하시나용?
 	if (method == "GET")
 	{
 		const std::string param_name = "name";
