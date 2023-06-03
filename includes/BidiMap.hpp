@@ -1,4 +1,5 @@
 #include <map>
+#include <stdexcept>
 
 /*
  * Bidirectional map with key and value access.

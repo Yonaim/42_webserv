@@ -1,5 +1,6 @@
 #include "async/TCPIOProcessor.hpp"
-#include <errno.h>
+#include <cerrno>
+#include <cstring>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>

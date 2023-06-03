@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 // parsing
 bool hasSpace(const std::string &key);

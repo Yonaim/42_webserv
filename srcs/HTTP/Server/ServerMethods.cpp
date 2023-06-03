@@ -4,6 +4,7 @@
 #include "HTTP/error_pages.hpp"
 #include "utils/string.hpp"
 #include <cctype>
+#include <climits>
 
 using namespace HTTP;
 

@@ -2,7 +2,8 @@
 #include "async/status.hpp"
 #include "utils/string.hpp"
 #include <algorithm>
-#include <errno.h>
+#include <cerrno>
+#include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
 

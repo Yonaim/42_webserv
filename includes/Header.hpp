@@ -2,6 +2,7 @@
 #define HTTP_HEADER_HPP
 
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

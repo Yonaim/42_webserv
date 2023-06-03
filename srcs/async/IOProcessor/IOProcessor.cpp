@@ -1,6 +1,8 @@
 #include "async/IOProcessor.hpp"
 #include "async/status.hpp"
 #include "utils/string.hpp"
+#include <cerrno>
+#include <cstring>
 #include <sstream>
 #include <unistd.h>
 
