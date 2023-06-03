@@ -94,7 +94,7 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 		{
 		case METHOD_POST: // upload_path/해시결과(URI에 현재 시각을 붙임)
 			uri_path = _upload_store_path;
-			if (uri_path.back() != '/')
+			if (uri_path[uri_path.size() - 1] != '/')
 				uri_path += "/";
 			uri_path
 				+= "upload_" + generateHash(toStr(clock()) + req.getURIPath());
@@ -110,7 +110,7 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 
 	uri_path.replace(0, _path.length(), _alias);
 	_logger << async::verbose << __func__ << ": after \"" << uri_path << "\"";
-	if (req.getURIPath().back() == '/' && _has_index)
+	if (req.getURIPath()[req.getURIPath().size() - 1] == '/' && _has_index)
 	{
 		uri_path += _index;
 		_logger << async::verbose << __func__

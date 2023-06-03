@@ -43,7 +43,7 @@ bool Server::RequestHandler::isInvalidDirectoryFormat(void) const
 {
 	if (_resource_path == "/")
 		return (false);
-	if (isDirectory() && _resource_path.back() != '/')
+	if (isDirectory() && _resource_path[_resource_path.size() - 1] != '/')
 		return (true);
 	return (false);
 }
