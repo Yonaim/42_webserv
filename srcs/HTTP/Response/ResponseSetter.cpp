@@ -16,7 +16,7 @@ void Response::setDate(void)
 	tm *gmt_time = gmtime(&cur_time);
 	static char date[100];
 
-	strftime(date, sizeof(date), "%a, %d %b %Y %T GMT", gmt_time);
+	std::strftime(date, sizeof(date), "%a, %d %b %Y %T GMT", gmt_time);
 	setValue("Date", date);
 }
 

@@ -118,13 +118,13 @@ void Response::makeDirectoryListing(const std::string &path,
 	std::string file_path;
 	std::string file_size;
 
-	dir_stream = opendir(path.c_str());
+	dir_stream = ::opendir(path.c_str());
 	if (dir_stream == NULL)
 		perror("opendir error");
 
 	for (int i = 0; i < 2; ++i)
-		dir_info = readdir(dir_stream);
-	while ((dir_info = readdir(dir_stream)) != NULL)
+		dir_info = ::readdir(dir_stream);
+	while ((dir_info = ::readdir(dir_stream)) != NULL)
 	{
 		file_name = dir_info->d_name;
 		file_path = path + "/" + file_name;
@@ -132,7 +132,7 @@ void Response::makeDirectoryListing(const std::string &path,
 			file_name += '/';
 		_body.append("<a href=\"" + file_name + "\">" + file_name + "</a>\n");
 	}
-	closedir(dir_stream);
+	::closedir(dir_stream);
 
 	_body.append("</pre><hr></body>\n"
 				 "</html>\n");
