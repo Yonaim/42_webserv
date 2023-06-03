@@ -94,4 +94,36 @@ inline async::Logger &operator<<(async::Logger &io, T content)
 			_logger << async::debug << message;                                \
 	} while (0)
 
+// _logger라는 이름의 로거 객체가 있을때 사용 가능
+#define LOG_VERBOSE(message)                                                   \
+	do                                                                         \
+	{                                                                          \
+		if (async::Logger::VERBOSE >= async::Logger::getLogLevel())            \
+			_logger << async::verbose << message;                              \
+	} while (0)
+
+// _logger라는 이름의 로거 객체가 있을때 사용 가능
+#define LOG_INFO(message)                                                      \
+	do                                                                         \
+	{                                                                          \
+		if (async::Logger::INFO >= async::Logger::getLogLevel())               \
+			_logger << async::info << message;                                 \
+	} while (0)
+
+// _logger라는 이름의 로거 객체가 있을때 사용 가능
+#define LOG_WARNING(message)                                                   \
+	do                                                                         \
+	{                                                                          \
+		if (async::Logger::WARNING >= async::Logger::getLogLevel())            \
+			_logger << async::warning << message;                              \
+	} while (0)
+
+// _logger라는 이름의 로거 객체가 있을때 사용 가능
+#define LOG_ERROR(message)                                                     \
+	do                                                                         \
+	{                                                                          \
+		if (async::Logger::ERROR >= async::Logger::getLogLevel())              \
+			_logger << async::error << message;                                \
+	} while (0)
+
 #endif
