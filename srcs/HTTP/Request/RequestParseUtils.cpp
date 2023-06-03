@@ -72,4 +72,5 @@ void Request::parseHeaderHandlerContentLength(void)
 	{
 		throw(HTTP::InvalidValue());
 	}
+	_current_state = PARSE_STATE_BODY;
 }
