@@ -2,6 +2,7 @@
 #include "HTTP/Request.hpp"
 #include "HTTP/const_values.hpp"
 #include "utils/string.hpp"
+#include <cstdlib>
 
 using namespace HTTP;
 
@@ -79,7 +80,7 @@ void Request::consumeHeaderGetNameValue(std::string &header_line,
 										std::vector<std::string> &values,
 										bool is_trailer)
 {
-	const size_t colon_pos = header_line.find(":");
+	const size_t colon_pos = header_line.find(':');
 	if (colon_pos == std::string::npos)
 	{
 		LOG_WARNING(__func__ << ": header line has no colon");
@@ -172,7 +173,7 @@ int Request::consumeChunk(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 
-	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
+	const size_t content_length = std::strtol(buffer.c_str(), NULL, 16);
 	LOG_DEBUG(__func__ << ": content length " << content_length);
 
 	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
