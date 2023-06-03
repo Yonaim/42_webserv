@@ -1,6 +1,7 @@
 #include "HTTP/RequestHandler.hpp"
 #include <errno.h>
 #include <unistd.h>
+#include <cstdio>
 
 using namespace HTTP;
 
@@ -20,7 +21,7 @@ int Server::RequestDeleteHandler::task(void)
 	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
 		return (_status);
 
-	if (unlink(_resource_path.c_str()) == -1)
+	if (std::remove(_resource_path.c_str()) == -1)
 	{
 		switch (errno)
 		{
