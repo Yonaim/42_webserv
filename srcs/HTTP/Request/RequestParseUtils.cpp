@@ -74,10 +74,4 @@ void Request::parseHeaderHandlerContentLength(void)
 	{
 		throw(HTTP::InvalidValue());
 	}
-
-	if (_content_length >= 0)
-	{
-		LOG_DEBUG("header has Content-Length >= 0");
-		_current_state = PARSE_STATE_BODY;
-	}
 }

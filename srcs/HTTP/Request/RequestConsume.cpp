@@ -179,12 +179,6 @@ int Request::consumeChunk(std::string &buffer)
 
 	const size_t content_length = strtol(buffer.c_str(), NULL, 16);
 	LOG_DEBUG(__func__ << ": content length " << content_length);
-	if (content_length < 0)
-	{
-		_logger << async::warning << __func__
-				<< ": negative content length of chunk";
-		throw(HTTP::InvalidValue());
-	}
 
 	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
 	if (buffer.size() < crlf_pos + CRLF_LEN + content_length + CRLF_LEN)
