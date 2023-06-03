@@ -28,16 +28,16 @@ void Server::iterateRequestHandlers(void)
 		{
 			_output_queue[client_fd].push(handlers.front()->retrieve());
 			handlers.pop();
-			_logger << async::verbose << "Response for client " << client_fd
-					<< " has been retrieved";
+			LOG_VERBOSE("Response for client " << client_fd
+											   << " has been retrieved");
 		}
 		else if (rc == RequestHandler::RESPONSE_STATUS_AGAIN)
 			continue;
 		else
 		{
 			handlers.pop();
-			_logger << async::error << "RequestHandler return code " << rc
-					<< ", causing code 500";
+			LOG_ERROR("RequestHandler return code " << rc
+													<< ", causing code 500");
 			registerErrorResponse(client_fd, 500); // Internal Server Error}
 		}
 	}
@@ -63,8 +63,8 @@ void Server::iterateCGIHandlers(void)
 					= handlers.front()->retrieve();
 				_output_queue[client_fd].push(cgi_response.toHTTPResponse());
 				handlers.pop();
-				_logger << async::verbose << "Response for client " << client_fd
-						<< " has been retrieved";
+				LOG_VERBOSE("Response for client " << client_fd
+												   << " has been retrieved");
 			}
 			else if (rc == CGI::RequestHandler::CGI_RESPONSE_STATUS_AGAIN)
 				continue;
@@ -72,8 +72,8 @@ void Server::iterateCGIHandlers(void)
 		catch (std::exception &e)
 		{
 			handlers.pop();
-			_logger << async::error << e.what();
-			_logger << async::error << "CGI failed, causing code 500";
+			LOG_ERROR(e.what());
+			LOG_ERROR("CGI failed, causing code 500");
 			registerErrorResponse(client_fd, 500); // Internal Server Error
 		}
 	}
@@ -116,7 +116,7 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 	}
 	catch (const LocationNotFound &e)
 	{
-		_logger << async::warning << e.what();
+		LOG_WARNING(e.what());
 		registerErrorResponse(client_fd, 404); // Not Found
 		return;
 	}
@@ -126,8 +126,8 @@ void Server::registerHTTPRequest(int client_fd, const Request &request,
 	if (_output_queue.find(client_fd) == _output_queue.end())
 		_output_queue[client_fd] = std::queue<Response>();
 	_request_handlers[client_fd].push(handler);
-	_logger << async::verbose << "Registered HTTP RequestHandler for "
-			<< METHOD[request.getMethod()];
+	LOG_VERBOSE("Registered HTTP RequestHandler for "
+				<< METHOD[request.getMethod()]);
 }
 
 void Server::registerCGIRequest(int client_fd, const Request &request,
@@ -140,24 +140,22 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 	{
 		if (request.getBody().size() > CGI::RequestHandler::pipeThreshold)
 		{
-			_logger << async::verbose
-					<< "Create CGI::RequestHandlerVnode for body size "
-					<< request.getBody().size();
+			LOG_VERBOSE("Create CGI::RequestHandlerVnode for body size "
+						<< request.getBody().size());
 			handler = _CGIRequestHandlerPtr(new CGI::RequestHandlerVnode(
 				cgi_request, exec_path, _timeout_ms, _temp_dir_path));
 		}
 		else
 		{
-			_logger << async::verbose
-					<< "Create CGI::RequestHandlerPipe for body size "
-					<< request.getBody().size();
+			LOG_VERBOSE("Create CGI::RequestHandlerPipe for body size "
+						<< request.getBody().size());
 			handler = _CGIRequestHandlerPtr(new CGI::RequestHandlerPipe(
 				cgi_request, exec_path, _timeout_ms));
 		}
 	}
 	catch (const std::runtime_error &e)
 	{
-		_logger << async::warning << e.what();
+		LOG_WARNING(e.what());
 		registerErrorResponse(client_fd, 500); // Internal Server Error
 		return;
 	}
@@ -167,8 +165,8 @@ void Server::registerCGIRequest(int client_fd, const Request &request,
 	if (_output_queue.find(client_fd) == _output_queue.end())
 		_output_queue[client_fd] = std::queue<Response>();
 	_cgi_handlers[client_fd].push(handler);
-	_logger << async::verbose << "Registered CGI RequestHandler for "
-			<< METHOD[request.getMethod()];
+	LOG_VERBOSE("Registered CGI RequestHandler for "
+				<< METHOD[request.getMethod()]);
 }
 
 void Server::registerRequest(int client_fd, const Request &request)
@@ -194,15 +192,14 @@ void Server::registerRequest(int client_fd, const Request &request)
 
 	if (!location.isAllowedMethod(method))
 	{
-		_logger << async::info << "Method " << METHOD[method]
-				<< " is not allowed";
+		LOG_INFO("Method " << METHOD[method] << " is not allowed");
 		registerErrorResponse(client_fd, 405); // Method Not Allowed
 		return;
 	}
 	if (location.doRedirect())
 	{
-		_logger << async::verbose << "Location " << location.getAlias()
-				<< " redirect the request";
+		LOG_VERBOSE("Location " << location.getAlias()
+								<< " redirect the request");
 		registerRedirectResponse(client_fd, location);
 		return;
 	}
@@ -259,5 +256,5 @@ void Server::disconnect(int client_fd)
 	_request_handlers.erase(client_fd);
 	_cgi_handlers.erase(client_fd);
 	_output_queue.erase(client_fd);
-	_logger << async::info << "Disconnected client fd " << client_fd;
+	LOG_INFO("Disconnected client fd " << client_fd);
 }

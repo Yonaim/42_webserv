@@ -14,7 +14,7 @@ Server::RequestPostHandler::RequestPostHandler(Server *server,
 	{
 		_response = _server->generateErrorResponse(500);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		_logger << async::warning << "This location doesn't allow upload";
+		LOG_WARNING("This location doesn't allow upload");
 	}
 }
 
@@ -47,12 +47,12 @@ int Server::RequestPostHandler::task(void)
 	}
 	else if (rc == async::status::ERROR_FILEOPENING)
 	{
-		_logger << async::warning << _writer.errorMsg();
+		LOG_WARNING(_writer.errorMsg());
 		registerErrorResponse(503); // Service Unavailable
 	}
 	else
 	{
-		_logger << async::warning << _writer.errorMsg();
+		LOG_WARNING(_writer.errorMsg());
 		registerErrorResponse(500); // Internal Server Error
 	}
 	return (_status);

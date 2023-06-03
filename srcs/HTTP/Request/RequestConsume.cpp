@@ -31,21 +31,19 @@ int Request::consumeStartLine(std::string &buffer)
 
 	if (crlf_pos == 0)
 	{
-		_logger << async::warning << __func__
-				<< ": buffer's first line is empty";
+		LOG_WARNING(__func__ << ": buffer's first line is empty");
 		throw(HTTP::EmptyLineFound());
 	}
 	if (start_line[0] == ' ')
 	{
-		_logger << async::warning << __func__
-				<< ": buffer's first character is space";
+		LOG_WARNING(__func__ << ": buffer's first character is space");
 		throw(HTTP::InvalidFormat());
 	}
 
 	std::vector<std::string> tokens = split(start_line, ' ');
 	if (tokens.size() != 3)
 	{
-		_logger << async::warning << __func__ << ": token count mismatch";
+		LOG_WARNING(__func__ << ": token count mismatch");
 		throw(HTTP::InvalidFormat());
 	}
 
@@ -55,7 +53,7 @@ int Request::consumeStartLine(std::string &buffer)
 	}
 	catch (const std::runtime_error &e)
 	{
-		_logger << async::warning << __func__ << ": invalid method";
+		LOG_WARNING(__func__ << ": invalid method");
 		throw(HTTP::InvalidValue());
 	}
 	LOG_DEBUG(__func__ << ": method index is " << _method);
@@ -69,11 +67,9 @@ int Request::consumeStartLine(std::string &buffer)
 	}
 	_version = tokens[2];
 
-	_logger << async::verbose << __func__ << ": URI: \"" << _uri << "\"";
-	_logger << async::verbose << __func__ << ": QUERY: \"" << _query_string
-			<< "\"";
-	_logger << async::verbose << __func__ << ": version: \"" << _version
-			<< "\"";
+	LOG_VERBOSE(__func__ << ": URI: \"" << _uri << "\"");
+	LOG_VERBOSE(__func__ << ": QUERY: \"" << _query_string << "\"");
+	LOG_VERBOSE(__func__ << ": version: \"" << _version << "\"");
 	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 	return (RETURN_TYPE_OK);
 }
@@ -86,14 +82,14 @@ void Request::consumeHeaderGetNameValue(std::string &header_line,
 	const size_t colon_pos = header_line.find(":");
 	if (colon_pos == std::string::npos)
 	{
-		_logger << async::warning << __func__ << ": header line has no colon";
+		LOG_WARNING(__func__ << ": header line has no colon");
 		throw(HTTP::InvalidField());
 	}
 
 	name = getfrontstr(header_line, colon_pos);
 	if (hasSpace(name))
 	{
-		_logger << async::warning << __func__ << ": header name has space";
+		LOG_WARNING(__func__ << ": header name has space");
 		throw(HTTP::InvalidField());
 	}
 
@@ -112,8 +108,7 @@ void Request::consumeHeaderGetNameValue(std::string &header_line,
 		}
 		if (found_name == false)
 		{
-			_logger << async::warning << __func__
-					<< ": Trailer header doesn't have " << name;
+			LOG_WARNING(__func__ << ": Trailer header doesn't have " << name);
 			throw(HTTP::InvalidField());
 		}
 	}
@@ -193,7 +188,7 @@ int Request::consumeChunk(std::string &buffer)
 	LOG_DEBUG(__func__ << ": body result in :\"" << _body << "\"");
 	if (consumestr(buffer, CRLF_LEN) != CRLF)
 	{
-		_logger << async::warning << __func__ << ": chunk must end with CRLF";
+		LOG_WARNING(__func__ << ": chunk must end with CRLF");
 		throw(HTTP::InvalidFormat());
 	}
 	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");

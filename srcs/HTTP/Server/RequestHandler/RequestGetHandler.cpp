@@ -29,8 +29,8 @@ int Server::RequestGetHandler::task(void)
 		_response = _server->generateErrorResponse(301); // Not Found;
 		_response.setValue("Location", _request.getURIPath() + "/");
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		_logger << async::warning << "invalid directory format, redirect to \""
-				<< _request.getURIPath() + "\"";
+		LOG_WARNING("invalid directory format, redirect to \""
+					<< _request.getURIPath() + "\"");
 		return (_status);
 	}
 
@@ -50,30 +50,30 @@ int Server::RequestGetHandler::task(void)
 	}
 	else if (rc == async::status::ERROR_FILEISDIR)
 	{
-		_logger << async::verbose << "Resource " << _resource_path
-				<< " is directory, attempt autoindex";
+		LOG_VERBOSE("Resource " << _resource_path
+								<< " is directory, attempt autoindex");
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		if (_location.hasAutoIndex() == true)
 		{
 			_response.makeDirectoryListing(_resource_path,
 										   _request.getURIPath());
 			_response.setStatus(200);
-			_logger << async::verbose << "autoindex success";
+			LOG_VERBOSE("autoindex success");
 		}
 		else
 		{
 			registerErrorResponse(404); // Not Found
-			_logger << async::verbose << "autoindex is not set";
+			LOG_VERBOSE("autoindex is not set");
 		}
 	}
 	else if (rc == async::status::ERROR_FILEOPENING)
 	{
-		_logger << async::error << _reader.errorMsg();
+		LOG_ERROR(_reader.errorMsg());
 		registerErrorResponse(404); // Not Found
 	}
 	else
 	{
-		_logger << async::warning << _reader.errorMsg();
+		LOG_WARNING(_reader.errorMsg());
 		registerErrorResponse(500); // Internal Server Error
 	}
 	return (_status);

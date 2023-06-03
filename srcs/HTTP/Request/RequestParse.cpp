@@ -37,12 +37,12 @@ int Request::parseHeader(std::string &buffer)
 		parseHeaderEnsureCorrectHeadersForPostPutMethod();
 		if (_header.hasValue("Transfer-Encoding", "chunked"))
 		{
-			_logger << async::verbose << "Transfer-Encoding is chunked";
+			LOG_VERBOSE("Transfer-Encoding is chunked");
 			parseHeaderHandleTransferEncodingChunked();
 		}
 		else if (_header.hasValue("Content-Length"))
 		{
-			_logger << async::verbose << "header has Content-Length";
+			LOG_VERBOSE("header has Content-Length");
 			parseHeaderHandlerContentLength();
 		}
 		else
@@ -74,7 +74,7 @@ int Request::parseChunk(std::string &buffer)
 	case RETURN_TYPE_OK:
 		if (_header.hasValue("Trailer"))
 		{
-			_logger << async::verbose << "header has Trailer";
+			LOG_VERBOSE("header has Trailer");
 			_current_state = PARSE_STATE_TRAILER;
 			return (RETURN_TYPE_IN_PROCESS);
 		}
