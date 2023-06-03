@@ -17,7 +17,7 @@ std::string loadFileFromPath(const std::string &path)
 	std::ifstream infile;
 	std::stringstream buffer;
 
-	infile.open(path, std::ios::in);
+	infile.open(path.c_str(), std::ios::in);
 	if (!infile.good())
 		throw(std::runtime_error("Error while opening file from " + path));
 	buffer << infile.rdbuf();
