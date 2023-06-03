@@ -32,7 +32,7 @@ int Server::RequestPutHandler::task(void)
 	{
 		std::string body = "made the file\n"
 						   "click <A href=\""
-						   + _resource_path + "\">here</A> to view it.";
+						   + _resource_path + "\">here</A> to view it.\n";
 
 		_response.setStatus(201); // Created
 		_response.setLocation(_resource_path);
