@@ -138,12 +138,12 @@ void Server::Location::parseDirectiveAutoIndex(
 	}
 	if (auto_index_directive.parameter(0) == "off")
 	{
-		_logger << async::debug << "autoindex set to off";
+		LOG_DEBUG("autoindex set to off");
 		return;
 	}
 	else if (auto_index_directive.parameter(0) == "on")
 	{
-		_logger << async::debug << "autoindex set to on";
+		LOG_DEBUG("autoindex set to on");
 		_autoindex = true;
 	}
 	else

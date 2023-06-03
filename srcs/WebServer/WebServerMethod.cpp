@@ -38,8 +38,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(400); // Bad Request
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
-			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
-					<< "\"";
+			LOG_DEBUG("Added to wrbuf: \"" << res.toString() << "\"");
 			continue;
 		}
 
@@ -61,8 +60,7 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(500);
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
-			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
-					<< "\"";
+			LOG_DEBUG("Added to wrbuf: \"" << res.toString() << "\"");
 			break;
 		}
 	}
@@ -135,8 +133,7 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 					<< " has been found";
 			HTTP::Response res = server->retrieveResponse(client_fd);
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
-			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
-					<< "\"";
+			LOG_DEBUG("Added to wrbuf: \"" << res.toString() << "\"");
 			_logger << async::info << "Outbound response " << res;
 		}
 	}
