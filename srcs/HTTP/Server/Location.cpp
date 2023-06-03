@@ -84,12 +84,10 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 	std::string uri_path = req.getURIPath();
 	const int method = req.getMethod();
 
-	_logger << async::verbose << __func__ << ": URI path before replace \""
-			<< uri_path << "\"";
+	LOG_VERBOSE(__func__ << ": URI path before replace \"" << uri_path << "\"");
 	if (_upload_allowed && (method == METHOD_POST || method == METHOD_PUT))
 	{
-		_logger << async::verbose << __func__
-				<< ": generate resource path for upload";
+		LOG_VERBOSE(__func__ << ": generate resource path for upload");
 		switch (method)
 		{
 		case METHOD_POST: // upload_path/해시결과(URI에 현재 시각을 붙임)
@@ -103,18 +101,17 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 			uri_path.replace(0, _path.length(), _upload_store_path);
 			break;
 		}
-		_logger << async::verbose << __func__ << ": after \"" << uri_path
-				<< "\"";
+		LOG_VERBOSE(__func__ << ": after \"" << uri_path << "\"");
 		return (uri_path);
 	}
 
 	uri_path.replace(0, _path.length(), _alias);
-	_logger << async::verbose << __func__ << ": after \"" << uri_path << "\"";
+	LOG_VERBOSE(__func__ << ": after \"" << uri_path << "\"");
 	if (req.getURIPath()[req.getURIPath().size() - 1] == '/' && _has_index)
 	{
 		uri_path += _index;
-		_logger << async::verbose << __func__
-				<< ": add index to URI path, result: \"" << uri_path << "\"";
+		LOG_VERBOSE(__func__ << ": add index to URI path, result: \""
+							 << uri_path << "\"");
 	}
 
 	return (uri_path);

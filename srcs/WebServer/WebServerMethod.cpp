@@ -34,20 +34,18 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 		{
 			// TODO: 오류 상황에 따라 에러 코드 세분화
 			// TODO: 에러 코드에 따라 연결 끊을 수도 있게 처리
-			_logger << async::warning << "Parsing failure: " << e.what();
+			LOG_WARNING("Parsing failure: " << e.what());
 			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(400); // Bad Request
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
-			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
-					<< "\"";
+			LOG_DEBUG("Added to wrbuf: \"" << res.toString() << "\"");
 			continue;
 		}
 
 		switch (rc)
 		{
 		case HTTP::Request::RETURN_TYPE_OK:
-			_logger << async::info << "Inbound request "
-					<< getRequestBuffer(port, client_fd);
+			LOG_INFO("Inbound request " << getRequestBuffer(port, client_fd));
 			registerRequest(port, client_fd, getRequestBuffer(port, client_fd));
 			resetRequestBuffer(port, client_fd);
 			break;
@@ -57,12 +55,11 @@ void WebServer::parseRequestForEachFd(int port, async::TCPIOProcessor &tcp_proc)
 			break;
 
 		default:
-			_logger << async::warning << "Unknown parsing error";
+			LOG_WARNING("Unknown parsing error");
 			resetRequestBuffer(port, client_fd);
 			HTTP::Response res = generateErrorResponse(500);
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
-			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
-					<< "\"";
+			LOG_DEBUG("Added to wrbuf: \"" << res.toString() << "\"");
 			break;
 		}
 	}
@@ -107,10 +104,9 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 	}
 	catch (const HTTP::Server::InvalidRequest &e)
 	{
-		_logger << async::warning << e.what();
+		LOG_WARNING(e.what());
 	}
-	_logger << async::warning << "No matching server for "
-			<< request.getHeaderValue("Host", 0);
+	LOG_WARNING("No matching server for " << request.getHeaderValue("Host", 0));
 	// 일치하는 Host가 없을 시, 해당 포트의 server_name이 없는 서버를 찾아보고
 	// 그러한 서버가 없다면 해당 포트의 첫 서버에 등록
 	if (findNoneNameServer(port) != _servers[port].end())
@@ -131,13 +127,12 @@ void WebServer::retrieveResponseForEachFd(int port, _Servers &servers)
 			int client_fd = server->hasResponses();
 			if (client_fd < 0)
 				break;
-			_logger << async::verbose << "Response for client " << client_fd
-					<< " has been found";
+			LOG_VERBOSE("Response for client " << client_fd
+											   << " has been found");
 			HTTP::Response res = server->retrieveResponse(client_fd);
 			_tcp_procs[port]->wrbuf(client_fd) += res.toString();
-			_logger << async::debug << "Added to wrbuf: \"" << res.toString()
-					<< "\"";
-			_logger << async::info << "Outbound response " << res;
+			LOG_DEBUG("Added to wrbuf: \"" << res.toString() << "\"");
+			LOG_INFO("Outbound response " << res);
 		}
 	}
 }
@@ -166,11 +161,10 @@ void WebServer::disconnect(int port, int client_fd)
 		}
 		catch (const HTTP::Server::ClientNotFound &e)
 		{
-			_logger << async::warning << e.what();
+			LOG_WARNING(e.what());
 		}
 	}
-	_logger << async::info << "Disconnected client fd " << client_fd
-			<< " from port " << port;
+	LOG_INFO("Disconnected client fd " << client_fd << " from port " << port);
 }
 
 void WebServer::terminate(void)

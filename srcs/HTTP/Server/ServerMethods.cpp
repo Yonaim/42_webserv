@@ -22,14 +22,13 @@ bool Server::isForMe(const Request &request) const
 							 "field found with name \"Host\""));
 	}
 	const std::string &host = request.getHeaderValue("Host", 0);
-	_logger << async::verbose << "Request is for host \"" << host << "\"";
+	LOG_VERBOSE("Request is for host \"" << host << "\"");
 	for (std::set<std::string>::iterator it = _server_name.begin();
 		 it != _server_name.end(); it++)
 	{
 		if (*it == host)
 		{
-			_logger << async::verbose << "Request host match with \"" << host
-					<< "\"";
+			LOG_VERBOSE("Request host match with \"" << host << "\"");
 			return (true);
 		}
 	}
@@ -101,9 +100,8 @@ std::string Server::getErrorPage(const int code)
 	else if (rc == async::status::OK_AGAIN)
 		return (generateErrorPage(code));
 	else if (rc == async::status::ERROR_TIMEOUT)
-		_logger << async::error << _error_pages[code]->errorMsg();
-	_logger << async::error
-			<< "Unknown error while loading error page for code " << code;
+		LOG_ERROR(_error_pages[code]->errorMsg());
+	LOG_ERROR("Unknown error while loading error page for code " << code);
 	return ("");
 }
 
@@ -134,7 +132,6 @@ const Server::Location &Server::getLocation(const std::string &path) const
 
 	if (cur_diff == ULLONG_MAX)
 		throw(LocationNotFound(path));
-	_logger << async::verbose << "path " << path << " is for location "
-			<< result->first;
+	LOG_VERBOSE("path " << path << " is for location " << result->first);
 	return (result->second);
 }

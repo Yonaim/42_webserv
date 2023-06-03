@@ -64,15 +64,14 @@ Request::Request(const HTTP::Request &http_req,
 				value += ", ";
 		}
 		addMetaVariable(http_meta_variable_name, value);
-		_logger << async::verbose << "name:" << http_meta_variable_name << ": "
-				<< value;
+		LOG_VERBOSE("name:" << http_meta_variable_name << ": " << value);
 	}
 
 	for (std::map<std::string, std::string>::iterator it
 		 = _meta_variables.begin();
 		 it != _meta_variables.end(); it++)
-		_logger << async::verbose << "CGI metavariable \"" << it->first
-				<< "\"=\"" << it->second << "\"";
+		LOG_VERBOSE("CGI metavariable \"" << it->first << "\"=\"" << it->second
+										  << "\"");
 }
 
 Request::~Request()

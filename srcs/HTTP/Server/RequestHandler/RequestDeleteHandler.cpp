@@ -1,6 +1,5 @@
 #include "HTTP/RequestHandler.hpp"
-#include <errno.h>
-#include <unistd.h>
+#include <cerrno>
 #include <cstdio>
 
 using namespace HTTP;

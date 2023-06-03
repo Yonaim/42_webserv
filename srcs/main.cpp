@@ -2,8 +2,8 @@
 #include "WebServer.hpp"
 #include "async/SingleIOProcessor.hpp"
 #include "parseConfig.hpp"
+#include <csignal>
 #include <iostream>
-#include <signal.h>
 #include <unistd.h>
 
 void setWebServerTerminationFlag(int arg)
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 		config_path = "example.conf";
 	else if (argc == 2)
 		config_path = argv[1];
-	if (argc > 2)
+	else
 	{
 		std::cout << "usage: " << argv[0] << " path/to/config/file\n";
 		return (2);

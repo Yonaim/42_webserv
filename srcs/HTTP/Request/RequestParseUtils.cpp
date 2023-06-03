@@ -9,8 +9,7 @@ void Request::parseHeaderEnsureHostHeaderField(void)
 {
 	if (!_header.hasValue("Host") && !_header.hasValue("Trailer", "Host"))
 	{
-		_logger << async::warning << __func__
-				<< "Header must include Host header field";
+		LOG_WARNING(__func__ << "Header must include Host header field");
 		throw(HTTP::InvalidValue());
 	}
 }
@@ -20,8 +19,7 @@ void Request::parseHeaderEnsureTrailerHeaderField(void)
 	if (!_header.hasValue("Transfer-Encoding", "chunked")
 		&& _header.hasValue("Trailer"))
 	{
-		_logger << async::warning << __func__
-				<< ": Trailer with no Transfer-Encoding";
+		LOG_WARNING(__func__ << ": Trailer with no Transfer-Encoding");
 		throw(HTTP::InvalidValue());
 	}
 }
@@ -51,7 +49,7 @@ void Request::parseHeaderHandleTransferEncodingChunked(void)
 				|| *iter == "Transfer-Encoding")
 				throw(HTTP::InvalidField());
 		}
-		_logger << async::verbose << "header has Trailer";
+		LOG_VERBOSE("header has Trailer");
 	}
 	_current_state = PARSE_STATE_CHUNK;
 }
@@ -63,8 +61,8 @@ void Request::parseHeaderHandlerContentLength(void)
 		throw(HTTP::InvalidField());
 
 	const std::string &content_length = getHeaderValue("Content-Length", 0);
-	_logger << async::verbose << "header has Content-Length";
-	_logger << async::verbose << "content-length : " << content_length;
+	LOG_VERBOSE("header has Content-Length");
+	LOG_VERBOSE("content-length : " << content_length);
 
 	try
 	{

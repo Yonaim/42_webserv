@@ -11,37 +11,35 @@ void Server::parseDirectiveListen(const ConfigContext &server_context)
 	const char *dir_name = "listen";
 	if (server_context.countDirectivesByName("listen") != 1)
 	{
-		_logger << async::error << server_context.name() << " should have 1 "
-				<< dir_name;
+		LOG_ERROR(server_context.name() << " should have 1 " << dir_name);
 		throw(ConfigDirective::InvalidNumberOfArgument(server_context));
 	}
 	const ConfigDirective &listen_directive
 		= server_context.getNthDirectiveByName(dir_name, 0);
 	if (listen_directive.is_context())
 	{
-		_logger << async::error << dir_name << " should not be context";
+		LOG_ERROR(dir_name << " should not be context");
 		throw(ConfigDirective::UndefinedDirective(listen_directive));
 	}
 	if (listen_directive.nParameters() != 1)
 	{
-		_logger << async::error << dir_name << " should have 1 parameter(s)";
+		LOG_ERROR(dir_name << " should have 1 parameter(s)");
 		throw(ConfigDirective::InvalidNumberOfArgument(listen_directive));
 	}
 	const std::string &port_str = listen_directive.parameter(0);
 	if (!isUnsignedIntStr(port_str))
 	{
-		_logger << async::error << dir_name
-				<< " should have integer form parameter";
+		LOG_ERROR(dir_name << " should have integer form parameter");
 		throw(ConfigDirective::UndefinedArgument(listen_directive));
 	}
 	std::stringstream ss(port_str);
 	ss >> _port;
 	if (!(0 <= _port && _port <= 65536))
 	{
-		_logger << async::error << dir_name << " has invalid port number";
+		LOG_ERROR(dir_name << " has invalid port number");
 		throw(ConfigDirective::UndefinedArgument(listen_directive));
 	}
-	_logger << async::verbose << "parsed port " << _port;
+	LOG_VERBOSE("parsed port " << _port);
 }
 
 void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
@@ -56,7 +54,7 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName(dir_name, i);
 		if (error_page_directive.is_context())
 		{
-			_logger << async::error << dir_name << " should not be context";
+			LOG_ERROR(dir_name << " should not be context");
 			throw(ConfigDirective::UndefinedDirective(error_page_directive));
 		}
 		const size_t n_arguments = error_page_directive.nParameters();
@@ -67,21 +65,19 @@ void Server::parseDirectiveErrorPage(const ConfigContext &server_context)
 			const std::string &code_str = error_page_directive.parameter(i);
 			if (!isUnsignedIntStr(code_str))
 			{
-				_logger << async::error << dir_name
-						<< " should have integer form parameter";
+				LOG_ERROR(dir_name << " should have integer form parameter");
 				throw(ConfigDirective::UndefinedArgument(error_page_directive));
 			}
 			const int code = toNum<int>(code_str);
 			if (!isValidStatusCode(code))
 			{
-				_logger << async::error << dir_name
-						<< " has invalid status code";
+				LOG_ERROR(dir_name << " has invalid status code");
 				throw(ConfigDirective::UndefinedArgument(error_page_directive));
 			}
 			_error_pages[code]
 				= _FileReaderPtr(new async::FileReader(_timeout_ms, file_path));
-			_logger << async::verbose << "parsed error page " << file_path
-					<< " for code " << code;
+			LOG_VERBOSE("parsed error page " << file_path << " for code "
+											 << code);
 		}
 	}
 }
@@ -101,15 +97,15 @@ void Server::parseDirectiveServerName(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName(dir_name, i);
 		if (server_name_directive.is_context())
 		{
-			_logger << async::error << dir_name << " should not be context";
+			LOG_ERROR(dir_name << " should not be context");
 			throw(ConfigDirective::UndefinedDirective(server_name_directive));
 		}
 		const size_t n_arguments = server_name_directive.nParameters();
 		for (size_t i = 0; i < n_arguments; i++)
 		{
 			_server_name.insert(server_name_directive.parameter(i));
-			_logger << async::verbose << "parsed server name "
-					<< server_name_directive.parameter(i);
+			LOG_VERBOSE("parsed server name "
+						<< server_name_directive.parameter(i));
 		}
 	}
 }
@@ -127,18 +123,17 @@ void Server::parseDirectiveLocation(const ConfigContext &server_context)
 				"location", i));
 		if (!location_context.is_context())
 		{
-			_logger << async::error << dir_name << " should be context";
+			LOG_ERROR(dir_name << " should be context");
 			throw(ConfigDirective::UndefinedDirective(location_context));
 		}
 		Location new_location(location_context, _max_body_size);
 		if (_locations.find(new_location.getPath()) != _locations.end())
 		{
-			_logger << async::error << dir_name << " has duplicate paths";
+			LOG_ERROR(dir_name << " has duplicate paths");
 			throw(ConfigDirective::DuplicateArgument(location_context));
 		}
 		_locations[new_location.getPath()] = new_location;
-		_logger << async::verbose << "parsed location "
-				<< new_location.getPath();
+		LOG_VERBOSE("parsed location " << new_location.getPath());
 	}
 }
 
@@ -154,20 +149,19 @@ void Server::parseDirectiveCGI(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName(dir_name, i);
 		if (cgi_directive.is_context())
 		{
-			_logger << async::error << dir_name << " should not be context";
+			LOG_ERROR(dir_name << " should not be context");
 			throw(ConfigDirective::UndefinedDirective(cgi_directive));
 		}
 		if (cgi_directive.nParameters() != 2)
 		{
-			_logger << async::error << dir_name
-					<< " should have 2 parameter(s)";
+			LOG_ERROR(dir_name << " should have 2 parameter(s)");
 			throw(ConfigDirective::InvalidNumberOfArgument(cgi_directive));
 		}
 		_cgi_ext_to_path[cgi_directive.parameter(0)]
 			= cgi_directive.parameter(1);
-		_logger << async::verbose << "CGI pass from URI *."
-				<< cgi_directive.parameter(0) << " to exec "
-				<< cgi_directive.parameter(1) << " enabled";
+		LOG_VERBOSE("CGI pass from URI *."
+					<< cgi_directive.parameter(0) << " to exec "
+					<< cgi_directive.parameter(1) << " enabled");
 	}
 	_cgi_enabled = true;
 }
@@ -182,8 +176,7 @@ void Server::parseDirectiveCGILimitExcept(const ConfigContext &server_context)
 		= server_context.countDirectivesByName(dir_name);
 	if (n_limit_excepts != 1)
 	{
-		_logger << async::error << server_context.name()
-				<< " should have 0 or 1 " << dir_name;
+		LOG_ERROR(server_context.name() << " should have 0 or 1 " << dir_name);
 		throw(ConfigDirective::InvalidNumberOfArgument(server_context));
 	}
 	_allowed_cgi_methods.clear();
@@ -194,15 +187,14 @@ void Server::parseDirectiveCGILimitExcept(const ConfigContext &server_context)
 			= server_context.getNthDirectiveByName(dir_name, i);
 		if (limit_except_directive.is_context())
 		{
-			_logger << async::error << dir_name << " should not be context";
+			LOG_ERROR(dir_name << " should not be context");
 			throw(ConfigDirective::UndefinedDirective(limit_except_directive));
 		}
 
 		const size_t n_methods = limit_except_directive.nParameters();
 		if (n_methods == 0)
 		{
-			_logger << async::error << dir_name
-					<< " should have more than 0 parameter(s)";
+			LOG_ERROR(dir_name << " should have more than 0 parameter(s)");
 			throw(ConfigDirective::InvalidNumberOfArgument(
 				limit_except_directive));
 		}
@@ -213,15 +205,14 @@ void Server::parseDirectiveCGILimitExcept(const ConfigContext &server_context)
 				= METHOD.find(limit_except_directive.parameter(j));
 			if (it == METHOD.end())
 			{
-				_logger << async::error << dir_name
-						<< " has invalid HTTP method";
+				LOG_ERROR(dir_name << " has invalid HTTP method");
 				throw(
 					ConfigDirective::UndefinedArgument(limit_except_directive));
 			}
 
 			const int method = it->second;
-			_logger << async::verbose << "CGI Method "
-					<< limit_except_directive.parameter(j) << " allowed";
+			LOG_VERBOSE("CGI Method " << limit_except_directive.parameter(j)
+									  << " allowed");
 			_allowed_cgi_methods.insert(method);
 		}
 	}
@@ -235,25 +226,23 @@ void Server::parseDirectiveTmpDirPath(const ConfigContext &server_context)
 		return;
 	if (n_indexs > 1)
 	{
-		_logger << async::error << server_context.name()
-				<< " should have 0 or 1 " << dir_name;
+		LOG_ERROR(server_context.name() << " should have 0 or 1 " << dir_name);
 		throw(ConfigDirective::InvalidNumberOfArgument(server_context));
 	}
 	const ConfigDirective &tmp_directive
 		= server_context.getNthDirectiveByName(dir_name, 0);
 	if (tmp_directive.is_context())
 	{
-		_logger << async::error << dir_name << " should not be context";
+		LOG_ERROR(dir_name << " should not be context");
 		throw(ConfigDirective::UndefinedDirective(tmp_directive));
 	}
 	if (tmp_directive.nParameters() != 1)
 	{
-		_logger << async::error << dir_name << " should have 1 parameter(s)";
+		LOG_ERROR(dir_name << " should have 1 parameter(s)");
 		throw(ConfigDirective::InvalidNumberOfArgument(tmp_directive));
 	}
 	_temp_dir_path = tmp_directive.parameter(0);
-	_logger << async::verbose
-			<< "temporary file storage path set to: " << _temp_dir_path;
+	LOG_VERBOSE("temporary file storage path set to: " << _temp_dir_path);
 }
 
 bool Server::isValidStatusCode(const int &status_code)

@@ -20,18 +20,16 @@ RequestHandlerVnode::RequestHandlerVnode(const Request &request,
 {
 	_writer = new async::FileWriter(_timeout_ms, _input_file_path,
 									_request.getMessageBody());
-	_logger << async::verbose << "CGI input file: " << _input_file_path;
-	_logger << async::verbose << "CGI output file: " << _output_file_path;
+	LOG_VERBOSE("CGI input file: " << _input_file_path);
+	LOG_VERBOSE("CGI output file: " << _output_file_path);
 }
 
 RequestHandlerVnode::~RequestHandlerVnode()
 {
 	if (std::remove(_input_file_path.c_str()) == -1)
-		_logger << async::warning
-				<< "Failed to delete file: " << _input_file_path;
+		LOG_WARNING("Failed to delete file: " << _input_file_path);
 	if (std::remove(_output_file_path.c_str()) == -1)
-		_logger << async::warning
-				<< "Failed to delete file: " << _output_file_path;
+		LOG_WARNING("Failed to delete file: " << _output_file_path);
 	delete _writer;
 	delete _reader;
 }
@@ -70,7 +68,7 @@ int RequestHandlerVnode::fork()
 		FILE *output_stream = fopen(_output_file_path.c_str(), "w");
 		if (!input_stream || !output_stream)
 		{
-			_logger << async::error << "Failed to create temporary files";
+			LOG_ERROR("Failed to create temporary files");
 			async::Logger::blockingWriteAll();
 			std::exit(2);
 		}
@@ -79,7 +77,7 @@ int RequestHandlerVnode::fork()
 		if (::dup2(input_fd, STDIN_FILENO) < 0
 			|| ::dup2(output_fd, STDOUT_FILENO) < 0)
 		{
-			_logger << async::error << "failed to dup2";
+			LOG_ERROR("failed to dup2");
 			async::Logger::blockingWriteAll();
 			std::exit(2);
 		}

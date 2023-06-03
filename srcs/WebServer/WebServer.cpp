@@ -19,8 +19,7 @@ WebServer::WebServer(const ConfigContext &root_context)
 	size_t n_servers = root_context.countDirectivesByName(dir_name);
 	if (n_servers < 1)
 	{
-		_logger << async::error << root_context.name()
-				<< " should have 1 or more " << dir_name;
+		LOG_ERROR(root_context.name() << " should have 1 or more " << dir_name);
 		throw(ConfigDirective::InvalidNumberOfDirective(root_context));
 	}
 	for (size_t i = 0; i < n_servers; i++)
