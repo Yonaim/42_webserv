@@ -173,9 +173,8 @@ int Request::consumeChunk(std::string &buffer)
 		return (RETURN_TYPE_AGAIN);
 	}
 
-	const size_t content_length = std::strtol(buffer.c_str(), NULL, 16);
+	const size_t content_length = ::toHexNum<size_t>(buffer.substr(0, crlf_pos));
 	LOG_DEBUG(__func__ << ": content length " << content_length);
-
 	// buffer.size() >= 숫자가 적힌 줄 길이 + content_length + CRLF_LEN이면 ok
 	if (buffer.size() < crlf_pos + CRLF_LEN + content_length + CRLF_LEN)
 	{

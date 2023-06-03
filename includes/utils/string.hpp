@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "HTTP/ParsingFail.hpp"
 
 // parsing
 bool hasSpace(const std::string &key);
@@ -54,14 +55,6 @@ inline std::string getExtension(const std::string &filename)
 	return ("");
 }
 
-template <typename T> std::string toStr(T num, T num2)
-{
-	std::ostringstream ss;
-
-	ss << num << num2;
-	return (ss.str());
-}
-
 template <typename T> std::string toStr(T num)
 {
 	std::ostringstream ss;
@@ -102,6 +95,24 @@ template <typename T> T toNum(const std::string &str)
 	if (ss >> remaining)
 	{
 		throw std::invalid_argument("Invalid input: '" + str + "'");
+	}
+	return (num);
+}
+
+template <typename T> T toHexNum(const std::string &str)
+{
+	T num;
+	std::istringstream ss(str);
+
+	if (!(ss >> std::hex >> num))
+	{
+		throw HTTP::InvalidValue();
+	}
+
+	char remaining;
+	if (ss >> remaining)
+	{
+		throw HTTP::InvalidValue();
 	}
 	return (num);
 }
