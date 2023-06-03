@@ -28,14 +28,13 @@ template <typename KeyType, typename ValueType> class BidiMap
 		for (size_t i = 0; i < n; i++)
 		{
 			_key_to_value_map[arr[i].first] = arr[i].second;
-			_value_to_key_map[arr[i].second] = arr[i].first;	
+			_value_to_key_map[arr[i].second] = arr[i].first;
 		}
 	}
 	BidiMap(const _KVmap &map)
 	{
-		for (typename _KVmap::const_iterator it
-			 = map.begin();
-			 it != map.end(); it++)
+		for (typename _KVmap::const_iterator it = map.begin(); it != map.end();
+			 it++)
 		{
 			_key_to_value_map[it->first] = it->second;
 			_value_to_key_map[it->second] = it->first;
@@ -86,8 +85,7 @@ template <typename KeyType, typename ValueType> class BidiMap
 	}
 	ValueType &getValueByKey(const KeyType &key)
 	{
-		const typename _KVmap::iterator find
-			= _key_to_value_map.find(key);
+		const typename _KVmap::iterator find = _key_to_value_map.find(key);
 
 		if (find == _key_to_value_map.end())
 			throw(std::runtime_error("Key not found"));
@@ -104,8 +102,7 @@ template <typename KeyType, typename ValueType> class BidiMap
 	}
 	KeyType &getKeyByValue(const ValueType &value)
 	{
-		const typename _VKmap::iterator find
-			= _value_to_key_map.find(value);
+		const typename _VKmap::iterator find = _value_to_key_map.find(value);
 
 		if (find == _value_to_key_map.end())
 			throw(std::runtime_error("Value not found"));
