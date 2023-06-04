@@ -6,6 +6,14 @@
 
 namespace async
 {
+/**
+ * @class SingleIOProcessor
+ * @brief 단일 파일디스크립터의 Asynchronous Non-Blocking 입출력 처리를 담당하는
+ *        IOProcessor의 유도 클래스
+ * 
+ * 주어진 파일 디스크립터를 비차단(non-blocking)으로 설정하고 멤버 변수 _fd에 저장한다.
+ * 특정 파일 디스크립터(_fd)에 대한 Asynchronous Non-Blocking I/O를 처리한다.
+ */
 class SingleIOProcessor : public IOProcessor
 {
   private:

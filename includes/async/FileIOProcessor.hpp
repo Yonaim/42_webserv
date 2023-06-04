@@ -8,6 +8,16 @@
 
 namespace async
 {
+/**
+ * @class FileIOProcessor
+ * @brief 주어진 파일에 대하여 논블로킹한 방식으로 비동기 입출력을 처리하는
+ *        추상 클래스
+ * 
+ * FileIOProcessor는 파일의 스트림을 관리하고 SingleIOProcessor 클래스로 파일에
+ * 대한 읽기 및 쓰기 작업을 수행한다. 작업에 걸리는 시간을 _timeout으로
+ * 제한하여 제한 시간을 초과하면 타임 아웃으로 처리하고 관련 에러 메시지를
+ * 저장한다.
+ */
 class FileIOProcessor
 {
   protected:
@@ -37,6 +47,14 @@ class FileIOProcessor
 	std::string retrieve(void);
 };
 
+/**
+ * @class FileWriter
+ * @brief 주어진 파일에 대하여 쓰기 작업 수행하는 FileIOProcessor의 유도클래스
+ *
+ * FileWriter는 주어진 파일에 대해 논블로킹 방식으로 비동기적인 쓰기 작업을
+ * 수행한다.
+ */
+
 class FileWriter : public FileIOProcessor
 {
   private:
@@ -51,6 +69,13 @@ class FileWriter : public FileIOProcessor
 	virtual int task(void);
 };
 
+/**
+ * @class FileReader
+ * @brief 주어진 파일에 대하여 읽기 작업을 수행하는 FileIOProcessor의 유도클래스
+ *
+ * FileReader는 주어진 파일에 대해 논블로킹 방식으로 비동기적인 읽기 작업을
+ * 수행한다.
+ */
 class FileReader : public FileIOProcessor
 {
   private:
