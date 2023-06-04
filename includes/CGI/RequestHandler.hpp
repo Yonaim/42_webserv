@@ -10,6 +10,17 @@
 
 namespace CGI
 {
+/**
+ * @class RequestHandler
+ * @brief CGI 요청을 처리하는 기본 클래스
+ *
+ * RequestHandler는 CGI 요청을 처리하기 위한 클래스이다. HTTP::Request와
+ * CGI 경로를 입력 받아 CGI 요청을 생성하고 처리하고 CGI 응답을 생성한다.
+ * FileReader와 FileWriter를 사용하여 파이프나 임시 정규 파일을 통해 입출력을
+ * 처리하고 자식 프로세스를 생성하여 CGI를 실행한다.
+ * 메시지 본문의 크기가 1024보다 작으면 파이프를, 그렇지 않으면 임시 정규 파일을
+ * 통해 입출력을 처리한다.
+ */
 class RequestHandler
 {
   protected:
@@ -51,6 +62,12 @@ class RequestHandler
 	const Response &retrieve(void);
 };
 
+/**
+ * @class RequestHandlerPipe
+ * @brief 파이프를 사용하여 CGI 요청을 처리하는 클래스
+ *
+ * RequestHandlerPipe는 파이프를 사용하여 입출력을 처리하는 클래스이다.
+ */
 class RequestHandlerPipe : public RequestHandler
 {
   private:
@@ -71,6 +88,12 @@ class RequestHandlerPipe : public RequestHandler
 	virtual int task(void);
 };
 
+/**
+ * @class RequestHandlerVnode
+ * @brief 임시 정규 파일을 사용하여 CGI 요청을 처리하는 클래스
+ *
+ * RequestHandlerVnode는 임시 정규 파일을 사용하여 입출력을 처리하는 클래스이다.
+ */
 class RequestHandlerVnode : public RequestHandler
 {
   private:

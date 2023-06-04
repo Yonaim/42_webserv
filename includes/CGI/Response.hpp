@@ -8,6 +8,15 @@
 
 namespace CGI
 {
+/**
+ * @class Response
+ * @brief CGI 응답의 상태 코드, 헤더 필드, 메시지 본문을 저장하는 클래스
+ *
+ * Response는 CGI 실행 결과를 파싱하여 CGI 응답의 상태코드, 헤더 필드, 메시지
+ * 본문을 각각 파싱하여 적절히 저장한다.
+ * 또한 toHTTPResponse 멤버 함수를 통해 CGI 응답을 HTTP 응답으로 변환해서 반환한다.
+ */
+
 class Response
 {
   private:
