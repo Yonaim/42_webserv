@@ -16,6 +16,7 @@ Response::Response(void) : _logger(async::Logger::getLogger("Response"))
 	initGeneralHeaderFields();
 	initResponseHeaderFields();
 	initEntityHeaderFields();
+	setDefaultHeaderValues();
 }
 
 Response::Response(Header header)

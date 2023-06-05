@@ -83,3 +83,8 @@ void Response::setLocation(const std::string &uri)
 	std::vector<std::string> uri_list(1, uri);
 	_header.assign("Location", uri_list);
 }
+
+void Response::setDefaultHeaderValues(void)
+{
+	_header.insert("Server", "webserv/1.0");
+}

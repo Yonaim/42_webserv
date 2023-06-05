@@ -29,6 +29,7 @@ class Response
 	void initGeneralHeaderFields(void);
 	void initResponseHeaderFields(void);
 	void initEntityHeaderFields(void);
+	void setDefaultHeaderValues(void);
 	void makeStatusLine(void);
 	void makeHeader(void);
 	void makeBody(void);
