@@ -39,7 +39,8 @@ class Server
 	bool _has_server_name;
 	bool _cgi_enabled;
 	std::set<std::string> _server_name;
-	std::map<int, _FileReaderPtr> _error_pages;
+	std::map<int, std::string> _error_page_paths;
+	std::map<std::string, _FileReaderPtr> _error_page_readers;
 	std::map<std::string, Location> _locations;
 	std::map<std::string, std::string> _cgi_ext_to_path;
 	std::string _temp_dir_path;

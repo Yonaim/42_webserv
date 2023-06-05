@@ -92,16 +92,17 @@ unsigned int Server::getTimeout(void) const
 
 std::string Server::getErrorPage(const int code)
 {
-	if (_error_pages.find(code) == _error_pages.end())
+	if (_error_page_paths.find(code) == _error_page_paths.end())
 		return (generateErrorPage(code));
-	int rc = _error_pages[code]->task();
+
+	_FileReaderPtr &reader = _error_page_readers[_error_page_paths[code]];
+	int rc = reader->task();
 	if (rc == async::status::OK_DONE)
-		return (_error_pages[code]->retrieve());
+		return (reader->retrieve());
 	else if (rc == async::status::OK_AGAIN)
 		return (generateErrorPage(code));
 	else if (rc == async::status::ERROR_TIMEOUT)
-		LOG_ERROR("Timeout while opening error page: "
-				  + _error_pages[code]->errorMsg());
+		LOG_ERROR("Timeout while opening error page: " + reader->errorMsg());
 	else
 		LOG_ERROR("Unknown error while loading error page for code " << code);
 	return ("");
