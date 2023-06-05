@@ -152,19 +152,6 @@ void IOProcessor::blockingWrite(void)
 	}
 }
 
-/*
-TODO: stat 함수가 사용 불가능하여 임시로 만든 해결책으로 stat이 사용 가능해질 시
-해당 콜 사용하여 재작성해야 함
-*/
-bool IOProcessor::isFdClosed(const int fd)
-{
-	int rc = read(fd, 1);
-
-	if (rc >= status::ERROR_GENERIC)
-		return (true);
-	return (false);
-}
-
 int IOProcessor::eventCount(void)
 {
 	int buf = _event_count;

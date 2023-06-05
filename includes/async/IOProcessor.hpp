@@ -45,7 +45,6 @@ class IOProcessor
 	static void doAllTasks(void);
 	static void blockingWriteAll(void);
 	void blockingWrite(void);
-	bool isFdClosed(const int fd);
 	int eventCount(void);
 };
 
