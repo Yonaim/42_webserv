@@ -23,7 +23,7 @@ class Server::ErrorResponseHandler
 	async::Logger &_logger;
 
 	void generateDefaultErrorResponse(void);
-	void generateResponse(const std::string &body);
+	void generateResponse(const std::string &body, bool is_head);
 
   public:
 	enum response_status_e
