@@ -1,5 +1,5 @@
-#ifndef ASYNC_FILEIOPROCESSOR_HPP
-#define ASYNC_FILEIOPROCESSOR_HPP
+#ifndef ASYNC_FILEIOHANDLER_HPP
+#define ASYNC_FILEIOHANDLER_HPP
 
 #include "async/SingleIOProcessor.hpp"
 #include "utils/shared_ptr.hpp"
@@ -9,7 +9,7 @@
 
 namespace async
 {
-class FileIOProcessor
+class FileIOHandler
 {
   protected:
 	ft::shared_ptr<SingleIOProcessor> _processor;
@@ -23,22 +23,22 @@ class FileIOProcessor
 	clock_t _next_timeout;
 	const bool _should_close; // 소멸자 호출시 fd를 close()해야하는지 여부
 
-	FileIOProcessor(unsigned int timeout_ms, int fd);
-	FileIOProcessor(unsigned int timeout_ms, const std::string &path);
+	FileIOHandler(unsigned int timeout_ms, int fd);
+	FileIOHandler(unsigned int timeout_ms, const std::string &path);
 
 	void renewTimeout(void);
 	bool checkTimeout(void);
 	bool openFdByPath(const char *mode);
 
   public:
-	virtual ~FileIOProcessor();
+	virtual ~FileIOHandler();
 
 	virtual int task(void) = 0;
 	const std::string &errorMsg(void) const;
 	std::string retrieve(void);
 };
 
-class FileWriter : public FileIOProcessor
+class FileWriter : public FileIOHandler
 {
   private:
 	const std::string _content;
@@ -52,7 +52,7 @@ class FileWriter : public FileIOProcessor
 	virtual int task(void);
 };
 
-class FileReader : public FileIOProcessor
+class FileReader : public FileIOHandler
 {
   private:
 	bool _is_fifo;

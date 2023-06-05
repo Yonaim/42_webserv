@@ -5,7 +5,7 @@ DIR_OBJS 			= objs/
 
 DIR_ASYNC			= async/
 DIR_ASYNC_IO 		= $(DIR_ASYNC)IOProcessor/
-DIR_ASYNCFILE		= $(DIR_ASYNC)FileIOProcessor/
+DIR_ASYNCFILE		= $(DIR_ASYNC)FileIOHandler/
 DIR_ASYNCLOGGER		= $(DIR_ASYNC)Logger/
 DIR_CONFIG_PARSER 	= ConfigParser/
 DIR_HTTP 			= HTTP/
@@ -52,7 +52,7 @@ FILENAMES			= \
 					$(DIR_ASYNC_IO)IOProcessor \
 					$(DIR_ASYNC_IO)SingleIOProcessor \
 					$(DIR_ASYNC_IO)TCPIOProcessor \
-					$(DIR_ASYNCFILE)FileIOProcessor \
+					$(DIR_ASYNCFILE)FileIOHandler \
 					$(DIR_ASYNCFILE)FileReader \
 					$(DIR_ASYNCFILE)FileWriter \
 					$(DIR_ASYNCLOGGER)Logger \

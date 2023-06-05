@@ -1,16 +1,16 @@
-#include "async/FileIOProcessor.hpp"
+#include "async/FileIOHandler.hpp"
 #include "async/status.hpp"
 #include "utils/file.hpp"
 
 using namespace async;
 
 FileReader::FileReader(unsigned int timeout_ms, int fd, bool is_fifo)
-	: FileIOProcessor(timeout_ms, fd), _is_fifo(is_fifo)
+	: FileIOHandler(timeout_ms, fd), _is_fifo(is_fifo)
 {
 }
 
 FileReader::FileReader(unsigned int timeout_ms, const std::string &path)
-	: FileIOProcessor(timeout_ms, path), _is_fifo(false)
+	: FileIOHandler(timeout_ms, path), _is_fifo(false)
 {
 }
 

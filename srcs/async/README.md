@@ -114,7 +114,7 @@ async::IOTaskHandler::`task()`;
 
 이때 `std::endl`에 상응하는 기능은 마련되어 있지 않다. `endl`은 입출력 작업이 완료될 때까지 블로킹하는 것을 의미하므로 본 기능에 적합하지 않다. 따라서 호출자는 매번 개행 문자를 삽입해야 한다.
 
-# async::FileIOProcessor
+# async::FileIOHandler
 
 이 클래스는 `SingleIOProcessor` 클래스를 계승하며, 한 파일(fd)에 대해 입출력 작업을 하는데, 생성시 시간 제한을 명시해야 하며 입출력 작업이 완료되었는지 확인할 수 있다.
 

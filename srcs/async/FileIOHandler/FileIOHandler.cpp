@@ -1,4 +1,4 @@
-#include "async/FileIOProcessor.hpp"
+#include "async/FileIOHandler.hpp"
 #include "async/status.hpp"
 #include "utils/file.hpp"
 #include "utils/string.hpp"
@@ -7,7 +7,7 @@
 using namespace async;
 typedef unsigned long long ull_t;
 
-bool FileIOProcessor::openFdByPath(const char *mode)
+bool FileIOHandler::openFdByPath(const char *mode)
 {
 	if (!_should_close)
 		return (false);
@@ -34,33 +34,32 @@ static clock_t msToClockT(const unsigned int ms)
 	return (result);
 }
 
-FileIOProcessor::FileIOProcessor(unsigned int timeout_ms, int fd)
+FileIOHandler::FileIOHandler(unsigned int timeout_ms, int fd)
 	: _processor(NULL), _stream(NULL), _fd(fd), _path(""),
 	  _status(status::OK_BEGIN), _buffer(""), _timeout(msToClockT(timeout_ms)),
 	  _next_timeout(clock() + _timeout), _should_close(false)
 {
 }
 
-FileIOProcessor::FileIOProcessor(unsigned int timeout_ms,
-								 const std::string &path)
+FileIOHandler::FileIOHandler(unsigned int timeout_ms, const std::string &path)
 	: _processor(NULL), _stream(NULL), _fd(-1), _path(path),
 	  _status(status::OK_BEGIN), _buffer(""), _timeout(msToClockT(timeout_ms)),
 	  _next_timeout(clock() + _timeout), _should_close(true)
 {
 }
 
-FileIOProcessor::~FileIOProcessor()
+FileIOHandler::~FileIOHandler()
 {
 	if (_should_close && _stream)
 		fclose(_stream);
 }
 
-void FileIOProcessor::renewTimeout(void)
+void FileIOHandler::renewTimeout(void)
 {
 	_next_timeout += _timeout;
 }
 
-bool FileIOProcessor::checkTimeout(void)
+bool FileIOHandler::checkTimeout(void)
 {
 	if (_timeout == 0)
 		return (false);
@@ -73,14 +72,14 @@ bool FileIOProcessor::checkTimeout(void)
 	return (false);
 }
 
-std::string FileIOProcessor::retrieve(void)
+std::string FileIOHandler::retrieve(void)
 {
 	if (_status != status::OK_DONE)
-		throw(std::logic_error("FileIOProcessor: File is not yet loaded."));
+		throw(std::logic_error("FileIOHandler: File is not yet loaded."));
 	return (_buffer);
 }
 
-const std::string &FileIOProcessor::errorMsg(void) const
+const std::string &FileIOHandler::errorMsg(void) const
 {
 	return (_error_msg);
 }
