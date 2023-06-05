@@ -176,6 +176,12 @@ void Server::registerRequest(int client_fd, const Request &request)
 	const int method = request.getMethod();
 	size_t location_body_size = location.getMaxBodySize();
 
+	if (_http_min_version > request.getVersion()
+		|| request.getVersion() > _http_max_version)
+	{
+		registerErrorResponse(client_fd, 505); // HTTP Version Not Supported
+		return;
+	}
 	if (location_body_size != _max_body_size
 		&& location_body_size < request.getBody().length())
 	{

@@ -33,6 +33,8 @@ class Server
 	typedef ft::shared_ptr<RequestHandler> _RequestHandlerPtr;
 	typedef ft::shared_ptr<CGI::RequestHandler> _CGIRequestHandlerPtr;
 
+	static const int _http_min_version; // should be min <= ver <= max
+	static const int _http_max_version; // (note that it is not min < ver < max)
 	int _port;
 	bool _has_server_name;
 	bool _cgi_enabled;
