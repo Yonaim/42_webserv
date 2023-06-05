@@ -148,13 +148,13 @@ int RequestHandlerPipe::waitRWOperation()
 
 int RequestHandlerPipe::waitExecution()
 {
-	int rc = ::waitpid(_pid, &_waitpid_status, WNOHANG);
+	pid_t pid = ::waitpid(_pid, &_waitpid_status, WNOHANG);
 
-	if (rc < 0)
+	if (pid < 0)
 	{
 		throw(std::runtime_error("failed to waitpid"));
 	}
-	else if (rc == 0)
+	else if (pid == 0)
 	{
 		LOG_DEBUG("waiting child");
 		checkTimeout();
