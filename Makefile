@@ -26,8 +26,14 @@ $(DIR_TESTOBJS)%.o: $(DIR_TESTSRCS)%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
 
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+
 $(NAME): $(OBJS) $(DIR_OBJS)main.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OBJS) $(DIR_OBJS)main.o -o $@ $(LDFLAGS)
+
+www/cgi_script/fortune.teapot: www/cgi-code/cgi_example.o
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) www/cgi-code/cgi_example.o -o $@ $(LDFLAGS)
 
 test_asyncio_echo: $(OBJS) $(DIR_TESTOBJS)test_asyncio_echo.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OBJS) $(DIR_TESTOBJS)test_asyncio_echo.o -o $@ $(LDFLAGS)
@@ -71,10 +77,10 @@ test_shared_ptr: $(OBJS) $(DIR_TESTOBJS)test_shared_ptr.o
 -include $(DEPS) $(TESTDRIVERDEPS)
 
 clean:
-	$(RM) $(DIR_OBJS) $(DIR_TESTOBJS)
+	$(RM) $(DIR_OBJS) $(DIR_TESTOBJS) www/cgi-code/cgi_example.o www/cgi-code/cgi_example.d
 
 fclean: clean
-	$(RM) $(NAME) $(TESTDRIVERNAMES)
+	$(RM) $(NAME) $(TESTDRIVERNAMES) www/cgi_script/fortune.teapot
 
 re: fclean
 	@make all
