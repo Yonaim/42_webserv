@@ -25,6 +25,7 @@ class Request
 	std::string _uri;
 	std::string _query_string;
 	std::string _version; // 1.1 2.0 1.0
+	int _version_num;     // 1001 2000 1000
 	Header _header;
 	std::string _body;
 	int _current_state; // enum parse_state_e
@@ -83,6 +84,8 @@ class Request
 	size_t countHeaderValue(const std::string &name) const;
 	int getMethod(void) const;
 	const std::string &getMethodString(void) const;
+	const int &getVersion(void) const;
+	const std::string &getVersionString(void) const;
 	const std::string &getURIPath(void) const;
 	const std::string &getQueryString(void) const;
 	const std::string &getBody(void) const;

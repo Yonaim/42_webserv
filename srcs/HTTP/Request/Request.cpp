@@ -77,6 +77,16 @@ const std::string &Request::getMethodString(void) const
 	return (HTTP::METHOD.getKeyByValue(_method));
 }
 
+const int &Request::getVersion(void) const
+{
+	return (_version_num);
+}
+
+const std::string &Request::getVersionString(void) const
+{
+	return (_version);
+}
+
 const std::string &Request::getURIPath(void) const
 {
 	return (_uri);

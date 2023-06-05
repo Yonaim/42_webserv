@@ -6,6 +6,29 @@
 
 using namespace HTTP;
 
+static int parseHTTPVersion(const std::string &http_version_str)
+{
+	static const std::string http_prefix = "HTTP/";
+
+	const size_t version_position = http_version_str.find(http_prefix);
+	if (version_position != 0)
+		throw(HTTP::InvalidValue());
+
+	const std::string version_str
+		= getbackstr(http_version_str, version_position + http_prefix.size());
+
+	const size_t dot_position = version_str.find(".");
+	if (dot_position == std::string::npos)
+		throw(HTTP::InvalidValue());
+
+	const std::string major_str = getfrontstr(version_str, dot_position);
+	const std::string minor_str = getbackstr(version_str, dot_position + 1);
+	const int major = toNum<int>(major_str);
+	const int minor = toNum<int>(minor_str);
+
+	return (major * 1000 + minor);
+}
+
 int Request::consumeLine(std::string &buffer, std::string &line,
 						 size_t &crlf_pos)
 {
@@ -68,9 +91,20 @@ int Request::consumeStartLine(std::string &buffer)
 	}
 	_version = tokens[2];
 
+	try
+	{
+		_version_num = parseHTTPVersion(tokens[2]);
+	}
+	catch (const std::invalid_argument &e)
+	{
+		LOG_WARNING(__func__ << ": invalid HTTP version");
+		throw(HTTP::InvalidValue());
+	}
+
 	LOG_VERBOSE(__func__ << ": URI: \"" << _uri << "\"");
 	LOG_VERBOSE(__func__ << ": QUERY: \"" << _query_string << "\"");
-	LOG_VERBOSE(__func__ << ": version: \"" << _version << "\"");
+	LOG_VERBOSE(__func__ << ": version: \"" << _version << "\" ("
+						 << _version_num << ")");
 	LOG_DEBUG(__func__ << ": buffer result in :\"" << buffer << "\"");
 	return (RETURN_TYPE_OK);
 }
