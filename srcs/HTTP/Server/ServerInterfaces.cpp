@@ -233,8 +233,7 @@ void Server::registerRequest(int client_fd, const Request &request)
 									 505); // HTTP Version Not Supported
 		return;
 	}
-	if (location_body_size != _max_body_size
-		&& location_body_size < request.getBody().length())
+	if (location_body_size < request.getBody().length())
 	{
 		registerErrorResponseHandler(client_fd, method, 413);
 		return;
