@@ -53,7 +53,7 @@ int Server::RequestGetHandler::task(void)
 		LOG_VERBOSE("Resource " << _resource_path
 								<< " is directory, attempt autoindex");
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
-		if (isDirectory() && _location.hasAutoIndex() == true)
+		if (_location.hasAutoIndex() == true)
 		{
 			_response.makeDirectoryListing(_resource_path,
 										   _request.getURIPath());
