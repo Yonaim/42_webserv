@@ -135,7 +135,6 @@ void WebServer::parseServer(const ConfigContext &server_context)
 	{
 		_tcp_procs[port]
 			= _TCPPtr(new async::TCPIOProcessor(port, _backlog_size));
-		_tcp_procs[port]->initialize();
 		LOG_VERBOSE("Created TCP IO Processor at port " << port);
 		_servers[port] = _Servers();
 		_request_buffer[port] = _ReqBufFdMap();

@@ -13,7 +13,6 @@ class SingleIOProcessor : public IOProcessor
 	int _event_option;
 
 	SingleIOProcessor();
-	void initialize(void);
 	virtual void task(void);
 
   public:
@@ -24,8 +23,7 @@ class SingleIOProcessor : public IOProcessor
 		IO_RW
 	};
 
-	SingleIOProcessor(const int fd);
-	SingleIOProcessor(const int fd, const int event_option);
+	SingleIOProcessor(const int fd, const int event_option = IO_RW);
 	virtual ~SingleIOProcessor();
 
 	void setWriteBuf(const std::string &str);

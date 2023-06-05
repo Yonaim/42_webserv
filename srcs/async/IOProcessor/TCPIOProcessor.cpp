@@ -14,6 +14,38 @@ TCPIOProcessor::TCPIOProcessor(const int port, const int backlog)
 	: _port(port), _backlog_size(backlog),
 	  _logger(Logger::getLogger("TCPIOProcessor"))
 {
+	int result;
+	_listening_socket = socket(PF_INET, SOCK_STREAM, 0);
+	if (_listening_socket < 0)
+		throw(std::runtime_error(std::string("Error while creating socket: ")
+								 + strerror(errno)));
+	int option = 1;
+	setsockopt(_listening_socket, SOL_SOCKET, SO_REUSEADDR, &option,
+			   sizeof(option));
+	LOG_INFO("Created socket " << _listening_socket);
+
+	struct sockaddr_in addr;
+	std::memset(&addr, 0, sizeof(struct sockaddr_in));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	addr.sin_port = htons(_port);
+	result = bind(_listening_socket, (struct sockaddr *)&addr,
+				  sizeof(struct sockaddr_in));
+	if (result < 0)
+		finalize(strerror(errno));
+	LOG_INFO("Bind socket " << _listening_socket << " at port " << _port);
+
+	result = listen(_listening_socket, _backlog_size);
+	if (result < 0)
+		finalize(strerror(errno));
+	LOG_INFO("Listen with backlog size " << _backlog_size);
+
+	result = fcntl(_listening_socket, F_SETFL, O_NONBLOCK);
+	if (result < 0)
+		finalize(strerror(errno));
+	_watchlist.push_back(constructKevent(_listening_socket, IOEVENT_READ));
+	flushKQueue();
+	LOG_VERBOSE("TCPIOProcessor initialization complete");
 }
 
 TCPIOProcessor::~TCPIOProcessor()
@@ -92,42 +124,6 @@ void TCPIOProcessor::task(void)
 		}
 	}
 	_status = status::OK_AGAIN;
-}
-
-void TCPIOProcessor::initialize(void)
-{
-	int result;
-	_listening_socket = socket(PF_INET, SOCK_STREAM, 0);
-	if (_listening_socket < 0)
-		throw(std::runtime_error(std::string("Error while creating socket: ")
-								 + strerror(errno)));
-	int option = 1;
-	setsockopt(_listening_socket, SOL_SOCKET, SO_REUSEADDR, &option,
-			   sizeof(option));
-	LOG_INFO("Created socket " << _listening_socket);
-
-	struct sockaddr_in addr;
-	std::memset(&addr, 0, sizeof(struct sockaddr_in));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	addr.sin_port = htons(_port);
-	result = bind(_listening_socket, (struct sockaddr *)&addr,
-				  sizeof(struct sockaddr_in));
-	if (result < 0)
-		finalize(strerror(errno));
-	LOG_INFO("Bind socket " << _listening_socket << " at port " << _port);
-
-	result = listen(_listening_socket, _backlog_size);
-	if (result < 0)
-		finalize(strerror(errno));
-	LOG_INFO("Listen with backlog size " << _backlog_size);
-
-	result = fcntl(_listening_socket, F_SETFL, O_NONBLOCK);
-	if (result < 0)
-		finalize(strerror(errno));
-	_watchlist.push_back(constructKevent(_listening_socket, IOEVENT_READ));
-	flushKQueue();
-	LOG_VERBOSE("TCPIOProcessor initialization complete");
 }
 
 void TCPIOProcessor::finalize(const char *with_error)
