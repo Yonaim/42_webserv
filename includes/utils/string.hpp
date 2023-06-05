@@ -4,7 +4,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "HTTP/ParsingFail.hpp"
 
 // parsing
 bool hasSpace(const std::string &key);
@@ -106,13 +105,14 @@ template <typename T> T toHexNum(const std::string &str)
 
 	if (!(ss >> std::hex >> num))
 	{
-		throw HTTP::InvalidValue();
+		throw(std::invalid_argument("String is not representing hex: " + str));
 	}
 
 	char remaining;
 	if (ss >> remaining)
 	{
-		throw HTTP::InvalidValue();
+		throw(std::invalid_argument(
+			"Leftover character after str to hex convertion: " + str));
 	}
 	return (num);
 }
