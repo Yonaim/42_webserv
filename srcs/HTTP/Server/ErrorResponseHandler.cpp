@@ -1,4 +1,5 @@
 #include "HTTP/Server.hpp"
+#include "HTTP/const_values.hpp"
 #include "HTTP/error_pages.hpp"
 
 using namespace HTTP;
@@ -14,7 +15,8 @@ Server::ErrorResponseHandler::ErrorResponseHandler(
 	if (_server->_error_page_paths.find(_code)
 		== _server->_error_page_paths.end())
 	{
-		generateResponse(generateErrorPage(_code));
+		generateResponse(generateErrorPage(_code),
+						 _request_method == METHOD_HEAD);
 		_status = RESPONSE_STATUS_OK;
 		return;
 	}
@@ -27,18 +29,23 @@ Server::ErrorResponseHandler::~ErrorResponseHandler()
 {
 }
 
-void Server::ErrorResponseHandler::generateResponse(const std::string &body)
+void Server::ErrorResponseHandler::generateResponse(const std::string &body,
+													bool is_head)
 {
 	_response.setStatus(_code);
-	_response.setBody(body);
-	_response.setContentLength(body.length());
+	if (is_head)
+		_response.setContentLength(0);
+	else
+	{
+		_response.setBody(body);
+		_response.setContentLength(body.length());
+	}
 	_response.setContentType("text/html");
 }
 
 int Server::ErrorResponseHandler::task(void)
 {
 	LOG_DEBUG("ErrorResponseHandler status " << _status);
-	// TODO: HEAD일 시 바디 없는 리스폰스 만들기
 	switch (_status)
 	{
 	case RESPONSE_STATUS_OK:
@@ -48,7 +55,8 @@ int Server::ErrorResponseHandler::task(void)
 		int rc = _reader->task();
 		if (rc == async::status::OK_DONE)
 		{
-			generateResponse(_reader->retrieve());
+			generateResponse(_reader->retrieve(),
+							 _request_method == METHOD_HEAD);
 			_status = RESPONSE_STATUS_OK;
 		}
 		else if (rc == async::status::OK_AGAIN)
@@ -59,7 +67,8 @@ int Server::ErrorResponseHandler::task(void)
 		{
 			LOG_ERROR("Timeout while opening error page: "
 					  + _reader->errorMsg());
-			generateResponse(generateErrorPage(_code));
+			generateResponse(generateErrorPage(_code),
+							 _request_method == METHOD_HEAD);
 			_status = RESPONSE_STATUS_OK;
 		}
 		else
@@ -67,7 +76,8 @@ int Server::ErrorResponseHandler::task(void)
 			LOG_ERROR("Unknown error while loading error page for code "
 					  << _code);
 			std::string body = generateErrorPage(_code);
-			generateResponse(generateErrorPage(_code));
+			generateResponse(generateErrorPage(_code),
+							 _request_method == METHOD_HEAD);
 			_status = RESPONSE_STATUS_OK;
 		}
 		break;
