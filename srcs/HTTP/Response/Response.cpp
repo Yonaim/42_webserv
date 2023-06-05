@@ -5,6 +5,7 @@
 #include "utils/string.hpp"
 #include <ctime>
 #include <dirent.h>
+#include <sys/stat.h>
 
 using namespace HTTP;
 
@@ -95,6 +96,18 @@ void Response::makeBody(void)
 	_response.append(_body);
 }
 
+void Response::alignAutoIndex(size_t minus_len, int to_align)
+{
+	if (!(AUTOINDEX_ALIGN_FILE_NAME <= to_align
+		  && to_align <= AUTOINDEX_ALIGN_FILE_SIZE))
+		throw std::runtime_error("alignAutoIndex: wrong argument(to_align)");
+
+	const int size[] = {51, 20};
+	int align_size = size[to_align] - minus_len;
+	for (int i = 0; i < align_size; ++i)
+		_body.append(" ");
+}
+
 void Response::makeDirectoryListing(const std::string &path,
 									const std::string &uri)
 {
@@ -112,11 +125,13 @@ void Response::makeDirectoryListing(const std::string &path,
 				   "<hr><pre><a href=\"../\">../</a>\n");
 
 	/* 각 파일에 대한 내용을 추가 */
+	struct stat file_info;
 	DIR *dir_stream;
 	struct dirent *dir_info;
 	std::string file_name;
 	std::string file_path;
 	std::string file_size;
+	static char modified_time[18];
 
 	dir_stream = ::opendir(path.c_str());
 
@@ -126,9 +141,23 @@ void Response::makeDirectoryListing(const std::string &path,
 	{
 		file_name = dir_info->d_name;
 		file_path = path + "/" + file_name;
-		if (::isDirectory(file_path))
-			file_name += '/';
-		_body.append("<a href=\"" + file_name + "\">" + file_name + "</a>\n");
+		if (stat(file_path.c_str(), &file_info) == 0)
+		{
+			if (file_info.st_mode & S_IFDIR)
+				file_name += '/';
+			_body.append("<a href=\"" + file_name + "\">" + file_name + "</a>");
+			strftime(modified_time, sizeof(modified_time), "%d-%b-%Y %R",
+					 gmtime(&file_info.st_mtimespec.tv_sec));
+			alignAutoIndex(file_name.length(), AUTOINDEX_ALIGN_FILE_NAME);
+			_body.append(modified_time);
+			if (file_info.st_mode & S_IFDIR)
+				file_size = "-";
+			else
+				file_size = toStr(file_info.st_size);
+			alignAutoIndex(file_size.length(), AUTOINDEX_ALIGN_FILE_SIZE);
+			_body.append(file_size);
+			_body.append("\n");
+		}
 	}
 	::closedir(dir_stream);
 
