@@ -90,24 +90,6 @@ unsigned int Server::getTimeout(void) const
 	return (_timeout_ms);
 }
 
-std::string Server::getErrorPage(const int code)
-{
-	if (_error_page_paths.find(code) == _error_page_paths.end())
-		return (generateErrorPage(code));
-
-	_FileReaderPtr &reader = _error_page_readers[_error_page_paths[code]];
-	int rc = reader->task();
-	if (rc == async::status::OK_DONE)
-		return (reader->retrieve());
-	else if (rc == async::status::OK_AGAIN)
-		return (generateErrorPage(code));
-	else if (rc == async::status::ERROR_TIMEOUT)
-		LOG_ERROR("Timeout while opening error page: " + reader->errorMsg());
-	else
-		LOG_ERROR("Unknown error while loading error page for code " << code);
-	return ("");
-}
-
 const Server::Location &Server::getLocation(const std::string &path) const
 {
 	size_t cmp_diff;

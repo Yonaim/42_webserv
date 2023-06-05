@@ -17,7 +17,7 @@ Server::RequestDeleteHandler::~RequestDeleteHandler()
 
 int Server::RequestDeleteHandler::task(void)
 {
-	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
+	if (_status == RESPONSE_STATUS_OK || _status == RESPONSE_STATUS_ERROR)
 		return (_status);
 
 	if (std::remove(_resource_path.c_str()) == -1)
@@ -26,14 +26,13 @@ int Server::RequestDeleteHandler::task(void)
 		{
 		case ENOENT:
 			// Not Found;
-			_response = _server->generateErrorResponse(404);
+			setErrorCode(404);
 			break;
 		default:
 			// Internal Server Error;
-			_response = _server->generateErrorResponse(500);
+			setErrorCode(500);
 			break;
 		}
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 	}
 	else
 	{

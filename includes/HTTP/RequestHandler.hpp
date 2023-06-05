@@ -18,16 +18,18 @@ class Server::RequestHandler
 	const Server::Location &_location;
 	Server *_server;
 	int _status;
+	int _error_code;
 	std::string _resource_path;
 	async::Logger &_logger;
 
-	void registerErrorResponse(const int code);
+	void setErrorCode(const int code);
 
   public:
 	enum response_status_e
 	{
 		RESPONSE_STATUS_OK = 0,
-		RESPONSE_STATUS_AGAIN
+		RESPONSE_STATUS_AGAIN,
+		RESPONSE_STATUS_ERROR
 	};
 
 	RequestHandler(Server *server, const Request &request,
@@ -37,9 +39,11 @@ class Server::RequestHandler
 
 	virtual int task(void) = 0;
 	Response retrieve(void);
+	const int &errorCode(void) const;
 
 	bool isDirectory(void) const;
 	bool isInvalidDirectoryFormat(void) const;
+	const Request &getRequest(void) const;
 };
 
 class Server::RequestGetHandler : public Server::RequestHandler

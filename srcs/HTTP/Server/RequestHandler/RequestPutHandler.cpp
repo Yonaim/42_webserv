@@ -12,8 +12,8 @@ Server::RequestPutHandler::RequestPutHandler(Server *server,
 {
 	if (!location.uploadAllowed())
 	{
-		_response = _server->generateErrorResponse(500);
-		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+		setErrorCode(500);
+		_status = Server::RequestHandler::RESPONSE_STATUS_ERROR;
 		LOG_WARNING("This location doesn't allow upload");
 	}
 }
@@ -24,7 +24,7 @@ Server::RequestPutHandler::~RequestPutHandler()
 
 int Server::RequestPutHandler::task(void)
 {
-	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
+	if (_status == RESPONSE_STATUS_OK || _status == RESPONSE_STATUS_ERROR)
 		return (_status);
 
 	int rc = _writer.task();
@@ -48,12 +48,12 @@ int Server::RequestPutHandler::task(void)
 	else if (rc == async::status::ERROR_FILEOPENING)
 	{
 		LOG_WARNING(_writer.errorMsg());
-		registerErrorResponse(503); // Service Unavailable
+		setErrorCode(503); // Service Unavailable
 	}
 	else
 	{
 		LOG_WARNING(_writer.errorMsg());
-		registerErrorResponse(500); // Internal Server Error
+		setErrorCode(500); // Internal Server Error
 	}
 	return (_status);
 }

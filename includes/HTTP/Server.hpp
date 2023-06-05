@@ -25,6 +25,7 @@ class Server
 	class RequestPostHandler;
 	class RequestPutHandler;
 	class RequestDeleteHandler;
+	class ErrorResponseHandler;
 
   private:
 	class Location;
@@ -32,6 +33,7 @@ class Server
 	typedef ft::shared_ptr<async::FileReader> _FileReaderPtr;
 	typedef ft::shared_ptr<RequestHandler> _RequestHandlerPtr;
 	typedef ft::shared_ptr<CGI::RequestHandler> _CGIRequestHandlerPtr;
+	typedef ft::shared_ptr<ErrorResponseHandler> _ErrorResponseHandlerPtr;
 
 	static const int _http_min_version; // should be min <= ver <= max
 	static const int _http_max_version; // (note that it is not min < ver < max)
@@ -40,13 +42,13 @@ class Server
 	bool _cgi_enabled;
 	std::set<std::string> _server_name;
 	std::map<int, std::string> _error_page_paths;
-	std::map<std::string, _FileReaderPtr> _error_page_readers;
 	std::map<std::string, Location> _locations;
 	std::map<std::string, std::string> _cgi_ext_to_path;
 	std::string _temp_dir_path;
 	std::set<int> _allowed_cgi_methods;
 	std::map<int, std::queue<_RequestHandlerPtr> > _request_handlers;
 	std::map<int, std::queue<_CGIRequestHandlerPtr> > _cgi_handlers;
+	std::map<int, std::queue<_ErrorResponseHandlerPtr> > _error_handlers;
 	std::map<int, std::queue<Response> > _output_queue;
 	size_t _max_body_size;
 	const unsigned int _timeout_ms;
@@ -64,9 +66,9 @@ class Server
 	void parseDirectiveTmpDirPath(const ConfigContext &server_context);
 
 	// utils of interfaces
-	Response generateErrorResponse(const int code);
 	void iterateRequestHandlers(void);
 	void iterateCGIHandlers(void);
+	void iterateErrorHandlers(void);
 
   public:
 	class ServerError;
@@ -86,10 +88,10 @@ class Server
 	void registerHTTPRequest(int client_fd, const Request &request,
 							 const Location &location,
 							 const std::string &resource_path);
+	void registerErrorResponseHandler(int client_fd, int method, int code);
 	void registerRequest(int client_fd, const Request &request);
 	Response retrieveResponse(int client_fd);
 	void registerRedirectResponse(int fd, const Server::Location &location);
-	void registerErrorResponse(int fd, int code);
 	void disconnect(int client_fd);
 
 	// methods
@@ -102,11 +104,11 @@ class Server
 	bool isCGIextension(const std::string &path) const;
 	int getPort(void) const;
 	unsigned int getTimeout(void) const;
-	std::string getErrorPage(int code);
 	const Location &getLocation(const std::string &location) const;
 };
 } // namespace HTTP
 
+#include "ErrorResponseHandler.hpp"
 #include "HTTP/ServerError.hpp"
 #include "HTTP/ServerLocation.hpp"
 #include "RequestHandler.hpp"

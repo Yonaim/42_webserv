@@ -17,13 +17,14 @@ Server::RequestHeadHandler::~RequestHeadHandler()
 
 int Server::RequestHeadHandler::task(void)
 {
-	if (_status == Server::RequestHandler::RESPONSE_STATUS_OK)
+	if (_status == RESPONSE_STATUS_OK || _status == RESPONSE_STATUS_ERROR)
 		return (_status);
 
 	if (isInvalidDirectoryFormat())
 	{
-		_response = _server->generateErrorResponse(301); // Not Found;
-		_response.setValue("Location", _request.getURIPath() + "/");
+		_response.setStatus(301);
+		_response.setLocation(_request.getURIPath() + "/");
+		_response.setContentLength(0);
 		_status = Server::RequestHandler::RESPONSE_STATUS_OK;
 		LOG_WARNING("invalid directory format, redirect to \""
 					<< _request.getURIPath() + "\"");
@@ -46,17 +47,17 @@ int Server::RequestHeadHandler::task(void)
 	else if (rc == async::status::ERROR_FILEISDIR)
 	{
 		LOG_WARNING(_reader.errorMsg());
-		registerErrorResponse(404); // Not Found
+		setErrorCode(404); // Not Found
 	}
 	else if (rc == async::status::ERROR_FILEOPENING)
 	{
 		LOG_WARNING(_reader.errorMsg());
-		registerErrorResponse(404); // Not Found
+		setErrorCode(404); // Not Found
 	}
 	else
 	{
 		LOG_WARNING(_reader.errorMsg());
-		registerErrorResponse(500); // Internal Server Error
+		setErrorCode(500); // Internal Server Error
 	}
 	return (_status);
 }

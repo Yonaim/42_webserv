@@ -21,10 +21,10 @@ Server::RequestHandler::~RequestHandler()
 {
 }
 
-void Server::RequestHandler::registerErrorResponse(const int code)
+void Server::RequestHandler::setErrorCode(const int code)
 {
-	_response = _server->generateErrorResponse(code);
-	_status = Server::RequestHandler::RESPONSE_STATUS_OK;
+	_error_code = code;
+	_status = Server::RequestHandler::RESPONSE_STATUS_ERROR;
 }
 
 Response Server::RequestHandler::retrieve(void)
@@ -46,4 +46,14 @@ bool Server::RequestHandler::isInvalidDirectoryFormat(void) const
 	if (isDirectory() && _resource_path[_resource_path.size() - 1] != '/')
 		return (true);
 	return (false);
+}
+
+const int &Server::RequestHandler::errorCode(void) const
+{
+	return (_error_code);
+}
+
+const Request &Server::RequestHandler::getRequest(void) const
+{
+	return (_request);
 }
