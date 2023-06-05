@@ -100,8 +100,10 @@ std::string Server::getErrorPage(const int code)
 	else if (rc == async::status::OK_AGAIN)
 		return (generateErrorPage(code));
 	else if (rc == async::status::ERROR_TIMEOUT)
-		LOG_ERROR(_error_pages[code]->errorMsg());
-	LOG_ERROR("Unknown error while loading error page for code " << code);
+		LOG_ERROR("Timeout while opening error page: "
+				  + _error_pages[code]->errorMsg());
+	else
+		LOG_ERROR("Unknown error while loading error page for code " << code);
 	return ("");
 }
 
