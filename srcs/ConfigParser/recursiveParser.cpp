@@ -92,7 +92,7 @@ ConfigDirectivePtr parseAvailableConfigDirective(
 	{
 		return (parseConfigDirective(cursor, tokens));
 	}
-	catch (const std::exception &e)
+	catch (const ConfigDirective::InvalidDirective &e)
 	{
 		(void)e;
 	}
