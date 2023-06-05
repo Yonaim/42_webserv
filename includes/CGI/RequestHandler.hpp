@@ -54,6 +54,7 @@ class RequestHandler
 
 	virtual int task(void) = 0;
 	const Response &retrieve(void);
+	std::string getMethod(void) const;
 };
 
 class RequestHandlerPipe : public RequestHandler

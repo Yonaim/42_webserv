@@ -149,3 +149,8 @@ void Request::addMetaVariable(const std::string &name, const std::string &value)
 		_meta_variables.insert(std::pair<std::string, std::string>(name, ""));
 	_meta_variables[name] = value;
 }
+
+std::string Request::getMethod(void) const
+{
+	return (_meta_variables.find("REQUEST_METHOD")->second);
+}

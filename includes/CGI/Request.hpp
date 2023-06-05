@@ -20,7 +20,6 @@ class Request
 	Request(const Request &orig);
 	const Request &operator=(const Request &orig);
 
-
 	// getter
 	char *const *getEnv(void) const;
 	const std::string &getPath(void) const;
@@ -29,6 +28,7 @@ class Request
 	void addMetaVariable(const std::string &name, const std::string &value);
 	bool isProtocolSpecificHeader(const std::string &name) const;
 	std::string toHTTPvarname(const std::string &name) const;
+	std::string getMethod(void) const;
 };
 } // namespace CGI
 

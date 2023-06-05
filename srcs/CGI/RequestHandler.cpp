@@ -58,3 +58,8 @@ const CGI::Response &RequestHandler::retrieve(void)
 		throw(std::runtime_error("CGI Response has not been made yet."));
 	return (_response);
 }
+
+std::string RequestHandler::getMethod(void) const
+{
+	return (_request.getMethod());
+}
