@@ -14,8 +14,10 @@ RequestHandlerVnode::RequestHandlerVnode(const Request &request,
 										 const unsigned int timeout_ms,
 										 const std::string &temp_dir_path)
 	: RequestHandler(request, exec_path, timeout_ms),
-	  _input_file_path(temp_dir_path + "/" + generateHash(toStr(clock()))),
-	  _output_file_path(temp_dir_path + "/" + generateHash(toStr(clock()))),
+	  _input_file_path(temp_dir_path + "/"
+					   + generateHash(toStr(clock()) + "input")),
+	  _output_file_path(temp_dir_path + "/"
+						+ generateHash(toStr(clock()) + "output")),
 	  _timeout_ms(timeout_ms)
 {
 	_writer = new async::FileWriter(_timeout_ms, _input_file_path,
