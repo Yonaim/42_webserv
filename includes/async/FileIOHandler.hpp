@@ -56,6 +56,7 @@ class FileReader : public FileIOHandler
 {
   private:
 	bool _is_fifo;
+	size_t _filesize;
 
   public:
 	FileReader(unsigned int timeout_ms, int fd, bool is_fifo);

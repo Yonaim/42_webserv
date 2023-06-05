@@ -28,10 +28,14 @@ int FileReader::task(void)
 		{
 			return (_status);
 		}
-		if (!_is_fifo && getFileSize(_path) == 0)
+		if (!_is_fifo)
 		{
-			_status = status::OK_DONE;
-			return (_status);
+			_filesize = getFileSize(_path);
+			if (_filesize == 0)
+			{
+				_status = status::OK_DONE;
+				return (_status);
+			}
 		}
 		_processor = ft::shared_ptr<SingleIOProcessor>(
 			new SingleIOProcessor(_fd, SingleIOProcessor::IO_R));
@@ -43,6 +47,12 @@ int FileReader::task(void)
 	if (checkTimeout())
 		return (_status);
 	_processor->getReadBuf(_buffer);
+
+	if (!_is_fifo && _filesize == _buffer.size())
+	{
+		_status = status::OK_DONE;
+		return (_status);
+	}
 
 	switch (_processor->stat())
 	{
