@@ -107,7 +107,7 @@ std::string Server::Location::generateResourcePath(const Request &req) const
 
 	uri_path.replace(0, _path.length(), _alias);
 	LOG_VERBOSE(__func__ << ": after \"" << uri_path << "\"");
-	if (req.getURIPath()[req.getURIPath().size() - 1] == '/' && _has_index)
+	if (uri_path[uri_path.length() - 1] == '/' && _has_index)
 	{
 		uri_path += _index;
 		LOG_VERBOSE(__func__ << ": add index to URI path, result: \""
