@@ -14,10 +14,6 @@
 #include <iostream>
 #include <map>
 
-// 일단 INDEX.HTML도 만들어야할듯
-//  서버 설정 conf파일도 잘 작성해야할듯?
-//  이 cgi 프로그램 실행하는 location은 /fortune으로 하는거 어떰?
-
 void printError(void)
 {
 	std::cout << "Content-Type: text/html\r\n";
@@ -58,6 +54,12 @@ void printResult(const std::string &name, const std::string &result)
 	else
 		std::cout << "<h1>Welcome!</h1>\n";
 	std::cout << "<h1>Your Fortune : " << result << "</h1>\n";
+	std::cout << "<img src=\"../fortune/img/fortune_cookie_image.jpg\" "
+				 "alt=\"Fortune Cookie "
+				 "Image\">\n";
+	std::cout << "<img src=\"fortune_cookie_image.jpg\" alt=\"Fortune Cookie "
+				 "Image\">\n";
+	std::cout << "<p><a href=\"index.html\">Back to Index</a></p>\n";
 	std::cout << "</body>\n";
 	std::cout << "</html>\n";
 }
@@ -103,9 +105,6 @@ int main(void)
 	std::string query = getEnv("QUERY_STRING");
 	std::string method = getEnv("REQUEST_METHOD");
 
-	// getenv에서 NULL 주면 어떻게 처리해요?
-	// QUERY_STRING이 없을 때 -> getEnv 함수 만들어서 사용했는데 괜찮을까요..?
-	// 테이팍님 뭐하시나용?
 	if (method == "GET")
 	{
 		const std::string param_name = "name";

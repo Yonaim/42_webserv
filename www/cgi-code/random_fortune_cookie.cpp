@@ -14,10 +14,6 @@
 #include <iostream>
 #include <map>
 
-// 일단 INDEX.HTML도 만들어야할듯
-//  서버 설정 conf파일도 잘 작성해야할듯?
-//  이 cgi 프로그램 실행하는 location은 /fortune으로 하는거 어떰?
-
 void printError(void)
 {
 	std::cout << "Content-Type: text/html\r\n";
@@ -57,6 +53,8 @@ void printResult(const std::string &name, const std::string &result)
 		std::cout << "<h1>Welcome, " << name << "!</h1>\n";
 	else
 		std::cout << "<h1>Welcome!</h1>\n";
+	std::cout << "<img src=\"../fortune/img/fortune_cookie_image.jpg\" alt=\"Fortune Cookie "
+				 "Image\">\n";
 	std::cout << "<h1>Your Fortune : " << result << "</h1>\n";
 	std::cout << "</body>\n";
 	std::cout << "</html>\n";
@@ -64,7 +62,17 @@ void printResult(const std::string &name, const std::string &result)
 
 std::string getRandomFortune(void)
 {
-	static const std::string fortunes[] = {"fine", "good", "hello", "awesome"};
+	static const std::string fortunes[]
+		= {"Nothing astonishes men so much as common sense and plain dealing.",
+		   "The greatest risk is not taking one.",
+		   "You are very talented in many ways.",
+		   "The man or woman you desire feels the same about you.",
+		   "You already know the answer to the questions lingering inside your "
+		   "head.",
+		   "You learn from your mistakes... You will learn a lot today.",
+		   "Never give up. You're not a failure if you don't give up.",
+		   "Be on the lookout for coming events; They cast their shadows "
+		   "beforehand."};
 	const int n_fortunes = sizeof(fortunes) / sizeof(fortunes[0]);
 
 	std::srand(std::time(NULL));
