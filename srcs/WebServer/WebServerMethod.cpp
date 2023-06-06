@@ -90,10 +90,10 @@ void WebServer::resetRequestBuffer(int port, int client_fd)
 
 void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 {
-	try
+	for (_Servers::iterator it = _servers[port].begin();
+		 it != _servers[port].end(); it++)
 	{
-		for (_Servers::iterator it = _servers[port].begin();
-			 it != _servers[port].end(); it++)
+		try
 		{
 			if ((*it)->isForMe(request))
 			{
@@ -101,10 +101,17 @@ void WebServer::registerRequest(int port, int client_fd, HTTP::Request &request)
 				return;
 			}
 		}
-	}
-	catch (const HTTP::Server::InvalidRequest &e)
-	{
-		LOG_WARNING(e.what());
+		catch (const HTTP::Server::LocationNotFound &e)
+		{
+			LOG_WARNING(e.what());
+			(*it)->registerErrorResponseHandler(client_fd, request.getMethod(), 404);
+			return;
+		}
+		catch (const HTTP::Server::InvalidRequest &e)
+		{
+			LOG_WARNING(e.what());
+			break;
+		}
 	}
 	LOG_WARNING("No matching server for " << request.getHeaderValue("Host", 0));
 	// 일치하는 Host가 없을 시, 해당 포트의 server_name이 없는 서버를 찾아보고
