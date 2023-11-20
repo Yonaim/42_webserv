@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!/usr/bin/env python
 # Import modules for CGI handling 
 from os import environ
 import fileinput
